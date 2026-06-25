@@ -8,9 +8,9 @@
     <!-- ===== Firebase SDK ===== -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <style>
-        /* ===== إعادة التعيين الأساسية ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         
         body {
@@ -41,7 +41,21 @@
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
         }
-        /* ===== خلفية الفيديو ===== */
+        
+        .custom-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            transition: all 0.8s ease;
+            opacity: 0;
+        }
+        .custom-bg.active {
+            opacity: 1;
+        }
+        .animated-bg.hidden {
+            opacity: 0;
+        }
+
         .video-bg {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -56,13 +70,14 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             z-index: 1;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
             display: none;
         }
         .video-bg-overlay.active {
             display: block;
         }
+
         .main-content {
             position: relative;
             z-index: 2;
@@ -187,7 +202,7 @@
             min-height: 24px;
         }
 
-        /* ===== الهيدر مع الإشعارات ===== */
+        /* ===== الهيدر ===== */
         .header {
             background: rgba(255,255,255,0.06);
             backdrop-filter: blur(16px);
@@ -263,6 +278,8 @@
         .btn-sm { padding: 6px 14px; font-size: 12px; }
         .btn-danger-sm { background: rgba(255,59,48,0.1); color: #ff3b30; border: 1px solid rgba(255,59,48,0.05); }
         .btn-danger-sm:hover { background: rgba(255,59,48,0.15); }
+        .btn-upload { background: rgba(90,200,250,0.1); color: #5ac8fa; border: 1px solid rgba(90,200,250,0.05); }
+        .btn-upload:hover { background: rgba(90,200,250,0.15); }
 
         /* ===== الإحصائيات ===== */
         .stats-grid {
@@ -611,7 +628,7 @@
             display: inline-flex;
         }
 
-        /* ===== ترقيم الصفحات (Pagination) ===== */
+        /* ===== ترقيم الصفحات ===== */
         .pagination {
             display: flex;
             justify-content: center;
@@ -686,7 +703,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ===== إعدادات الخلفية والحساب ===== */
+        /* ===== إعدادات الخلفية ===== */
         .settings-section {
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.05);
@@ -745,6 +762,134 @@
             width: 100%;
             max-height: 200px;
             object-fit: cover;
+        }
+
+        /* ===== مدير الخلفيات المتعددة ===== */
+        .bg-manager {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .bg-manager .bg-item {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 14px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .bg-manager .bg-item:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,215,0,0.08);
+        }
+        .bg-manager .bg-item .bg-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background-size: cover;
+            background-position: center;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .bg-manager .bg-item .bg-name {
+            font-weight: 700;
+            font-size: 13px;
+            color: #fff;
+        }
+        .bg-manager .bg-item .bg-status {
+            font-size: 11px;
+            color: rgba(255,255,255,0.2);
+            margin-top: 2px;
+        }
+        .bg-manager .bg-item .bg-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .bg-manager .bg-item .bg-actions button {
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .bg-manager .bg-item .bg-actions button:hover {
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+        }
+        .bg-manager .bg-item .bg-actions .btn-active {
+            border-color: rgba(76,217,100,0.2);
+            color: #4cd964;
+        }
+        .bg-manager .bg-item .bg-actions .btn-active:hover {
+            background: rgba(76,217,100,0.05);
+        }
+        .bg-manager .bg-item .bg-actions .btn-delete-bg {
+            border-color: rgba(255,59,48,0.1);
+            color: rgba(255,59,48,0.3);
+        }
+        .bg-manager .bg-item .bg-actions .btn-delete-bg:hover {
+            background: rgba(255,59,48,0.05);
+            color: #ff3b30;
+        }
+        .bg-manager .bg-item .bg-actions .btn-edit-bg {
+            border-color: rgba(255,215,0,0.1);
+            color: rgba(255,215,0,0.3);
+        }
+        .bg-manager .bg-item .bg-actions .btn-edit-bg:hover {
+            background: rgba(255,215,0,0.05);
+            color: #ffd700;
+        }
+        .bg-manager .bg-item.active-bg {
+            border-color: rgba(76,217,100,0.2);
+            background: rgba(76,217,100,0.03);
+        }
+
+        /* ===== إعدادات تناوب الخلفيات ===== */
+        .bg-rotation-settings {
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        .bg-rotation-settings .rotation-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .bg-rotation-settings .rotation-row label {
+            color: rgba(255,255,255,0.3);
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .bg-rotation-settings .rotation-row input[type="number"] {
+            width: 80px;
+            padding: 6px 12px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.02);
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            text-align: center;
+        }
+        .bg-rotation-settings .rotation-row input[type="number"]:focus {
+            border-color: rgba(255,215,0,0.15);
+        }
+        .bg-rotation-settings .rotation-row .rotation-status {
+            font-size: 12px;
+            color: rgba(255,255,255,0.12);
+        }
+        .bg-rotation-settings .rotation-row .rotation-status.active {
+            color: #4cd964;
         }
 
         /* ===== عرض الطلبات ===== */
@@ -1065,7 +1210,7 @@
             background: rgba(90,200,250,0.05);
         }
 
-        /* ===== العملاء - تحديد وحذف ===== */
+        /* ===== العملاء ===== */
         .customer-select-all {
             display: flex;
             align-items: center;
@@ -1100,7 +1245,7 @@
             cursor: pointer;
         }
 
-        /* ===== بطاقة الطباعة (موجهة للبائع) ===== */
+        /* ===== بطاقة الطباعة ===== */
         .print-card {
             display: none;
             background: #fff;
@@ -1282,6 +1427,137 @@
         }
         .toast.show { transform: translateY(0); opacity: 1; }
 
+        /* ===== نفاذ المخزن ===== */
+        .out-of-stock-section {
+            margin-top: 20px;
+            background: rgba(255,59,48,0.05);
+            border: 1px solid rgba(255,59,48,0.1);
+            border-radius: 16px;
+            padding: 16px;
+            display: none;
+        }
+        .out-of-stock-section .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .out-of-stock-section .header-row h3 {
+            color: #ff3b30;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .out-of-stock-section .header-row h3 .count {
+            background: #ff3b30;
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .out-of-stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .out-of-stock-item {
+            background: rgba(255,59,48,0.08);
+            border: 1px solid rgba(255,59,48,0.15);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+        }
+        .out-of-stock-item .badge-out {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ff3b30;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .out-of-stock-item .img-container {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.02);
+            margin-bottom: 8px;
+        }
+        .out-of-stock-item .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .out-of-stock-item .img-container .no-img {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: rgba(255,59,48,0.1);
+        }
+        .out-of-stock-item .name {
+            font-weight: 700;
+            color: #ff3b30;
+            font-size: 14px;
+        }
+        .out-of-stock-item .price {
+            font-size: 12px;
+            color: rgba(255,255,255,0.2);
+        }
+        .out-of-stock-item .status {
+            font-size: 11px;
+            color: #ff3b30;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .out-of-stock-item .actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .out-of-stock-item .actions button {
+            font-size: 10px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.02);
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .out-of-stock-item .actions button:hover {
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+        }
+        .out-of-stock-item .actions .btn-edit {
+            border-color: rgba(255,215,0,0.1);
+            color: rgba(255,215,0,0.3);
+        }
+        .out-of-stock-item .actions .btn-edit:hover {
+            background: rgba(255,215,0,0.05);
+            color: #ffd700;
+        }
+        .out-of-stock-item .actions .btn-restock {
+            border-color: rgba(76,217,100,0.1);
+            color: rgba(76,217,100,0.3);
+        }
+        .out-of-stock-item .actions .btn-restock:hover {
+            background: rgba(76,217,100,0.05);
+            color: #4cd964;
+        }
+
         /* ===== استجابة ===== */
         @media (max-width: 768px) {
             .form-row { grid-template-columns: 1fr; }
@@ -1304,6 +1580,9 @@
             .search-sort-bar { flex-direction: column; }
             .search-sort-bar .search-filters { width: 100%; }
             .search-sort-bar .search-filters select { flex: 1; min-width: 0; }
+            .bg-manager { grid-template-columns: 1fr; }
+            .bg-rotation-settings .rotation-row { flex-direction: column; align-items: stretch; }
+            .out-of-stock-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
         }
         @media (max-width: 480px) {
             .stats-grid { grid-template-columns: 1fr; }
@@ -1317,16 +1596,13 @@
             .print-card .print-products th,
             .print-card .print-products td { padding: 6px 8px; }
             .pagination button { padding: 6px 12px; font-size: 11px; }
+            .out-of-stock-grid { grid-template-columns: 1fr 1fr; }
         }
 
         /* ===== الطباعة ===== */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            .print-card, .print-card * {
-                visibility: visible;
-            }
+            body * { visibility: hidden; }
+            .print-card, .print-card * { visibility: visible; }
             .print-card {
                 display: block !important;
                 position: fixed;
@@ -1339,34 +1615,24 @@
                 z-index: 9999;
                 overflow-y: auto;
             }
-            .print-card .print-header h1 {
-                font-size: 22px;
-            }
+            .print-card .print-header h1 { font-size: 22px; }
             .print-card .print-info-grid .info-box,
-            .print-card .print-customer-box {
-                background: #f5f5f7 !important;
-            }
-            .print-card .print-products th {
-                background: #f5f5f7 !important;
-            }
-            .print-card .print-total {
-                background: #f5f5f7 !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .print-card .print-products .product-img-col img {
-                max-width: 40px;
-                max-height: 40px;
-            }
+            .print-card .print-customer-box { background: #f5f5f7 !important; }
+            .print-card .print-products th { background: #f5f5f7 !important; }
+            .print-card .print-total { background: #f5f5f7 !important; }
+            .no-print { display: none !important; }
+            .print-card .print-products .product-img-col img { max-width: 40px; max-height: 40px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== خلفية الفيديو ===== -->
+    <!-- ===== خلفيات ===== -->
     <video class="video-bg" id="videoBg" autoplay loop muted playsinline></video>
     <div class="video-bg-overlay" id="videoBgOverlay"></div>
+    <div class="animated-bg" id="defaultBg"></div>
+    <div class="custom-bg" id="customBg"></div>
+    <div class="bg-overlay"></div>
 
     <!-- ===== صفحة تسجيل الدخول ===== -->
     <div class="login-page" id="loginPage">
@@ -1433,6 +1699,10 @@
                 <div class="number" id="repeatCustomers">0</div>
                 <div class="label">👤 عملاء متكررون</div>
             </div>
+            <div class="stat-card" style="border-color:rgba(255,59,48,0.1);">
+                <div class="number" id="outOfStockCount" style="background:linear-gradient(135deg, #ff3b30, #d63031); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">0</div>
+                <div class="label">🚫 نفاذ المخزن</div>
+            </div>
         </div>
 
         <!-- ===== تبويبات ===== -->
@@ -1445,9 +1715,8 @@
 
         <!-- ===== تبويب المنتجات ===== -->
         <div class="tab-content active" id="tab-products">
-            <!-- ===== شريط البحث والترتيب المتقدم ===== -->
             <div class="search-sort-bar">
-                <input type="text" class="search-input" id="productSearchInput" placeholder="🔍 بحث عن منتج (الاسم، الوصف، السعر...)">
+                <input type="text" class="search-input" id="productSearchInput" placeholder="🔍 بحث عن منتج...">
                 <div class="search-filters">
                     <select id="searchCategory">
                         <option value="all">📂 كل التصنيفات</option>
@@ -1501,11 +1770,21 @@
                 </table>
             </div>
 
-            <!-- ===== ترقيم الصفحات (Pagination) ===== -->
             <div class="pagination" id="productPagination">
                 <button onclick="changeProductPage('prev')" id="prevPageBtn">‹ السابق</button>
                 <span class="page-info">الصفحة <span id="currentPage">1</span> من <span id="totalPages">1</span></span>
                 <button onclick="changeProductPage('next')" id="nextPageBtn">التالي ›</button>
+            </div>
+
+            <!-- ===== قسم نفاذ المخزن ===== -->
+            <div class="out-of-stock-section" id="outOfStockSection">
+                <div class="header-row">
+                    <h3>🚫 نفاذ المخزن <span class="count" id="outOfStockCountLabel">0</span></h3>
+                    <button class="btn btn-outline btn-sm" onclick="toggleOutOfStock()">🔄 إخفاء/إظهار</button>
+                </div>
+                <div class="out-of-stock-grid" id="outOfStockList">
+                    <!-- يتم ملؤها بواسطة JavaScript -->
+                </div>
             </div>
         </div>
 
@@ -1576,6 +1855,7 @@
 
         <!-- ===== تبويب الإعدادات ===== -->
         <div class="tab-content" id="tab-settings">
+            <!-- ===== إعدادات الحساب ===== -->
             <div class="settings-section">
                 <h3>🔐 إعدادات الحساب</h3>
                 <div class="form-row">
@@ -1592,26 +1872,60 @@
                 <button class="btn btn-outline" onclick="resetCredentials()" style="margin-right:10px;">🔄 إعادة الضبط الافتراضي</button>
             </div>
 
+            <!-- ===== مدير الخلفيات المتعددة ===== -->
             <div class="settings-section">
-                <h3>🎨 تخصيص الخلفية</h3>
+                <h3>🎨 مدير الخلفيات المتعددة</h3>
                 <p style="color:rgba(255,255,255,0.2); font-size:13px; margin-bottom:12px;">
-                    أدخل كود CSS مخصص للخلفية
+                    أضف خلفيات CSS متعددة واختر أي منها تريد عرضها في الموقع الرئيسي، مع إمكانية التناوب بينها
                 </p>
-                <textarea id="bgCssInput" placeholder="ضع هنا كود CSS للخلفية المخصصة..."></textarea>
-                <button class="btn btn-success" onclick="saveBackgroundSettings()" style="margin-top:12px;">
-                    💾 حفظ الخلفية
-                </button>
-                <button class="btn btn-outline" onclick="resetBackgroundSettings()" style="margin-top:12px; margin-right:10px;">
-                    🔄 إعادة الخلفية الافتراضية
-                </button>
+                
+                <div style="background:rgba(255,255,255,0.02); border-radius:12px; padding:14px; margin-bottom:14px; border:1px solid rgba(255,255,255,0.03);">
+                    <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; align-items:end;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>اسم الخلفية</label>
+                            <input type="text" id="newBgName" placeholder="مثال: خلفية نجومية" style="width:100%; padding:8px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); background:rgba(255,255,255,0.02); color:#fff;">
+                        </div>
+                        <button class="btn btn-success" onclick="addNewBackground()" style="height:42px;">➕ إضافة</button>
+                    </div>
+                    <div class="form-group" style="margin-top:10px; margin-bottom:0;">
+                        <label>كود CSS للخلفية</label>
+                        <textarea id="newBgCss" placeholder="ضع هنا كود CSS للخلفية..." style="min-height:80px; width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.03); background:rgba(255,255,255,0.02); color:#fff; font-family:monospace;"></textarea>
+                    </div>
+                </div>
+
+                <div class="bg-rotation-settings">
+                    <div class="rotation-row">
+                        <label>🔄 التناوب التلقائي:</label>
+                        <select id="rotationEnabled" onchange="toggleRotation()" style="padding:6px 14px; border-radius:30px; border:1px solid rgba(255,255,255,0.03); background:rgba(255,255,255,0.02); color:#fff;">
+                            <option value="false">❌ معطل</option>
+                            <option value="true">✅ مفعل</option>
+                        </select>
+                        <label>⏱️ المدة (ثانية):</label>
+                        <input type="number" id="rotationInterval" value="10" min="3" max="120">
+                        <span class="rotation-status" id="rotationStatus">⏸️ غير مفعل</span>
+                    </div>
+                </div>
+
+                <div class="bg-manager" id="bgManager">
+                    <div style="grid-column:1/-1; text-align:center; padding:20px; color:rgba(255,255,255,0.06);">
+                        ⏳ جاري تحميل الخلفيات...
+                    </div>
+                </div>
             </div>
 
+            <!-- ===== خلفية الفيديو ===== -->
             <div class="settings-section">
                 <h3>🎬 خلفية فيديو</h3>
                 <p style="color:rgba(255,255,255,0.2); font-size:13px; margin-bottom:12px;">
-                    أدخل رابط فيديو (YouTube, Facebook, أو رابط مباشر) ليكون خلفية للموقع
+                    أدخل رابط فيديو أو ارفع فيديو من جهازك ليكون خلفية للموقع الرئيسي
                 </p>
-                <input type="text" class="video-url-input" id="videoUrlInput" placeholder="https://www.youtube.com/watch?v=..." value="">
+                <div style="display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center;">
+                    <input type="text" class="video-url-input" id="videoUrlInput" placeholder="https://www.youtube.com/watch?v=... أو رابط مباشر" value="">
+                    <button class="btn btn-upload btn-sm" onclick="document.getElementById('videoFileInput').click()" style="white-space:nowrap;">
+                        📁 رفع فيديو
+                    </button>
+                </div>
+                <input type="file" id="videoFileInput" accept="video/*" style="display:none;" onchange="uploadVideoFile(event)">
                 <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
                     <button class="btn btn-success" onclick="saveVideoBackground()">💾 حفظ الفيديو</button>
                     <button class="btn btn-outline" onclick="removeVideoBackground()">🗑️ إزالة الفيديو</button>
@@ -1620,7 +1934,7 @@
                     <video controls id="previewVideo"></video>
                 </div>
                 <div style="margin-top:12px; font-size:12px; color:rgba(255,255,255,0.08);">
-                    <i class="fas fa-info-circle"></i> يمكنك استخدام روابط يوتيوب (سيتم تحويلها تلقائياً) أو روابط مباشرة للفيديو
+                    <i class="fas fa-info-circle"></i> يمكنك استخدام روابط يوتيوب (سيتم تحويلها تلقائياً) أو روابط مباشرة للفيديو، أو رفع فيديو من جهازك
                 </div>
             </div>
             
@@ -1739,11 +2053,6 @@
 
     </div>
 
-    <!-- ===== الخلفيات ===== -->
-    <div class="animated-bg" id="defaultBg"></div>
-    <div class="custom-bg" id="customBg"></div>
-    <div class="bg-overlay"></div>
-
     <script>
         // ============================================================
         // 1. تكوين Firebase
@@ -1759,33 +2068,28 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+        const storage = firebase.storage();
 
         // ============================================================
-        // 2. دالة تحويل كود اللون إلى اسم
+        // 2. المتغيرات العامة
         // ============================================================
-        function getColorName(hexCode) {
-            const colorMap = {
-                '#ff3b30': 'أحمر',
-                '#007aff': 'أزرق',
-                '#34c759': 'أخضر',
-                '#ffd700': 'أصفر',
-                '#ff9500': 'برتقالي',
-                '#ff2d55': 'وردي',
-                '#af52de': 'بنفسجي',
-                '#8d6e63': 'بني',
-                '#8e8e93': 'رمادي',
-                '#1d1d1f': 'أسود',
-                '#ffffff': 'أبيض',
-                '#f5e6d3': 'بيج',
-                '#ff6b6b': 'أحمر فاتح',
-                '#4cd964': 'أخضر فاتح',
-                '#5ac8fa': 'أزرق فاتح'
-            };
-            return colorMap[hexCode] || hexCode;
-        }
+        let products = [];
+        let allOrders = [];
+        let allCustomers = [];
+        let selectedCustomers = new Set();
+        let selectedColors = [];
+        let selectedSizes = [];
+        let uploadedImages = [];
+        let editingId = null;
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let filteredProducts = [];
+        let rotationTimer = null;
+        let backgrounds = [];
+        let allBgData = {};
 
         // ============================================================
-        // 3. إدارة تسجيل الدخول (تشفير قوي SHA-256)
+        // 3. دوال تسجيل الدخول
         // ============================================================
         async function hashPassword(password) {
             const encoder = new TextEncoder();
@@ -1795,10 +2099,7 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        let adminCredentials = {
-            username: 'admin',
-            passwordHash: ''
-        };
+        let adminCredentials = { username: 'admin', passwordHash: '' };
 
         async function initCredentials() {
             database.ref('settings/admin').once('value', async (snapshot) => {
@@ -1846,7 +2147,7 @@
                 loadProductsFromDB();
                 loadOrdersFromDB();
                 loadCustomersFromDB();
-                loadBackgroundSettings();
+                loadBackgroundsFromDB();
                 loadVideoBackground();
                 startOrderNotifications();
             } else {
@@ -1863,6 +2164,7 @@
                 document.getElementById('loginPassword').value = '';
                 showToast('🚪 تم تسجيل الخروج');
                 stopOrderNotifications();
+                stopRotation();
             }
         }
 
@@ -1878,7 +2180,7 @@
                 loadProductsFromDB();
                 loadOrdersFromDB();
                 loadCustomersFromDB();
-                loadBackgroundSettings();
+                loadBackgroundsFromDB();
                 loadVideoBackground();
                 startOrderNotifications();
             }
@@ -1892,7 +2194,6 @@
                 showToast('⚠️ يرجى إدخال اسم المستخدم وكلمة المرور الجديدة');
                 return;
             }
-
             if (newPassword.length < 6) {
                 showToast('⚠️ كلمة المرور يجب أن تكون 6 أحرف على الأقل');
                 return;
@@ -2013,19 +2314,7 @@
         }
 
         // ============================================================
-        // 5. دخول بضغط Enter
-        // ============================================================
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                if (document.getElementById('loginPage') && 
-                    !document.getElementById('loginPage').classList.contains('hidden')) {
-                    login();
-                }
-            }
-        });
-
-        // ============================================================
-        // 6. البيانات الثابتة
+        // 5. دوال المنتجات
         // ============================================================
         const AVAILABLE_COLORS = [
             { name: 'أحمر', code: '#ff3b30' }, { name: 'أزرق', code: '#007aff' },
@@ -2037,29 +2326,6 @@
         ];
         const AVAILABLE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', 'One Size'];
 
-        let selectedColors = [];
-        let selectedSizes = [];
-        let uploadedImages = [];
-        let editingId = null;
-        let allOrders = [];
-        let allCustomers = [];
-        let products = [];
-        let selectedCustomers = new Set();
-
-        // ============================================================
-        // 7. متغيرات البحث والترتيب والترقيم
-        // ============================================================
-        let currentPage = 1;
-        const itemsPerPage = 10;
-        let filteredProducts = [];
-        let currentSearchTerm = '';
-        let currentCategoryFilter = 'all';
-        let currentSubCategoryFilter = 'all';
-        let currentSortFilter = 'name-asc';
-
-        // ============================================================
-        // 8. تهيئة الألوان والمقاسات
-        // ============================================================
         function initColorPicker() {
             const container = document.getElementById('colorPicker');
             container.innerHTML = '';
@@ -2118,7 +2384,7 @@
         }
 
         // ============================================================
-        // 9. رفع الصور
+        // 6. رفع الصور
         // ============================================================
         document.getElementById('imageInput').addEventListener('change', function(e) {
             const files = Array.from(e.target.files);
@@ -2153,7 +2419,7 @@
         }
 
         // ============================================================
-        // 10. فتح/إغلاق النموذج
+        // 7. نموذج المنتج
         // ============================================================
         function openAddForm() {
             editingId = null;
@@ -2203,7 +2469,7 @@
         }
 
         // ============================================================
-        // 11. حفظ المنتج
+        // 8. حفظ المنتج
         // ============================================================
         function saveProduct(e) {
             e.preventDefault();
@@ -2254,7 +2520,7 @@
         }
 
         // ============================================================
-        // 12. حذف منتج
+        // 9. حذف منتج
         // ============================================================
         function deleteProduct(productId) {
             if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
@@ -2264,7 +2530,7 @@
         }
 
         // ============================================================
-        // 13. تبديل حالة الرائج
+        // 10. تبديل حالة الرائج
         // ============================================================
         function togglePopular(productId, currentStatus) {
             database.ref(`products/${productId}/popular`).set(!currentStatus)
@@ -2276,7 +2542,7 @@
         }
 
         // ============================================================
-        // 14. جلب وعرض المنتجات مع البحث والترتيب والترقيم
+        // 11. جلب وعرض المنتجات مع قسم نفاذ المخزن
         // ============================================================
         function loadProductsFromDB() {
             database.ref('products').on('value', (snapshot) => {
@@ -2289,6 +2555,7 @@
                 applyProductFilters();
                 updateStats(products);
                 updateSettingsStats(products);
+                updateOutOfStockSection();
             });
         }
 
@@ -2298,12 +2565,6 @@
             const subCategory = document.getElementById('searchSubCategory').value;
             const sort = document.getElementById('searchSort').value;
 
-            currentSearchTerm = searchTerm;
-            currentCategoryFilter = category;
-            currentSubCategoryFilter = subCategory;
-            currentSortFilter = sort;
-
-            // تطبيق الفلاتر
             let filtered = products.filter(p => {
                 const matchSearch = !searchTerm || 
                     p.name.toLowerCase().includes(searchTerm) ||
@@ -2314,7 +2575,6 @@
                 return matchSearch && matchCategory && matchSubCategory;
             });
 
-            // تطبيق الترتيب
             switch(sort) {
                 case 'name-asc': filtered.sort((a, b) => a.name.localeCompare(b.name)); break;
                 case 'name-desc': filtered.sort((a, b) => b.name.localeCompare(a.name)); break;
@@ -2332,7 +2592,6 @@
             renderProductsTableWithPagination();
             updatePagination();
 
-            // إظهار زر إلغاء البحث إذا كان هناك بحث
             const clearBtn = document.getElementById('clearSearchBtn');
             if (searchTerm || category !== 'all' || subCategory !== 'all') {
                 clearBtn.classList.add('show');
@@ -2366,19 +2625,23 @@
                 const realIndex = start + index + 1;
                 const hasDiscount = p.oldPrice && p.oldPrice > p.price;
                 const isLowStock = p.stock <= 5;
-                const imagesCount = p.images ? p.images.length : 0;
+                const isOutOfStock = p.stock === 0 || p.stock < 1;
+
+                const rowStyle = isOutOfStock ? 'background:rgba(255,59,48,0.05);' : '';
 
                 return `
-                    <tr>
+                    <tr style="${rowStyle}">
                         <td>${realIndex}</td>
-                        <td>
+                        <td style="position:relative;">
                             ${p.images && p.images.length > 0 
-                                ? `<img src="${p.images[0]}" class="product-thumb" onclick="previewProductImages('${p.id}')" title="معاينة الصور">`
-                                : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.06);">📷</div>`
+                                ? `<img src="${p.images[0]}" class="product-thumb" onclick="previewProductImages('${p.id}')" title="معاينة الصور" style="${isOutOfStock ? 'opacity:0.4;' : ''}">`
+                                : `<div class="product-thumb" style="display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.06);${isOutOfStock ? 'opacity:0.4;' : ''}">📷</div>`
                             }
+                            ${isOutOfStock ? `<div style="position:absolute; top:-2px; right:-2px; background:#ff3b30; color:#fff; font-size:8px; padding:1px 8px; border-radius:10px; font-weight:700;">نفد</div>` : ''}
                         </td>
                         <td>
-                            <strong>${p.name}</strong>
+                            <strong style="${isOutOfStock ? 'color:#ff3b30;' : ''}">${p.name}</strong>
+                            ${isOutOfStock ? '<br><span class="badge badge-danger">🚫 غير متوفر</span>' : ''}
                             ${p.badge ? `<br><span class="badge ${p.popular ? 'badge-pin' : 'badge-info'}">${p.badge}</span>` : ''}
                             ${p.popular ? '<br><span class="badge badge-pin">📍 رائج</span>' : ''}
                         </td>
@@ -2387,27 +2650,30 @@
                                 ? `<div><span style="color:#ffd700;font-weight:900;">${p.price.toLocaleString()} دج</span>
                                    <br><span style="color:rgba(255,255,255,0.08);font-size:11px;text-decoration:line-through;">${p.oldPrice.toLocaleString()} دج</span>
                                    <br><span class="badge badge-danger">-${Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)}%</span></div>`
-                                : `<span style="font-weight:700; color:rgba(255,255,255,0.5);">${p.price.toLocaleString()} دج</span>`
+                                : `<span style="font-weight:700; color:${isOutOfStock ? 'rgba(255,59,48,0.3)' : 'rgba(255,255,255,0.5)'};">${p.price.toLocaleString()} دج</span>`
                             }
                         </td>
                         <td>
                             <div class="color-dots">
-                                ${p.colors ? p.colors.slice(0, 4).map(c => `<span class="color-dot" style="background:${c};"></span>`).join('') : ''}
+                                ${p.colors ? p.colors.slice(0, 4).map(c => `<span class="color-dot" style="background:${c};${isOutOfStock ? 'opacity:0.3;' : ''}"></span>`).join('') : ''}
                                 ${p.colors && p.colors.length > 4 ? `<span style="font-size:10px; color:rgba(255,255,255,0.08);">+${p.colors.length - 4}</span>` : ''}
                             </div>
                         </td>
                         <td>
-                            ${p.sizes ? p.sizes.slice(0, 4).map(s => `<span class="badge badge-info">${s}</span>`).join('') : ''}
+                            ${p.sizes ? p.sizes.slice(0, 4).map(s => `<span class="badge badge-info" style="${isOutOfStock ? 'opacity:0.3;' : ''}">${s}</span>`).join('') : ''}
                             ${p.sizes && p.sizes.length > 4 ? `<span style="font-size:10px; color:rgba(255,255,255,0.08);">+${p.sizes.length - 4}</span>` : ''}
                         </td>
                         <td>
-                            <span class="badge ${isLowStock ? 'badge-warning' : 'badge-success'}">
-                                ${p.stock} قطعة
-                            </span>
-                            ${isLowStock ? '<br><small style="color:#ffd700;">⚠️ مخزون منخفض</small>' : ''}
+                            ${isOutOfStock 
+                                ? `<span class="badge badge-danger">🚫 0 قطعة</span>`
+                                : `<span class="badge ${isLowStock ? 'badge-warning' : 'badge-success'}">
+                                    ${p.stock} قطعة
+                                   </span>`
+                            }
+                            ${isLowStock && !isOutOfStock ? '<br><small style="color:#ffd700;">⚠️ مخزون منخفض</small>' : ''}
                         </td>
                         <td style="text-align:center;">
-                            <button class="btn ${p.popular ? 'btn-warning' : 'btn-outline'} btn-sm" onclick="togglePopular('${p.id}', ${p.popular || false})">
+                            <button class="btn ${p.popular ? 'btn-warning' : 'btn-outline'} btn-sm" onclick="togglePopular('${p.id}', ${p.popular || false})" ${isOutOfStock ? 'disabled style="opacity:0.3;"' : ''}>
                                 ${p.popular ? '📍' : '📌'}
                             </button>
                         </td>
@@ -2416,6 +2682,7 @@
                                 <button class="btn btn-outline btn-sm" onclick="previewProductImages('${p.id}')" title="معاينة الصور">🖼️</button>
                                 <button class="btn btn-warning btn-sm" onclick="openEditForm('${p.id}')" title="تعديل">✏️</button>
                                 <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')" title="حذف">🗑️</button>
+                                ${isOutOfStock ? `<button class="btn btn-success btn-sm" onclick="restockProduct('${p.id}')" title="إعادة تخزين">📦</button>` : ''}
                             </div>
                         </td>
                     </tr>
@@ -2485,9 +2752,6 @@
             });
         }
 
-        // ============================================================
-        // 15. ترقيم الصفحات (Pagination)
-        // ============================================================
         function updatePagination() {
             const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
             document.getElementById('currentPage').textContent = currentPage;
@@ -2505,12 +2769,11 @@
             }
             renderProductsTableWithPagination();
             updatePagination();
-            // تمرير إلى أعلى الجدول
             document.querySelector('.table-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // ============================================================
-        // 16. الإحصائيات
+        // 12. الإحصائيات
         // ============================================================
         function updateStats(products) {
             document.getElementById('totalProducts').textContent = products.length;
@@ -2518,6 +2781,7 @@
             document.getElementById('totalStock').textContent = totalStock;
             document.getElementById('lowStock').textContent = products.filter(p => p.stock <= 5).length;
             document.getElementById('popularCount').textContent = products.filter(p => p.popular).length;
+            document.getElementById('outOfStockCount').textContent = products.filter(p => p.stock === 0 || p.stock < 1).length;
         }
 
         function updateSettingsStats(products) {
@@ -2527,7 +2791,74 @@
         }
 
         // ============================================================
-        // 17. الطلبات مع طباعة موجهة للبائع
+        // 13. قسم نفاذ المخزن
+        // ============================================================
+        function updateOutOfStockSection() {
+            const outOfStockProducts = products.filter(p => p.stock === 0 || p.stock < 1);
+            const section = document.getElementById('outOfStockSection');
+            const count = document.getElementById('outOfStockCountLabel');
+            const list = document.getElementById('outOfStockList');
+
+            if (outOfStockProducts.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            count.textContent = outOfStockProducts.length;
+
+            list.innerHTML = outOfStockProducts.map(p => `
+                <div class="out-of-stock-item">
+                    <div class="badge-out">🚫 غير متوفر</div>
+                    <div class="img-container">
+                        ${p.images && p.images[0] 
+                            ? `<img src="${p.images[0]}" alt="${p.name}">` 
+                            : `<div class="no-img">📷</div>`
+                        }
+                    </div>
+                    <div class="name">${p.name}</div>
+                    <div class="price">${p.price.toLocaleString()} دج</div>
+                    <div class="status">⛔ نفد المخزون</div>
+                    <div class="actions">
+                        <button class="btn-edit" onclick="openEditForm('${p.id}')">✏️ تعديل</button>
+                        <button class="btn-restock" onclick="restockProduct('${p.id}')">📦 إعادة تخزين</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function restockProduct(productId) {
+            const newStock = prompt('📦 أدخل الكمية الجديدة للمخزون:', '10');
+            if (newStock === null) return;
+            
+            const quantity = parseInt(newStock);
+            if (isNaN(quantity) || quantity < 1) {
+                showToast('⚠️ يرجى إدخال كمية صحيحة (1 أو أكثر)');
+                return;
+            }
+
+            database.ref(`products/${productId}/stock`).set(quantity)
+                .then(() => {
+                    showToast(`✅ تم تحديث المخزون إلى ${quantity} قطعة`);
+                    loadProductsFromDB();
+                })
+                .catch((error) => {
+                    console.error(error);
+                    showToast('⚠️ حدث خطأ في تحديث المخزون');
+                });
+        }
+
+        function toggleOutOfStock() {
+            const list = document.getElementById('outOfStockList');
+            if (list.style.display === 'none') {
+                list.style.display = 'grid';
+            } else {
+                list.style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        // 14. الطلبات مع تحديث المخزون تلقائياً
         // ============================================================
         function loadOrdersFromDB() {
             database.ref('orders').on('value', (snapshot) => {
@@ -2546,15 +2877,72 @@
         }
 
         function updateOrderStats(orders) {
-            const newCount = orders.filter(o => o.status === 'جديد').length;
-            const processingCount = orders.filter(o => o.status === 'قيد المعالجة').length;
-            const shippedCount = orders.filter(o => o.status === 'تم الشحن').length;
-            const cancelledCount = orders.filter(o => o.status === 'ملغي').length;
-            
-            document.getElementById('newOrdersCount').textContent = newCount;
-            document.getElementById('processingOrdersCount').textContent = processingCount;
-            document.getElementById('shippedOrdersCount').textContent = shippedCount;
-            document.getElementById('cancelledOrdersCount').textContent = cancelledCount;
+            document.getElementById('newOrdersCount').textContent = orders.filter(o => o.status === 'جديد').length;
+            document.getElementById('processingOrdersCount').textContent = orders.filter(o => o.status === 'قيد المعالجة').length;
+            document.getElementById('shippedOrdersCount').textContent = orders.filter(o => o.status === 'تم الشحن').length;
+            document.getElementById('cancelledOrdersCount').textContent = orders.filter(o => o.status === 'ملغي').length;
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            if (newStatus === 'تم الشحن') {
+                database.ref(`orders/${orderId}`).once('value', (snapshot) => {
+                    const order = snapshot.val();
+                    if (!order || !order.products) {
+                        showToast('⚠️ لا توجد منتجات في هذا الطلب');
+                        return;
+                    }
+
+                    const updates = {};
+                    let productCount = 0;
+                    let updatedCount = 0;
+
+                    order.products.forEach((product) => {
+                        if (product.id) {
+                            productCount++;
+                            database.ref(`products/${product.id}/stock`).once('value', (stockSnapshot) => {
+                                const currentStock = stockSnapshot.val() || 0;
+                                const newStock = Math.max(0, currentStock - (product.quantity || 1));
+                                updates[`products/${product.id}/stock`] = newStock;
+                                updatedCount++;
+
+                                if (updatedCount === productCount) {
+                                    database.ref().update(updates)
+                                        .then(() => {
+                                            database.ref(`orders/${orderId}/status`).set(newStatus)
+                                                .then(() => {
+                                                    showToast(`✅ تم شحن الطلب وتحديث المخزون تلقائياً`);
+                                                    loadProductsFromDB();
+                                                    loadOrdersFromDB();
+                                                });
+                                        })
+                                        .catch((error) => {
+                                            console.error('خطأ في تحديث المخزون:', error);
+                                            showToast('⚠️ حدث خطأ في تحديث المخزون');
+                                        });
+                                }
+                            });
+                        }
+                    });
+
+                    if (productCount === 0) {
+                        database.ref(`orders/${orderId}/status`).set(newStatus)
+                            .then(() => {
+                                showToast(`✅ تم شحن الطلب (لا يوجد تغيير في المخزون)`);
+                                loadOrdersFromDB();
+                            });
+                    }
+                });
+            } else {
+                database.ref(`orders/${orderId}/status`).set(newStatus)
+                    .then(() => {
+                        showToast(`✅ تم تحديث حالة الطلب إلى: ${newStatus}`);
+                        loadOrdersFromDB();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        showToast('⚠️ حدث خطأ في تحديث الحالة');
+                    });
+            }
         }
 
         function renderOrders(orders) {
@@ -2668,7 +3056,9 @@
                                     `<button class="btn-process" onclick="updateOrderStatus('${order.id}', 'قيد المعالجة')">⚙️ قيد المعالجة</button>` : ''
                                 }
                                 ${order.status === 'قيد المعالجة' ? 
-                                    `<button class="btn-ship" onclick="updateOrderStatus('${order.id}', 'تم الشحن')">🚚 تم الشحن</button>` : ''
+                                    `<button class="btn-ship" onclick="updateOrderStatus('${order.id}', 'تم الشحن')" style="border-color:rgba(76,217,100,0.2); color:#4cd964; font-weight:700;">
+                                        🚚 شحن (تحديث المخزون)
+                                    </button>` : ''
                                 }
                                 ${order.status !== 'ملغي' && order.status !== 'تم الشحن' ? 
                                     `<button class="btn-cancel" onclick="cancelOrder('${order.id}')">❌ إلغاء</button>` : ''
@@ -2687,8 +3077,53 @@
             }).join('');
         }
 
+        function cancelOrder(orderId) {
+            if (!confirm('⚠️ هل أنت متأكد من إلغاء هذا الطلب؟')) return;
+            
+            database.ref(`orders/${orderId}`).once('value', (snapshot) => {
+                const order = snapshot.val();
+                if (!order) return;
+
+                database.ref(`orders/${orderId}/status`).set('ملغي')
+                    .then(() => {
+                        const phone = order.phone;
+                        if (phone) {
+                            database.ref('customers').orderByChild('phone').equalTo(phone).once('value', (snap) => {
+                                const existing = snap.val();
+                                if (existing) {
+                                    const key = Object.keys(existing)[0];
+                                    database.ref(`customers/${key}/cancelledOrders`).set(
+                                        (existing[key].cancelledOrders || 0) + 1
+                                    );
+                                }
+                            });
+                        }
+                        showToast('❌ تم إلغاء الطلب');
+                        loadOrdersFromDB();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        showToast('⚠️ حدث خطأ في إلغاء الطلب');
+                    });
+            });
+        }
+
+        function deleteOrder(orderId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الطلب الملغي؟')) return;
+            database.ref(`orders/${orderId}`).remove()
+                .then(() => { showToast('🗑️ تم حذف الطلب الملغي'); loadOrdersFromDB(); })
+                .catch((error) => { console.error(error); showToast('⚠️ حدث خطأ في حذف الطلب'); });
+        }
+
+        function deleteShippedOrder(orderId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الطلب المشحون؟ هذا الإجراء نهائي.')) return;
+            database.ref(`orders/${orderId}`).remove()
+                .then(() => { showToast('🗑️ تم حذف الطلب المشحون'); loadOrdersFromDB(); })
+                .catch((error) => { console.error(error); showToast('⚠️ حدث خطأ في حذف الطلب'); });
+        }
+
         // ============================================================
-        // 18. طباعة تفاصيل الطلب (موجهة للبائع)
+        // 15. طباعة الطلب
         // ============================================================
         function printOrderDetails(orderId) {
             const order = allOrders.find(o => o.id === orderId);
@@ -2838,81 +3273,7 @@
         }
 
         // ============================================================
-        // 19. دوال الطلبات
-        // ============================================================
-        function updateOrderStatus(orderId, newStatus) {
-            database.ref(`orders/${orderId}/status`).set(newStatus)
-                .then(() => {
-                    showToast(`✅ تم تحديث حالة الطلب إلى: ${newStatus}`);
-                    loadOrdersFromDB();
-                })
-                .catch((error) => {
-                    console.error(error);
-                    showToast('⚠️ حدث خطأ في تحديث الحالة');
-                });
-        }
-
-        function cancelOrder(orderId) {
-            if (!confirm('⚠️ هل أنت متأكد من إلغاء هذا الطلب؟')) return;
-            
-            database.ref(`orders/${orderId}`).once('value', (snapshot) => {
-                const order = snapshot.val();
-                if (!order) return;
-
-                database.ref(`orders/${orderId}/status`).set('ملغي')
-                    .then(() => {
-                        const phone = order.phone;
-                        if (phone) {
-                            database.ref('customers').orderByChild('phone').equalTo(phone).once('value', (snap) => {
-                                const existing = snap.val();
-                                if (existing) {
-                                    const key = Object.keys(existing)[0];
-                                    database.ref(`customers/${key}/cancelledOrders`).set(
-                                        (existing[key].cancelledOrders || 0) + 1
-                                    );
-                                }
-                            });
-                        }
-                        showToast('❌ تم إلغاء الطلب');
-                        loadOrdersFromDB();
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                        showToast('⚠️ حدث خطأ في إلغاء الطلب');
-                    });
-            });
-        }
-
-        function deleteOrder(orderId) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الطلب الملغي؟')) return;
-            
-            database.ref(`orders/${orderId}`).remove()
-                .then(() => {
-                    showToast('🗑️ تم حذف الطلب الملغي');
-                    loadOrdersFromDB();
-                })
-                .catch((error) => {
-                    console.error(error);
-                    showToast('⚠️ حدث خطأ في حذف الطلب');
-                });
-        }
-
-        function deleteShippedOrder(orderId) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الطلب المشحون؟ هذا الإجراء نهائي.')) return;
-            
-            database.ref(`orders/${orderId}`).remove()
-                .then(() => {
-                    showToast('🗑️ تم حذف الطلب المشحون');
-                    loadOrdersFromDB();
-                })
-                .catch((error) => {
-                    console.error(error);
-                    showToast('⚠️ حدث خطأ في حذف الطلب');
-                });
-        }
-
-        // ============================================================
-        // 20. العملاء
+        // 16. العملاء
         // ============================================================
         function loadCustomersFromDB() {
             database.ref('customers').on('value', (snapshot) => {
@@ -3032,59 +3393,328 @@
         }
 
         // ============================================================
-        // 21. إعدادات الخلفية
+        // 17. مدير الخلفيات المتعددة (للموقع الرئيسي)
         // ============================================================
-        function loadBackgroundSettings() {
-            database.ref('settings/background').once('value', (snapshot) => {
+        function loadBackgroundsFromDB() {
+            database.ref('settings/backgrounds').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data && data.css) {
-                    document.getElementById('bgCssInput').value = data.css;
+                backgrounds = [];
+                allBgData = data || {};
+                if (data) {
+                    backgrounds = Object.keys(data).map(key => ({
+                        id: key,
+                        ...data[key]
+                    }));
+                }
+                renderBackgrounds();
+                applyActiveBackground();
+                checkRotationStatus();
+            });
+        }
+
+        function renderBackgrounds() {
+            const container = document.getElementById('bgManager');
+            if (backgrounds.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; padding:20px; color:rgba(255,255,255,0.06);">
+                        📭 لا توجد خلفيات مضافة. أضف خلفيتك الأولى!
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = backgrounds.map((bg, index) => {
+                const isActive = bg.active === true;
+                const previewStyle = bg.css ? 
+                    bg.css.replace(/position:fixed;/g, '').replace(/top:0;/g, '').replace(/left:0;/g, '').replace(/right:0;/g, '').replace(/bottom:0;/g, '').replace(/z-index:0;/g, '') : 
+                    'background: linear-gradient(135deg, #0f172a, #1e1b4b);';
+                
+                return `
+                    <div class="bg-item ${isActive ? 'active-bg' : ''}">
+                        <div class="bg-preview" style="${previewStyle}"></div>
+                        <div class="bg-name">${bg.name || 'خلفية غير مسماة'}</div>
+                        <div class="bg-status">${isActive ? '✅ نشطة حالياً' : '⏸️ غير نشطة'}</div>
+                        <div class="bg-actions">
+                            ${!isActive ? `<button class="btn-active" onclick="activateBackground('${bg.id}')">▶️ تفعيل</button>` : ''}
+                            <button class="btn-edit-bg" onclick="editBackground('${bg.id}')">✏️ تعديل</button>
+                            <button class="btn-delete-bg" onclick="deleteBackground('${bg.id}')">🗑️ حذف</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addNewBackground() {
+            const name = document.getElementById('newBgName').value.trim();
+            const css = document.getElementById('newBgCss').value.trim();
+
+            if (!name || !css) {
+                showToast('⚠️ يرجى إدخال اسم الخلفية وكود CSS');
+                return;
+            }
+
+            const newBg = {
+                name: name,
+                css: css,
+                active: backgrounds.length === 0,
+                createdAt: new Date().toISOString()
+            };
+
+            database.ref('settings/backgrounds').push().set(newBg)
+                .then(() => {
+                    showToast('✅ تم إضافة الخلفية بنجاح!');
+                    document.getElementById('newBgName').value = '';
+                    document.getElementById('newBgCss').value = '';
+                    loadBackgroundsFromDB();
+                })
+                .catch((error) => {
+                    console.error(error);
+                    showToast('⚠️ حدث خطأ في إضافة الخلفية');
+                });
+        }
+
+        function editBackground(bgId) {
+            const bg = backgrounds.find(b => b.id === bgId);
+            if (!bg) {
+                showToast('⚠️ الخلفية غير موجودة');
+                return;
+            }
+
+            const newName = prompt('✏️ تعديل اسم الخلفية:', bg.name);
+            if (newName === null) return;
+
+            const newCss = prompt('✏️ تعديل كود CSS:', bg.css);
+            if (newCss === null) return;
+
+            if (!newName.trim() || !newCss.trim()) {
+                showToast('⚠️ الاسم وكود CSS مطلوبان');
+                return;
+            }
+
+            database.ref(`settings/backgrounds/${bgId}`).update({
+                name: newName.trim(),
+                css: newCss.trim()
+            }).then(() => {
+                showToast('✅ تم تحديث الخلفية بنجاح!');
+                loadBackgroundsFromDB();
+            }).catch((error) => {
+                console.error(error);
+                showToast('⚠️ حدث خطأ في تحديث الخلفية');
+            });
+        }
+
+        function deleteBackground(bgId) {
+            const bg = backgrounds.find(b => b.id === bgId);
+            if (!bg) {
+                showToast('⚠️ الخلفية غير موجودة');
+                return;
+            }
+
+            if (!confirm(`⚠️ هل أنت متأكد من حذف الخلفية "${bg.name}"؟`)) return;
+
+            if (bg.active) {
+                database.ref(`settings/backgrounds/${bgId}`).remove()
+                    .then(() => {
+                        showToast('🗑️ تم حذف الخلفية');
+                        const remaining = backgrounds.filter(b => b.id !== bgId);
+                        if (remaining.length > 0) {
+                            activateBackground(remaining[0].id);
+                        } else {
+                            document.getElementById('defaultBg').classList.remove('hidden');
+                            document.getElementById('customBg').classList.remove('active');
+                            showToast('🔄 تم إعادة الخلفية الافتراضية');
+                        }
+                        loadBackgroundsFromDB();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        showToast('⚠️ حدث خطأ في حذف الخلفية');
+                    });
+            } else {
+                database.ref(`settings/backgrounds/${bgId}`).remove()
+                    .then(() => {
+                        showToast('🗑️ تم حذف الخلفية');
+                        loadBackgroundsFromDB();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        showToast('⚠️ حدث خطأ في حذف الخلفية');
+                    });
+            }
+        }
+
+        function activateBackground(bgId) {
+            const updates = {};
+            backgrounds.forEach(bg => {
+                updates[`settings/backgrounds/${bg.id}/active`] = false;
+            });
+            updates[`settings/backgrounds/${bgId}/active`] = true;
+
+            database.ref().update(updates)
+                .then(() => {
+                    showToast('✅ تم تفعيل الخلفية بنجاح!');
+                    loadBackgroundsFromDB();
+                })
+                .catch((error) => {
+                    console.error(error);
+                    showToast('⚠️ حدث خطأ في تفعيل الخلفية');
+                });
+        }
+
+        function applyActiveBackground() {
+            const activeBg = backgrounds.find(b => b.active === true);
+            const customBg = document.getElementById('customBg');
+            const defaultBg = document.getElementById('defaultBg');
+
+            if (activeBg && activeBg.css) {
+                customBg.style.cssText = activeBg.css;
+                customBg.classList.add('active');
+                defaultBg.classList.add('hidden');
+            } else {
+                customBg.classList.remove('active');
+                defaultBg.classList.remove('hidden');
+            }
+        }
+
+        // ============================================================
+        // 18. نظام تناوب الخلفيات
+        // ============================================================
+        function toggleRotation() {
+            const enabled = document.getElementById('rotationEnabled').value === 'true';
+            const status = document.getElementById('rotationStatus');
+            
+            if (enabled) {
+                startRotation();
+                status.textContent = '🔄 مفعل';
+                status.className = 'rotation-status active';
+            } else {
+                stopRotation();
+                status.textContent = '⏸️ غير مفعل';
+                status.className = 'rotation-status';
+            }
+            
+            const interval = parseInt(document.getElementById('rotationInterval').value) || 10;
+            database.ref('settings/rotation').set({
+                enabled: enabled,
+                interval: interval
+            }).catch((error) => console.error('خطأ في حفظ إعدادات التناوب:', error));
+        }
+
+        function startRotation() {
+            stopRotation();
+            
+            const activeBgs = backgrounds.filter(b => b.active === true);
+            if (activeBgs.length < 2) {
+                showToast('⚠️ تحتاج إلى خلفيتين نشطتين على الأقل للتناوب');
+                document.getElementById('rotationEnabled').value = 'false';
+                document.getElementById('rotationStatus').textContent = '⏸️ غير مفعل (لا توجد خلفيات كافية)';
+                document.getElementById('rotationStatus').className = 'rotation-status';
+                return;
+            }
+
+            const interval = parseInt(document.getElementById('rotationInterval').value) || 10;
+            const activeBgList = backgrounds.filter(b => b.active === true);
+            let currentIndex = 0;
+            
+            applySpecificBackground(activeBgList[currentIndex].id);
+            
+            rotationTimer = setInterval(() => {
+                currentIndex = (currentIndex + 1) % activeBgList.length;
+                applySpecificBackground(activeBgList[currentIndex].id);
+                showToast(`🔄 تم تبديل الخلفية إلى: ${activeBgList[currentIndex].name}`);
+            }, interval * 1000);
+            
+            document.getElementById('rotationStatus').textContent = `🔄 مفعل (كل ${interval} ثانية)`;
+            document.getElementById('rotationStatus').className = 'rotation-status active';
+        }
+
+        function stopRotation() {
+            if (rotationTimer) {
+                clearInterval(rotationTimer);
+                rotationTimer = null;
+            }
+        }
+
+        function applySpecificBackground(bgId) {
+            const bg = backgrounds.find(b => b.id === bgId);
+            if (!bg) return;
+            
+            const customBg = document.getElementById('customBg');
+            const defaultBg = document.getElementById('defaultBg');
+            
+            if (bg.css) {
+                customBg.style.cssText = bg.css;
+                customBg.classList.add('active');
+                defaultBg.classList.add('hidden');
+            }
+        }
+
+        function checkRotationStatus() {
+            database.ref('settings/rotation').once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    document.getElementById('rotationEnabled').value = data.enabled ? 'true' : 'false';
+                    document.getElementById('rotationInterval').value = data.interval || 10;
+                    
+                    if (data.enabled) {
+                        startRotation();
+                    }
                 }
             });
         }
 
-        function saveBackgroundSettings() {
-            const css = document.getElementById('bgCssInput').value.trim();
-            if (!css) {
-                showToast('⚠️ يرجى إدخال كود CSS للخلفية');
-                return;
-            }
-            database.ref('settings/background').set({ css: css })
-                .then(() => { showToast('✅ تم تحديث الخلفية بنجاح!'); })
-                .catch((error) => { showToast('⚠️ حدث خطأ في حفظ الخلفية'); console.error(error); });
-        }
-
-        function resetBackgroundSettings() {
-            if (!confirm('هل أنت متأكد من إعادة الخلفية الافتراضية؟')) return;
-            database.ref('settings/background').remove()
-                .then(() => {
-                    document.getElementById('bgCssInput').value = '';
-                    showToast('✅ تم إعادة الخلفية الافتراضية');
-                })
-                .catch((error) => { showToast('⚠️ حدث خطأ'); console.error(error); });
-        }
-
         // ============================================================
-        // 22. خلفية الفيديو
+        // 19. خلفية الفيديو
         // ============================================================
         function loadVideoBackground() {
             database.ref('settings/video').once('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data && data.url) {
-                    document.getElementById('videoUrlInput').value = data.url;
+                    document.getElementById('videoUrlInput').value = data.originalUrl || data.url;
                     applyVideoBackground(data.url);
                 }
             });
         }
 
-        function saveVideoBackground() {
-            const url = document.getElementById('videoUrlInput').value.trim();
-            if (!url) {
-                showToast('⚠️ يرجى إدخال رابط الفيديو');
+        function uploadVideoFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 50 * 1024 * 1024) {
+                showToast('⚠️ حجم الفيديو كبير جداً (الحد الأقصى 50MB)');
                 return;
             }
 
-            // تحويل رابط يوتيوب إلى رابط مباشر
+            showToast('📤 جاري رفع الفيديو...');
+
+            const storageRef = storage.ref(`videos/${Date.now()}_${file.name}`);
+            const uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    showToast(`📤 جاري الرفع: ${Math.round(progress)}%`);
+                },
+                (error) => {
+                    console.error('خطأ في رفع الفيديو:', error);
+                    showToast('⚠️ حدث خطأ في رفع الفيديو');
+                },
+                () => {
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        document.getElementById('videoUrlInput').value = downloadURL;
+                        showToast('✅ تم رفع الفيديو بنجاح! اضغط حفظ لحفظه');
+                    });
+                }
+            );
+        }
+
+        function saveVideoBackground() {
+            const url = document.getElementById('videoUrlInput').value.trim();
+            if (!url) {
+                showToast('⚠️ يرجى إدخال رابط الفيديو أو رفع فيديو');
+                return;
+            }
+
             let videoUrl = url;
             const youtubeRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
             const match = url.match(youtubeRegex);
@@ -3112,7 +3742,12 @@
                     document.getElementById('videoBgOverlay').classList.remove('active');
                     document.getElementById('videoPreview').classList.remove('show');
                     document.getElementById('defaultBg').classList.remove('hidden');
+                    
+                    const iframe = document.querySelector('.video-bg-iframe');
+                    if (iframe) iframe.remove();
+                    
                     showToast('✅ تم إزالة خلفية الفيديو');
+                    applyActiveBackground();
                 })
                 .catch((error) => {
                     console.error(error);
@@ -3126,15 +3761,12 @@
             const defaultBg = document.getElementById('defaultBg');
             const previewVideo = document.getElementById('previewVideo');
 
-            // إظهار معاينة
             const previewContainer = document.getElementById('videoPreview');
             previewContainer.classList.add('show');
             previewVideo.src = url;
             previewVideo.load();
 
-            // تطبيق الخلفية
             if (url.includes('youtube.com/embed')) {
-                // استخدام iframe ليوتيوب
                 const iframe = document.createElement('iframe');
                 iframe.src = url;
                 iframe.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;width:100%;height:100%;border:none;pointer-events:none;';
@@ -3150,7 +3782,6 @@
                 defaultBg.classList.add('hidden');
                 videoOverlay.classList.add('active');
             } else {
-                // استخدام فيديو مباشر
                 const oldIframe = document.querySelector('.video-bg-iframe');
                 if (oldIframe) oldIframe.remove();
                 
@@ -3163,7 +3794,7 @@
         }
 
         // ============================================================
-        // 23. التبويبات
+        // 20. التبويبات
         // ============================================================
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -3176,24 +3807,20 @@
         });
 
         // ============================================================
-        // 24. أحداث البحث والترتيب
+        // 21. أحداث البحث والترتيب
         // ============================================================
-        // البحث عند الكتابة مع تأخير (debounce)
         let searchTimeout;
         document.getElementById('productSearchInput').addEventListener('input', function() {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                applyProductFilters();
-            }, 300);
+            searchTimeout = setTimeout(() => applyProductFilters(), 300);
         });
 
-        // التغيير في الفلاتر
         document.getElementById('searchCategory').addEventListener('change', applyProductFilters);
         document.getElementById('searchSubCategory').addEventListener('change', applyProductFilters);
         document.getElementById('searchSort').addEventListener('change', applyProductFilters);
 
         // ============================================================
-        // 25. دوال مساعدة
+        // 22. دوال مساعدة
         // ============================================================
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -3203,22 +3830,50 @@
             window.toastTimeout = setTimeout(() => toast.classList.remove('show'), 5000);
         }
 
+        function getColorName(hexCode) {
+            const colorMap = {
+                '#ff3b30': 'أحمر', '#007aff': 'أزرق', '#34c759': 'أخضر',
+                '#ffd700': 'أصفر', '#ff9500': 'برتقالي', '#ff2d55': 'وردي',
+                '#af52de': 'بنفسجي', '#8d6e63': 'بني', '#8e8e93': 'رمادي',
+                '#1d1d1f': 'أسود', '#ffffff': 'أبيض', '#f5e6d3': 'بيج',
+                '#ff6b6b': 'أحمر فاتح', '#4cd964': 'أخضر فاتح', '#5ac8fa': 'أزرق فاتح'
+            };
+            return colorMap[hexCode] || hexCode;
+        }
+
         // ============================================================
-        // 26. إغلاق النموذج
+        // 23. إغلاق النموذج
         // ============================================================
         document.getElementById('productFormModal').addEventListener('click', function(e) {
             if (e.target === this) closeForm();
         });
 
         // ============================================================
-        // 27. التهيئة النهائية
+        // 24. تهيئة Enter لتسجيل الدخول
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (document.getElementById('loginPage') && 
+                    !document.getElementById('loginPage').classList.contains('hidden')) {
+                    login();
+                }
+            }
+        });
+
+        // ============================================================
+        // 25. التهيئة النهائية
         // ============================================================
         initColorPicker();
         initSizePicker();
         checkSession();
 
         console.log('✅ لوحة التحكم المتطورة جاهزة!');
-        console.log('✅ تم إضافة: معاينة المنتج، ترقيم الصفحات، بحث متقدم، ترتيب، خلفية فيديو');
+        console.log('✅ تم إضافة:');
+        console.log('   📌 مدير الخلفيات المتعددة (للموقع الرئيسي)');
+        console.log('   📌 نظام تناوب الخلفيات التلقائي');
+        console.log('   📌 رفع فيديو من الجهاز');
+        console.log('   📌 تحديث المخزون تلقائياً عند الشحن');
+        console.log('   📌 قسم نفاذ المخزن (المنتجات غير المتوفرة)');
         console.log('👨‍💻 تم التطوير بواسطة LordOfShdow');
     </script>
 
