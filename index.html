@@ -1852,6 +1852,522 @@
         body.light-mode .about-section { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.02); color: rgba(0,0,0,0.12); }
         body.light-mode .about-section a { color: rgba(0,0,0,0.2); }
         body.light-mode .about-section a:hover { color: #e83e8c; }
+/* ============================================================
+   رسالة تأكيد الطلب - أنماط كاملة ومُحسّنة
+   ============================================================ */
+
+/* ===== الخلفية الزجاجية ===== */
+.confirmation-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(15, 23, 42, 0.88) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 28px;
+    padding: 35px 40px;
+    max-width: 580px;
+    width: 92%;
+    z-index: 9999;
+    color: #fff;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-height: 92vh;
+    overflow-y: auto;
+}
+
+.confirmation-message.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+}
+
+/* ===== شريط التمرير ===== */
+.confirmation-message::-webkit-scrollbar {
+    width: 4px;
+}
+.confirmation-message::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+.confirmation-message::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* ===== الأيقونة ===== */
+.confirmation-message .msg-icon {
+    font-size: 56px;
+    color: #4cd964;
+    display: block;
+    margin-bottom: 4px;
+    animation: confettiPop 0.6s ease;
+}
+
+@keyframes confettiPop {
+    0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+    60% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ===== العنوان ===== */
+.confirmation-message h2 {
+    font-size: 26px;
+    font-weight: 900;
+    color: #4cd964;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+}
+
+/* ===== النص الفرعي ===== */
+.confirmation-message .msg-sub {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 14px;
+}
+.confirmation-message .msg-sub strong {
+    color: #ffd700;
+    font-weight: 700;
+}
+
+/* ===== تفاصيل الطلب (المنتجات، الفاتورة، معلومات الزبون) ===== */
+.confirmation-message .msg-details {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.3);
+    text-align: right;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.confirmation-message .msg-details::-webkit-scrollbar {
+    width: 3px;
+}
+.confirmation-message .msg-details::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.15);
+    border-radius: 10px;
+}
+
+/* ===== المنتجات ===== */
+.confirmation-message .msg-details .product-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    margin: 2px 0;
+    padding: 8px 10px !important;
+    transition: all 0.3s;
+}
+.confirmation-message .msg-details .product-row:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+.confirmation-message .msg-details .product-row:last-child {
+    border-bottom: none;
+}
+
+/* ===== صورة المنتج ===== */
+.confirmation-message .msg-details .product-row .product-img {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+}
+.confirmation-message .msg-details .product-row .product-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.confirmation-message .msg-details .product-row .product-img .no-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.05);
+}
+
+/* ===== اسم المنتج ===== */
+.confirmation-message .msg-details .product-row .product-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+/* ===== المقاس واللون ===== */
+.confirmation-message .msg-details .product-row .product-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+.confirmation-message .msg-details .product-row .product-meta .size {
+    font-weight: 600;
+    color: #4cd964;
+}
+.confirmation-message .msg-details .product-row .product-meta .color {
+    font-weight: 600;
+    color: #ffd700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.confirmation-message .msg-details .product-row .product-meta .color .color-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+.confirmation-message .msg-details .product-row .product-meta .qty {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== سعر المنتج ===== */
+.confirmation-message .msg-details .product-row .product-price {
+    font-weight: 900;
+    font-size: 17px;
+    color: #ffd700;
+    flex-shrink: 0;
+}
+
+/* ===== الفاتورة ===== */
+.confirmation-message .msg-details .invoice-box {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-top: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+.confirmation-message .msg-details .invoice-box .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.confirmation-message .msg-details .invoice-box .row:last-child {
+    border-bottom: none;
+    border-top: 2px solid rgba(255, 215, 0, 0.08);
+    padding-top: 8px;
+    margin-top: 2px;
+}
+.confirmation-message .msg-details .invoice-box .row .label {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 13px;
+}
+.confirmation-message .msg-details .invoice-box .row .value {
+    font-weight: 600;
+    color: #fff;
+}
+.confirmation-message .msg-details .invoice-box .row .value.gold {
+    font-weight: 900;
+    color: #ffd700;
+    font-size: 20px;
+}
+.confirmation-message .msg-details .invoice-box .row .value.green {
+    color: #4cd964;
+}
+
+/* ===== ملاحظة التوصيل ===== */
+.confirmation-message .msg-details .delivery-note {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 215, 0, 0.04);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 215, 0, 0.04);
+    text-align: center;
+}
+.confirmation-message .msg-details .delivery-note span {
+    font-size: 11px;
+    color: rgba(255, 215, 0, 0.2);
+}
+
+/* ===== معلومات الزبون ===== */
+.confirmation-message .msg-details .customer-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 14px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+.confirmation-message .msg-details .customer-info .field .label {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.06);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.confirmation-message .msg-details .customer-info .field .value {
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+}
+.confirmation-message .msg-details .customer-info .field .value.phone {
+    color: #4cd964;
+}
+.confirmation-message .msg-details .customer-info .field .value.muted {
+    font-weight: 500;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.3);
+}
+.confirmation-message .msg-details .customer-info .field .value.date {
+    font-weight: 500;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.12);
+}
+.confirmation-message .msg-details .customer-info .field .note {
+    grid-column: 1/-1;
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.02);
+}
+.confirmation-message .msg-details .customer-info .field .note .label {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.06);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.confirmation-message .msg-details .customer-info .field .note .value {
+    font-weight: 400;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== زر الإغلاق ===== */
+.confirmation-message .msg-btn {
+    padding: 10px 40px;
+    border-radius: 50px;
+    border: 2px solid rgba(76, 217, 100, 0.3);
+    background: rgba(76, 217, 100, 0.08);
+    color: #4cd964;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s;
+    font-size: 16px;
+    position: relative;
+    z-index: 10;
+    margin-top: 6px;
+}
+.confirmation-message .msg-btn:hover {
+    background: rgba(76, 217, 100, 0.15);
+    transform: scale(1.05);
+    border-color: #4cd964;
+}
+.confirmation-message .msg-btn:active {
+    transform: scale(0.95);
+}
+
+/* ============================================================
+   الوضع الفاتح (Light Mode)
+   ============================================================ */
+body.light-mode .confirmation-message {
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    color: #1d1d1f !important;
+}
+body.light-mode .confirmation-message .msg-sub {
+    color: rgba(0, 0, 0, 0.25) !important;
+}
+body.light-mode .confirmation-message .msg-details {
+    background: rgba(0, 0, 0, 0.02) !important;
+    border-color: rgba(0, 0, 0, 0.03) !important;
+}
+body.light-mode .confirmation-message .msg-details .product-row {
+    background: rgba(0, 0, 0, 0.02) !important;
+}
+body.light-mode .confirmation-message .msg-details .product-row:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+}
+body.light-mode .confirmation-message .msg-details .product-row .product-name {
+    color: #1d1d1f !important;
+}
+body.light-mode .confirmation-message .msg-details .product-row .product-meta .size {
+    color: #34c759 !important;
+}
+body.light-mode .confirmation-message .msg-details .product-row .product-meta .color {
+    color: #e83e8c !important;
+}
+body.light-mode .confirmation-message .msg-details .product-row .product-price {
+    color: #e83e8c !important;
+}
+body.light-mode .confirmation-message .msg-details .invoice-box {
+    background: rgba(0, 0, 0, 0.02) !important;
+    border-color: rgba(0, 0, 0, 0.04) !important;
+}
+body.light-mode .confirmation-message .msg-details .invoice-box .row .label {
+    color: rgba(0, 0, 0, 0.2) !important;
+}
+body.light-mode .confirmation-message .msg-details .invoice-box .row .value {
+    color: #1d1d1f !important;
+}
+body.light-mode .confirmation-message .msg-details .invoice-box .row .value.gold {
+    color: #e83e8c !important;
+}
+body.light-mode .confirmation-message .msg-details .delivery-note {
+    background: rgba(232, 62, 140, 0.04) !important;
+    border-color: rgba(232, 62, 140, 0.04) !important;
+}
+body.light-mode .confirmation-message .msg-details .delivery-note span {
+    color: rgba(232, 62, 140, 0.3) !important;
+}
+body.light-mode .confirmation-message .msg-details .customer-info {
+    background: rgba(0, 0, 0, 0.02) !important;
+    border-color: rgba(0, 0, 0, 0.03) !important;
+}
+body.light-mode .confirmation-message .msg-details .customer-info .field .label {
+    color: rgba(0, 0, 0, 0.06) !important;
+}
+body.light-mode .confirmation-message .msg-details .customer-info .field .value {
+    color: #1d1d1f !important;
+}
+body.light-mode .confirmation-message .msg-details .customer-info .field .value.phone {
+    color: #34c759 !important;
+}
+body.light-mode .confirmation-message .msg-details .customer-info .field .value.muted {
+    color: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ============================================================
+   استجابة للشاشات الصغيرة (موبايل)
+   ============================================================ */
+@media (max-width: 768px) {
+    .confirmation-message {
+        padding: 25px 20px !important;
+        max-width: 95% !important;
+        border-radius: 20px !important;
+    }
+    .confirmation-message h2 {
+        font-size: 22px !important;
+    }
+    .confirmation-message .msg-icon {
+        font-size: 44px !important;
+    }
+    .confirmation-message .msg-details {
+        padding: 10px 12px !important;
+        max-height: 350px !important;
+    }
+    .confirmation-message .msg-details .product-row {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    .confirmation-message .msg-details .product-row .product-img {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    .confirmation-message .msg-details .product-row .product-name {
+        font-size: 14px !important;
+    }
+    .confirmation-message .msg-details .product-row .product-price {
+        font-size: 15px !important;
+    }
+    .confirmation-message .msg-details .customer-info {
+        grid-template-columns: 1fr !important;
+        gap: 4px !important;
+    }
+    .confirmation-message .msg-details .invoice-box {
+        padding: 10px 12px !important;
+    }
+    .confirmation-message .msg-details .invoice-box .row .value.gold {
+        font-size: 17px !important;
+    }
+    .confirmation-message .msg-btn {
+        padding: 10px 30px !important;
+        font-size: 14px !important;
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .confirmation-message {
+        padding: 20px 14px !important;
+        max-width: 98% !important;
+        border-radius: 16px !important;
+    }
+    .confirmation-message h2 {
+        font-size: 20px !important;
+    }
+    .confirmation-message .msg-icon {
+        font-size: 38px !important;
+    }
+    .confirmation-message .msg-sub {
+        font-size: 12px !important;
+    }
+    .confirmation-message .msg-details {
+        padding: 8px 8px !important;
+        font-size: 12px !important;
+        max-height: 300px !important;
+    }
+    .confirmation-message .msg-details .product-row {
+        padding: 6px 6px !important;
+        gap: 6px !important;
+    }
+    .confirmation-message .msg-details .product-row .product-img {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 8px !important;
+    }
+    .confirmation-message .msg-details .product-row .product-name {
+        font-size: 13px !important;
+    }
+    .confirmation-message .msg-details .product-row .product-meta {
+        font-size: 11px !important;
+        gap: 8px !important;
+    }
+    .confirmation-message .msg-details .product-row .product-price {
+        font-size: 14px !important;
+    }
+    .confirmation-message .msg-details .invoice-box {
+        padding: 8px 10px !important;
+    }
+    .confirmation-message .msg-details .invoice-box .row {
+        font-size: 12px !important;
+        padding: 3px 0 !important;
+    }
+    .confirmation-message .msg-details .invoice-box .row .value.gold {
+        font-size: 15px !important;
+    }
+    .confirmation-message .msg-details .customer-info {
+        padding: 8px 10px !important;
+        gap: 2px 8px !important;
+    }
+    .confirmation-message .msg-details .customer-info .field .value {
+        font-size: 12px !important;
+    }
+    .confirmation-message .msg-details .customer-info .field .value.muted {
+        font-size: 11px !important;
+    }
+    .confirmation-message .msg-btn {
+        padding: 8px 20px !important;
+        font-size: 13px !important;
+    }
+}
 
         /* ===== Modern Redesign Override ===== */
         :root{
@@ -4097,60 +4613,140 @@
         }
 
         // ============================================================
-        // 28. رسالة تأكيد الطلب
-        // ============================================================
-        function showConfirmationMessage(orderData) {
-            const msg = document.getElementById('confirmationMessage');
-            const details = document.getElementById('confirmDetails');
+// 28. رسالة تأكيد الطلب (المطورة مع صور وخلفية زجاجية)
+// ============================================================
+function showConfirmationMessage(orderData) {
+    const msg = document.getElementById('confirmationMessage');
+    const details = document.getElementById('confirmDetails');
 
-            let productsHtml = '';
-            if (orderData.products && orderData.products.length > 0) {
-                productsHtml = orderData.products.map(p => {
-                    const colorName = p.color ? getColorName(p.color) : 'غير محدد';
-                    return `
-                                <div class="row">
-                                    <span class="label">${p.name} (${p.size || 'غير محدد'})</span>
-                                    <span class="value">${(p.price * p.quantity).toLocaleString()} دج</span>
-                                </div>
-                            `;
-                }).join('');
-            }
+    // تنسيق التاريخ
+    const date = new Date().toLocaleString('ar', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-            details.innerHTML = `
-                        ${productsHtml}
-                        <div class="row" style="border-top:1px solid rgba(255,215,0,0.05); padding-top:6px; margin-top:4px;">
-                            <span class="label" style="font-weight:700;">المجموع الكلي</span>
-                            <span class="value" style="font-size:16px;">${orderData.grandTotal.toLocaleString()} دج</span>
+    let productsHtml = '';
+    if (orderData.products && orderData.products.length > 0) {
+        productsHtml = orderData.products.map((p, index) => {
+            const colorName = p.color ? getColorName(p.color) : 'غير محدد';
+            const colorDisplay = p.color && p.color.startsWith('#') ? p.color : '#ffd700';
+            
+            return `
+                <div class="product-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <!-- ===== صورة المنتج ===== -->
+                    <div style="flex-shrink:0; width:60px; height:60px; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">
+                        ${p.image 
+                            ? `<img src="${p.image}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">` 
+                            : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:24px; color:rgba(255,255,255,0.05);">📷</div>`
+                        }
+                    </div>
+                    
+                    <!-- ===== معلومات المنتج ===== -->
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-weight:700; font-size:15px; color:#fff; margin-bottom:2px;">${p.name}</div>
+                        <div style="display:flex; gap:14px; flex-wrap:wrap; font-size:13px;">
+                            <span style="font-weight:600; color:#4cd964;">📏 ${p.size || 'غير محدد'}</span>
+                            <span style="font-weight:600; color:#ffd700;">🎨 <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:${colorDisplay}; vertical-align:middle; border:1px solid rgba(255,255,255,0.05);"></span> ${colorName}</span>
+                            <span style="font-weight:600; color:rgba(255,255,255,0.3);">× ${p.quantity}</span>
                         </div>
-                        <div class="row">
-                            <span class="label">طريقة التوصيل</span>
-                            <span class="value" style="color:rgba(255,255,255,0.3); font-weight:400;">${orderData.deliveryType || 'غير محدد'}</span>
-                        </div>
-                        <div class="row">
-                            <span class="label">طريقة الدفع</span>
-                            <span class="value" style="color:rgba(255,255,255,0.3); font-weight:400;">${orderData.paymentMethod === 'cash' ? 'الدفع عند الاستلام' : 'تحويل بنكي'}</span>
-                        </div>
-                    `;
+                    </div>
+                    
+                    <!-- ===== السعر ===== -->
+                    <div style="font-weight:900; font-size:17px; color:#ffd700; flex-shrink:0;">${(p.price * p.quantity).toLocaleString()} دج</div>
+                </div>
+            `;
+        }).join('');
+    }
 
-            msg.classList.add('show');
-            document.body.style.overflow = 'hidden';
+    // حساب المجاميع
+    const subtotal = orderData.total || 0;
+    const deliveryFee = orderData.deliveryPrice || 0;
+    const grandTotal = orderData.grandTotal || (subtotal + deliveryFee);
 
-            if (confirmationTimer) clearTimeout(confirmationTimer);
-            confirmationTimer = setTimeout(() => {
-                closeConfirmationMessage();
-            }, 10000);
-        }
+    // تحديد طريقة الدفع
+    const paymentText = orderData.paymentMethod === 'cash' ? '💵 الدفع عند الاستلام' : '🏦 تحويل بنكي';
+    const deliveryTypeText = orderData.deliveryType || (orderData.deliveryType === 'bureau' ? 'توصيل للمكتب' : 'توصيل للمنزل');
 
-        function closeConfirmationMessage() {
-            const msg = document.getElementById('confirmationMessage');
-            msg.classList.remove('show');
-            document.body.style.overflow = '';
-            if (confirmationTimer) {
-                clearTimeout(confirmationTimer);
-                confirmationTimer = null;
-            }
-        }
+    details.innerHTML = `
+        <!-- ===== قائمة المنتجات مع الصور ===== -->
+        <div style="margin-bottom:14px; background:rgba(255,255,255,0.02); border-radius:16px; padding:8px 12px; border:1px solid rgba(255,255,255,0.03);">
+            <div style="font-weight:700; color:rgba(255,255,255,0.1); font-size:11px; margin-bottom:4px; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.02); padding-bottom:6px;">
+                📦 المنتجات المطلوبة
+            </div>
+            ${productsHtml}
+        </div>
 
+        <!-- ===== الفاتورة الكاملة ===== -->
+        <div style="background:rgba(255,255,255,0.03); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-radius:16px; padding:14px 16px; margin-top:6px; border:1px solid rgba(255,255,255,0.06); box-shadow:0 8px 32px rgba(0,0,0,0.1);">
+            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                <span style="color:rgba(255,255,255,0.2); font-size:13px;">💰 سعر المنتجات</span>
+                <span style="font-weight:600; color:#fff;">${subtotal.toLocaleString()} دج</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                <span style="color:rgba(255,255,255,0.2); font-size:13px;">🚚 رسوم التوصيل</span>
+                <span style="font-weight:600; color:#4cd964;">${deliveryFee.toLocaleString()} دج</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0 4px; border-top:2px solid rgba(255,215,0,0.08); margin-top:2px;">
+                <span style="font-weight:700; color:rgba(255,255,255,0.4); font-size:15px;">📦 المجموع الكلي</span>
+                <span style="font-weight:900; color:#ffd700; font-size:20px;">${grandTotal.toLocaleString()} دج</span>
+            </div>
+            
+            <!-- ===== ملاحظة التوصيل ===== -->
+            <div style="margin-top:10px; padding:8px 12px; background:rgba(255,215,0,0.04); border-radius:10px; border:1px solid rgba(255,215,0,0.04); text-align:center;">
+                <span style="font-size:11px; color:rgba(255,215,0,0.2);">
+                    <i class="fas fa-info-circle"></i> ملاحظة: أسعار التوصيل تختلف حسب شركة التوصيل والوجهة
+                </span>
+            </div>
+        </div>
+
+        <!-- ===== معلومات الزبون ===== -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px 14px; margin-top:12px; padding:12px 14px; background:rgba(255,255,255,0.02); border-radius:14px; border:1px solid rgba(255,255,255,0.03);">
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">👤 الزبون</div>
+                <div style="font-weight:700; font-size:14px; color:#fff;">${orderData.customerName || 'غير معروف'}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">📞 الهاتف</div>
+                <div style="font-weight:700; font-size:14px; color:#4cd964;">${orderData.phone || '-'}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">📍 العنوان</div>
+                <div style="font-weight:500; font-size:13px; color:rgba(255,255,255,0.3);">${orderData.state || '-'} - ${orderData.city || '-'}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">🚚 التوصيل</div>
+                <div style="font-weight:500; font-size:13px; color:rgba(255,255,255,0.3);">${deliveryTypeText}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">💳 الدفع</div>
+                <div style="font-weight:500; font-size:13px; color:rgba(255,255,255,0.3);">${paymentText}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">📅 التاريخ</div>
+                <div style="font-weight:500; font-size:12px; color:rgba(255,255,255,0.12);">${date}</div>
+            </div>
+            ${orderData.notes ? `
+            <div style="grid-column:1/-1; margin-top:4px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.02);">
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">📝 ملاحظات</div>
+                <div style="font-weight:400; font-size:12px; color:rgba(255,255,255,0.15);">${orderData.notes}</div>
+            </div>
+            ` : ''}
+        </div>
+    `;
+
+    // إظهار الرسالة مع تأثير
+    msg.classList.add('show');
+    document.body.style.overflow = 'hidden';
+
+    // إغلاق تلقائي بعد 10 ثانية
+    if (confirmationTimer) clearTimeout(confirmationTimer);
+    confirmationTimer = setTimeout(() => {
+        closeConfirmationMessage();
+    }, 10000);
+}
         // ============================================================
         // 29. دوال مساعدة
         // ============================================================
@@ -4325,6 +4921,223 @@
         console.log('✅ سياسة الاسترجاع: 12 ساعة فقط');
         console.log('👨‍💻 تم التطوير بواسطة LordOfShdow');
     </script>
+<!-- ===== إصلاح زر موافق ===== -->
+<script>
+// ============================================================
+// دالة إغلاق رسالة التأكيد - تعمل بشكل مؤكد 100%
+// ============================================================
+function closeConfirmationMessage() {
+    console.log('🔄 جاري إغلاق رسالة التأكيد...');
+    
+    const msg = document.getElementById('confirmationMessage');
+    if (msg) {
+        msg.classList.remove('show');
+        msg.style.display = 'none';
+        console.log('✅ تم إخفاء رسالة التأكيد');
+    }
+    
+    document.body.style.overflow = '';
+    
+    if (window.confirmationTimer) {
+        clearTimeout(window.confirmationTimer);
+        window.confirmationTimer = null;
+    }
+}
 
+// ============================================================
+// دالة عرض رسالة التأكيد (المُصلحة)
+// ============================================================
+function showConfirmationMessage(orderData) {
+    const msg = document.getElementById('confirmationMessage');
+    const details = document.getElementById('confirmDetails');
+
+    if (!msg || !details) {
+        console.error('❌ عناصر رسالة التأكيد غير موجودة');
+        showToast('⚠️ حدث خطأ في عرض رسالة التأكيد');
+        return;
+    }
+
+    // التأكد من إظهار العنصر
+    msg.style.display = 'block';
+
+    const date = new Date().toLocaleString('ar', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    let productsHtml = '';
+    if (orderData.products && orderData.products.length > 0) {
+        productsHtml = orderData.products.map((p) => {
+            const colorName = p.color ? getColorName(p.color) : 'غير محدد';
+            const colorDisplay = p.color && p.color.startsWith('#') ? p.color : '#ffd700';
+            
+            return `
+                <div class="product-row" style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04);">
+                    <div style="flex-shrink:0; width:60px; height:60px; border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.02);">
+                        ${p.image 
+                            ? `<img src="${p.image}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;">` 
+                            : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:24px; color:rgba(255,255,255,0.05);">📷</div>`
+                        }
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-weight:700; font-size:15px; color:#fff; margin-bottom:2px;">${p.name}</div>
+                        <div style="display:flex; gap:14px; flex-wrap:wrap; font-size:13px;">
+                            <span style="font-weight:600; color:#4cd964;">📏 ${p.size || 'غير محدد'}</span>
+                            <span style="font-weight:600; color:#ffd700;">🎨 <span style="display:inline-block; width:14px; height:14px; border-radius:50%; background:${colorDisplay}; vertical-align:middle; border:1px solid rgba(255,255,255,0.05);"></span> ${colorName}</span>
+                            <span style="font-weight:600; color:rgba(255,255,255,0.3);">× ${p.quantity}</span>
+                        </div>
+                    </div>
+                    <div style="font-weight:900; font-size:17px; color:#ffd700; flex-shrink:0;">${(p.price * p.quantity).toLocaleString()} دج</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    const subtotal = orderData.total || 0;
+    const deliveryFee = orderData.deliveryPrice || 0;
+    const grandTotal = orderData.grandTotal || (subtotal + deliveryFee);
+    const paymentText = orderData.paymentMethod === 'cash' ? '💵 الدفع عند الاستلام' : '🏦 تحويل بنكي';
+    const deliveryTypeText = orderData.deliveryType || (orderData.deliveryType === 'bureau' ? 'توصيل للمكتب' : 'توصيل للمنزل');
+
+    details.innerHTML = `
+        <div style="margin-bottom:14px; background:rgba(255,255,255,0.02); border-radius:16px; padding:8px 12px; border:1px solid rgba(255,255,255,0.03);">
+            <div style="font-weight:700; color:rgba(255,255,255,0.1); font-size:11px; margin-bottom:4px; letter-spacing:1px; text-transform:uppercase; border-bottom:1px solid rgba(255,255,255,0.02); padding-bottom:6px;">
+                📦 المنتجات المطلوبة
+            </div>
+            ${productsHtml}
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-radius:16px; padding:14px 16px; margin-top:6px; border:1px solid rgba(255,255,255,0.06); box-shadow:0 8px 32px rgba(0,0,0,0.1);">
+            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                <span style="color:rgba(255,255,255,0.2); font-size:13px;">💰 سعر المنتجات</span>
+                <span style="font-weight:600; color:#fff;">${subtotal.toLocaleString()} دج</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                <span style="color:rgba(255,255,255,0.2); font-size:13px;">🚚 رسوم التوصيل</span>
+                <span style="font-weight:600; color:#4cd964;">${deliveryFee.toLocaleString()} دج</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0 4px; border-top:2px solid rgba(255,215,0,0.08); margin-top:2px;">
+                <span style="font-weight:700; color:rgba(255,255,255,0.4); font-size:15px;">📦 المجموع الكلي</span>
+                <span style="font-weight:900; color:#ffd700; font-size:20px;">${grandTotal.toLocaleString()} دج</span>
+            </div>
+            
+            <div style="margin-top:10px; padding:8px 12px; background:rgba(255,215,0,0.04); border-radius:10px; border:1px solid rgba(255,215,0,0.04); text-align:center;">
+                <span style="font-size:11px; color:rgba(255,215,0,0.2);">
+                    <i class="fas fa-info-circle"></i> ملاحظة: أسعار التوصيل تختلف حسب شركة التوصيل والوجهة
+                </span>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px 14px; margin-top:12px; padding:12px 14px; background:rgba(255,255,255,0.02); border-radius:14px; border:1px solid rgba(255,255,255,0.03);">
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">👤 الزبون</div>
+                <div style="font-weight:700; font-size:14px; color:#fff;">${orderData.customerName || 'غير معروف'}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">📞 الهاتف</div>
+                <div style="font-weight:700; font-size:14px; color:#4cd964;">${orderData.phone || '-'}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">📍 العنوان</div>
+                <div style="font-weight:500; font-size:13px; color:rgba(255,255,255,0.3);">${orderData.state || '-'} - ${orderData.city || '-'}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">🚚 التوصيل</div>
+                <div style="font-weight:500; font-size:13px; color:rgba(255,255,255,0.3);">${deliveryTypeText}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">💳 الدفع</div>
+                <div style="font-weight:500; font-size:13px; color:rgba(255,255,255,0.3);">${paymentText}</div>
+            </div>
+            <div>
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">📅 التاريخ</div>
+                <div style="font-weight:500; font-size:12px; color:rgba(255,255,255,0.12);">${date}</div>
+            </div>
+            ${orderData.notes ? `
+            <div style="grid-column:1/-1; margin-top:4px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.02);">
+                <div style="font-size:9px; color:rgba(255,255,255,0.06); text-transform:uppercase; letter-spacing:1px;">📝 ملاحظات</div>
+                <div style="font-weight:400; font-size:12px; color:rgba(255,255,255,0.15);">${orderData.notes}</div>
+            </div>
+            ` : ''}
+        </div>
+    `;
+
+    // إظهار الرسالة
+    msg.classList.add('show');
+    msg.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+
+    // إغلاق تلقائي بعد 10 ثانية
+    if (window.confirmationTimer) {
+        clearTimeout(window.confirmationTimer);
+    }
+    window.confirmationTimer = setTimeout(() => {
+        closeConfirmationMessage();
+    }, 10000);
+
+    console.log('✅ تم عرض رسالة التأكيد بنجاح');
+}
+
+// ============================================================
+// ربط زر موافق - يعمل بشكل مؤكد
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // البحث عن زر موافق
+    const confirmBtn = document.querySelector('.confirmation-message .msg-btn');
+    if (confirmBtn) {
+        // إزالة أي مستمعات قديمة
+        const newBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+        
+        // إضافة مستمع جديد
+        newBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🖱️ تم النقر على زر موافق');
+            closeConfirmationMessage();
+        });
+        console.log('✅ تم ربط زر موافق بنجاح');
+    } else {
+        console.warn('⚠️ زر موافق غير موجود في الصفحة');
+        // محاولة إيجاد الزر بعد قليل
+        setTimeout(() => {
+            const btn = document.querySelector('.confirmation-message .msg-btn');
+            if (btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeConfirmationMessage();
+                });
+                console.log('✅ تم ربط زر موافق (بعد تأخير)');
+            }
+        }, 500);
+    }
+});
+
+// إغلاق عند الضغط على Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const msg = document.getElementById('confirmationMessage');
+        if (msg && msg.classList.contains('show')) {
+            closeConfirmationMessage();
+        }
+    }
+});
+
+// إغلاق عند النقر خارجها
+document.addEventListener('click', function(e) {
+    const msg = document.getElementById('confirmationMessage');
+    if (msg && msg.classList.contains('show')) {
+        if (!msg.contains(e.target)) {
+            closeConfirmationMessage();
+        }
+    }
+});
+
+console.log('✅ تم تحميل جميع دوال رسالة التأكيد بنجاح');
+</script>
 </body>
 </html>
