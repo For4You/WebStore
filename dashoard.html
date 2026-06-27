@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
     <title>لوحة تحكم متجر الموضة - المتطورة</title>
     
     <!-- ===== Firebase SDK ===== -->
@@ -410,6 +411,152 @@
         .form-group input::placeholder { color: rgba(255,255,255,0.08); }
         .form-group textarea { resize: vertical; min-height: 80px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        /* ===== بطاقة فنية لنموذج المنتج: إضافة/تعديل ===== */
+        .form-modal .form-container.product-art-shell {
+            max-width: 920px;
+            padding: 0;
+            border-radius: 30px;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 18% 0%, rgba(255,215,0,0.14), transparent 34%),
+                radial-gradient(circle at 88% 18%, rgba(90,200,250,0.16), transparent 32%),
+                linear-gradient(145deg, rgba(24,24,31,0.98), rgba(11,15,27,0.96));
+            border: 1px solid rgba(255,255,255,0.10);
+            box-shadow: 0 30px 90px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .product-art-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(135deg, rgba(255,215,0,0.15), transparent 32%, rgba(255,107,107,0.10) 62%, rgba(90,200,250,0.14)),
+                radial-gradient(circle at 50% 100%, rgba(175,82,222,0.13), transparent 42%);
+            opacity: 0.8;
+        }
+
+        .product-art-header {
+            position: relative;
+            padding: 28px 34px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+        }
+
+        .product-art-header h2 {
+            margin: 0;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #fff, #ffd700 45%, #ff9f6e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .product-art-subtitle {
+            margin-top: 8px;
+            color: rgba(255,255,255,0.32);
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.7;
+        }
+
+        .product-form-grid {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+            gap: 18px;
+            padding: 24px 30px 30px;
+        }
+
+        .product-form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 0;
+        }
+
+        .product-info-card {
+            position: relative;
+            padding: 18px;
+            border-radius: 22px;
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 16px 38px rgba(0,0,0,0.18);
+            overflow: hidden;
+        }
+
+        .product-info-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 110px;
+            height: 110px;
+            background: radial-gradient(circle, rgba(255,215,0,0.13), transparent 68%);
+            pointer-events: none;
+        }
+
+        .product-info-card.card-accent-blue::before { background: radial-gradient(circle, rgba(90,200,250,0.14), transparent 68%); }
+        .product-info-card.card-accent-pink::before { background: radial-gradient(circle, rgba(255,45,85,0.13), transparent 68%); }
+        .product-info-card.card-accent-green::before { background: radial-gradient(circle, rgba(76,217,100,0.12), transparent 68%); }
+
+        .product-info-card-title {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            font-size: 14px;
+            font-weight: 900;
+            color: rgba(255,255,255,0.78);
+        }
+
+        .product-info-card-title span {
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .product-info-card .form-group:last-child,
+        .product-info-card .form-row:last-child .form-group {
+            margin-bottom: 0;
+        }
+
+        .product-info-card .image-upload-area {
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+            border-color: rgba(255,215,0,0.16);
+            min-height: 128px;
+            display: grid;
+            place-items: center;
+        }
+
+        .product-form-submit-card {
+            position: relative;
+            padding: 0 30px 30px;
+        }
+
+        .product-form-submit-card .btn-success {
+            border-radius: 18px;
+            background: linear-gradient(135deg, #4cd964, #34c759 55%, #17a55a);
+            box-shadow: 0 14px 38px rgba(52,199,89,0.23);
+        }
+
+        @media (max-width: 860px) {
+            .product-form-grid { grid-template-columns: 1fr; padding: 18px; }
+            .product-art-header { padding: 24px 22px 18px; }
+            .product-form-submit-card { padding: 0 18px 22px; }
+            .product-art-header h2 { font-size: 24px; }
+        }
+
 
         /* ===== أزرار الألوان والمقاسات ===== */
         .color-picker, .size-picker {
@@ -1250,20 +1397,67 @@
             display: none;
             background: #fff;
             color: #1d1d1f;
-            padding: 35px 40px;
+            padding: 22px 26px;
+            width: 210mm;
             max-width: 800px;
+            min-height: auto;
             margin: 0 auto;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             direction: rtl;
+            border-top: 7px solid #e83e8c;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        .print-card .print-brand-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #fff7fb, #fff9e6);
+            border: 1px solid #f3d7e5;
+            border-radius: 12px;
+        }
+        .print-card .brand-mark {
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #e83e8c, #ffd700);
+            color: #fff;
+            font-size: 22px;
+            font-weight: 900;
+        }
+        .print-card .brand-title {
+            font-size: 20px;
+            line-height: 1.15;
+            font-weight: 900;
+            color: #1d1d1f;
+        }
+        .print-card .brand-subtitle {
+            margin-top: 2px;
+            color: #777;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .print-card .order-summary-chip {
+            text-align: left;
+            direction: rtl;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.8;
+            white-space: nowrap;
         }
         .print-card .print-header {
             text-align: center;
-            border-bottom: 3px solid #ffd700;
-            padding-bottom: 16px;
-            margin-bottom: 20px;
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
         .print-card .print-header h1 {
-            font-size: 26px;
+            font-size: 20px;
             color: #1d1d1f;
             font-weight: 900;
             letter-spacing: -0.5px;
@@ -1288,14 +1482,15 @@
 
         .print-card .print-info-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
         }
         .print-card .print-info-grid .info-box {
             background: #f5f5f7;
-            padding: 14px 16px;
-            border-radius: 10px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            border: 1px solid #ececf1;
         }
         .print-card .print-info-grid .info-box .label {
             font-size: 10px;
@@ -1305,22 +1500,31 @@
             letter-spacing: 0.5px;
         }
         .print-card .print-info-grid .info-box .value {
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 12px;
+            font-weight: 800;
             color: #1d1d1f;
             margin-top: 2px;
         }
         .print-card .print-customer-box {
-            background: #fafafa;
-            padding: 16px;
+            background: #fff;
+            padding: 10px 12px;
             border-radius: 10px;
-            margin-bottom: 16px;
+            margin-bottom: 10px;
             border: 1px solid #e5e5ea;
+        }
+        .print-card .section-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            color: #e83e8c;
+            font-size: 12px;
+            font-weight: 900;
         }
         .print-card .print-customer-box .customer-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 8px 12px;
         }
         .print-card .print-customer-box .customer-row .field .label {
             font-size: 10px;
@@ -1330,12 +1534,13 @@
             letter-spacing: 0.5px;
         }
         .print-card .print-customer-box .customer-row .field .value {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 700;
             color: #1d1d1f;
+            line-height: 1.45;
         }
         .print-card .print-products {
-            margin: 16px 0;
+            margin: 10px 0;
             border: 1px solid #e5e5ea;
             border-radius: 10px;
             overflow: hidden;
@@ -1347,19 +1552,20 @@
         }
         .print-card .print-products th {
             background: #f5f5f7;
-            padding: 10px 14px;
+            padding: 7px 8px;
             text-align: center;
-            font-weight: 700;
+            font-weight: 800;
             color: #1d1d1f;
             border-bottom: 2px solid #e5e5ea;
-            font-size: 12px;
+            font-size: 11px;
         }
         .print-card .print-products td {
-            padding: 10px 14px;
+            padding: 6px 8px;
             text-align: center;
             border-bottom: 1px solid #e5e5ea;
             color: #333;
-            font-size: 13px;
+            font-size: 11px;
+            line-height: 1.35;
         }
         .print-card .print-products .product-img-col {
             width: 50px;
@@ -1373,24 +1579,31 @@
         .print-card .print-total {
             display: flex;
             justify-content: space-between;
-            padding: 14px 18px;
+            padding: 10px 14px;
             background: #f5f5f7;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 15px;
             font-weight: 900;
             color: #1d1d1f;
-            margin-top: 12px;
+            margin-top: 8px;
+            border: 1px solid #ececf1;
         }
         .print-card .print-total .amount {
             color: #e83e8c;
         }
         .print-card .print-footer {
             text-align: center;
-            margin-top: 20px;
-            padding-top: 14px;
+            margin-top: 10px;
+            padding-top: 8px;
             border-top: 1px solid #e5e5ea;
-            color: #999;
-            font-size: 11px;
+            color: #777;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+        .print-card .print-footer a {
+            color: #1877f2;
+            text-decoration: none;
+            font-weight: 800;
         }
         .print-card .print-footer .store-name {
             color: #e83e8c;
@@ -1600,29 +1813,483 @@
         }
 
         /* ===== الطباعة ===== */
+        @page { size: A4 portrait; margin: 0; }
         @media print {
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                background: #fff !important;
+                overflow: hidden !important;
+            }
             body * { visibility: hidden; }
             .print-card, .print-card * { visibility: visible; }
             .print-card {
                 display: block !important;
-                position: fixed;
+                position: absolute;
                 top: 0;
                 left: 0;
                 right: 0;
-                bottom: 0;
-                padding: 25px 30px;
-                background: #fff;
+                width: 210mm !important;
+                max-width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 8mm 9mm !important;
+                background: #fff !important;
                 z-index: 9999;
-                overflow-y: auto;
+                overflow: hidden !important;
+                border-top: 5px solid #e83e8c !important;
+                box-shadow: none !important;
+                page-break-before: avoid !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
             }
-            .print-card .print-header h1 { font-size: 22px; }
+            .print-card .print-header h1 { font-size: 17px !important; }
+            .print-card .print-brand-strip { padding: 7px 10px !important; margin-bottom: 7px !important; }
+            .print-card .brand-mark { width: 38px !important; height: 38px !important; flex-basis: 38px !important; font-size: 18px !important; }
+            .print-card .brand-title { font-size: 17px !important; }
+            .print-card .print-info-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; }
             .print-card .print-info-grid .info-box,
-            .print-card .print-customer-box { background: #f5f5f7 !important; }
-            .print-card .print-products th { background: #f5f5f7 !important; }
+            .print-card .print-customer-box,
+            .print-card .print-products th,
             .print-card .print-total { background: #f5f5f7 !important; }
+            .print-card .print-products .product-img-col img { max-width: 30px !important; max-height: 30px !important; }
+            .print-card .print-products th { padding: 5px 6px !important; font-size: 10px !important; }
+            .print-card .print-products td { padding: 4px 6px !important; font-size: 10px !important; }
+            .print-card .print-total { padding: 8px 12px !important; font-size: 14px !important; }
+            .print-card .print-footer { margin-top: 7px !important; padding-top: 6px !important; }
             .no-print { display: none !important; }
-            .print-card .print-products .product-img-col img { max-width: 40px; max-height: 40px; }
         }
+    
+
+        /* ===== إصلاح خلفية YouTube + تجاوب شامل للهاتف ===== */
+        .video-bg-iframe {
+            top: 50% !important;
+            left: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 177.78vh !important;
+            height: 100vh !important;
+            min-width: 100vw !important;
+            min-height: 56.25vw !important;
+            transform: translate(-50%, -50%) !important;
+        }
+
+        .youtube-bg-fallback {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            z-index: 0 !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            pointer-events: none !important;
+        }
+
+        html { max-width: 100%; -webkit-text-size-adjust: 100%; }
+        body { max-width: 100%; }
+        img, video, iframe { max-width: 100%; }
+
+        @media (max-width: 768px) {
+            body { overflow-x: hidden !important; }
+            .main-content { width: 100% !important; max-width: 100% !important; padding: 12px !important; }
+            .header { padding: 14px !important; border-radius: 16px !important; gap: 10px !important; }
+            .header h1 { font-size: clamp(20px, 7vw, 28px) !important; justify-content: center !important; flex-wrap: wrap !important; text-align: center !important; }
+            .header-actions {
+                width: 100% !important;
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 8px !important;
+            }
+            .header-actions .btn { width: 100% !important; justify-content: center !important; padding: 10px 12px !important; }
+            .stats-grid, .orders-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+            .stat-card { padding: 14px 10px !important; }
+            .stat-card .number { font-size: 26px !important; }
+            .tabs {
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding-bottom: 5px !important;
+            }
+            .tab-btn { flex: 0 0 auto !important; white-space: nowrap !important; padding: 10px 16px !important; }
+            .settings-section { padding: 14px !important; border-radius: 14px !important; }
+            .settings-section > div[style*="display:grid"] { grid-template-columns: 1fr !important; }
+            .settings-section .video-preview { max-width: 100% !important; }
+            .settings-section .video-preview video,
+            .settings-section .video-preview iframe { width: 100% !important; min-height: 190px !important; }
+            .settings-section .video-url-input,
+            .form-group input, .form-group select, .form-group textarea { font-size: 16px !important; }
+            .search-sort-bar { flex-direction: column !important; align-items: stretch !important; }
+            .search-sort-bar .search-input { width: 100% !important; min-width: 0 !important; font-size: 16px !important; }
+            .search-sort-bar .search-filters { width: 100% !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+            .search-sort-bar .search-filters select { width: 100% !important; min-width: 0 !important; font-size: 14px !important; }
+            .table-container { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+            .table-container table { min-width: 760px !important; }
+            .form-modal { align-items: flex-start !important; padding: 10px !important; overflow-y: auto !important; }
+            .form-modal .form-container { width: 100% !important; max-height: none !important; padding: 18px !important; border-radius: 18px !important; }
+            .form-row { grid-template-columns: 1fr !important; }
+            .bg-manager { grid-template-columns: 1fr !important; }
+            .bg-rotation-settings .rotation-row { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; }
+            .order-card { padding: 14px !important; }
+            .order-card .customer-info { grid-template-columns: 1fr !important; }
+            .order-card .order-footer { flex-direction: column !important; align-items: stretch !important; gap: 10px !important; }
+            .order-card .order-footer .actions { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+            .order-card .order-products .product-item { flex-wrap: wrap !important; }
+            .out-of-stock-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+            .pagination { gap: 6px !important; }
+            .pagination button { padding: 7px 12px !important; font-size: 12px !important; }
+            .login-page { padding: 12px !important; }
+            .login-page .login-box { width: 100% !important; padding: 28px 18px !important; border-radius: 20px !important; }
+        }
+
+        @media (max-width: 480px) {
+            .header-actions { grid-template-columns: 1fr !important; }
+            .stats-grid { grid-template-columns: 1fr 1fr !important; }
+            .orders-stats { grid-template-columns: 1fr 1fr !important; }
+            .search-sort-bar .search-filters { grid-template-columns: 1fr !important; }
+            .out-of-stock-grid { grid-template-columns: 1fr 1fr !important; }
+            .order-card .order-footer .actions { grid-template-columns: 1fr !important; }
+            .settings-section .video-preview video,
+            .settings-section .video-preview iframe { min-height: 170px !important; }
+            .login-page .login-box .logo { font-size: 36px !important; }
+        }
+
+        @media (max-width: 360px) {
+            .stats-grid, .orders-stats, .out-of-stock-grid { grid-template-columns: 1fr !important; }
+        }
+
+
+
+        /* ===== تصميم السايدبار بأسلوب Octomatic ===== */
+        :root {
+            --octo-sidebar-w: 292px;
+            --octo-sidebar-gap: 24px;
+            --octo-sidebar-bg: linear-gradient(180deg, rgba(6, 87, 112, 0.98) 0%, rgba(5, 68, 94, 0.98) 46%, rgba(3, 48, 74, 0.98) 100%);
+            --octo-sidebar-line: rgba(255,255,255,0.18);
+            --octo-sidebar-soft: rgba(255,255,255,0.12);
+            --octo-accent: #59dfd2;
+            --octo-accent-2: #9af7ed;
+            --octo-shadow: 0 24px 70px rgba(0, 35, 55, 0.45);
+        }
+
+        .main-content {
+            width: 100%;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 24px calc(var(--octo-sidebar-w) + 44px) 24px 24px !important;
+            transition: padding 0.25s ease;
+        }
+
+        .dashboard-sidebar {
+            position: fixed;
+            z-index: 220;
+            top: 18px;
+            right: 18px;
+            bottom: 18px;
+            width: var(--octo-sidebar-w);
+            background: var(--octo-sidebar-bg);
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 0 30px 30px 0;
+            box-shadow: var(--octo-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+            isolation: isolate;
+        }
+
+        .dashboard-sidebar::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 82% 10%, rgba(138, 244, 231, 0.23), transparent 32%),
+                linear-gradient(90deg, rgba(255,255,255,0.08), transparent 34%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .dashboard-sidebar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 18px;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, rgba(255,255,255,0.18), transparent);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 24px 22px 18px;
+            min-height: 92px;
+            direction: ltr;
+        }
+
+        .sidebar-brand-title {
+            font-size: 31px;
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -1.4px;
+            color: #99f8f0;
+            text-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            white-space: nowrap;
+        }
+
+        .sidebar-logo {
+            width: 58px;
+            height: 58px;
+            flex: 0 0 58px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background:
+                linear-gradient(145deg, rgba(255,255,255,0.96), rgba(218, 250, 247, 0.92));
+            color: #0d6f84;
+            font-size: 31px;
+            box-shadow:
+                0 12px 24px rgba(0,0,0,0.18),
+                inset 0 0 0 5px rgba(255,255,255,0.65);
+        }
+
+        .sidebar-nav {
+            padding: 2px 16px 18px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.25) transparent;
+        }
+
+        .sidebar-nav::-webkit-scrollbar { width: 6px; }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.22);
+            border-radius: 999px;
+        }
+
+        .dashboard-nav-link {
+            width: 100%;
+            appearance: none;
+            border: 0;
+            outline: 0;
+            cursor: pointer;
+            background: transparent;
+            color: rgba(255,255,255,0.92);
+            min-height: 50px;
+            border-radius: 18px;
+            padding: 8px 5px 8px 10px;
+            margin: 4px 0;
+            display: grid;
+            grid-template-columns: 42px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            text-align: right;
+            font-size: 17px;
+            font-weight: 850;
+            letter-spacing: -0.15px;
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+            position: relative;
+        }
+
+        .dashboard-nav-link:hover {
+            background: rgba(255,255,255,0.09);
+            transform: translateX(-3px);
+        }
+
+        .dashboard-nav-link.active {
+            background: linear-gradient(90deg, rgba(157, 255, 244, 0.24), rgba(255,255,255,0.08));
+            color: #fff;
+            box-shadow: inset -3px 0 0 var(--octo-accent);
+        }
+
+        .dashboard-nav-link.active::before {
+            content: "";
+            position: absolute;
+            right: -16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 7px;
+            height: 36px;
+            border-radius: 99px 0 0 99px;
+            background: #a8fff5;
+            box-shadow: 0 0 18px rgba(154,247,237,0.75);
+        }
+
+        .nav-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            border: 2px solid rgba(229, 255, 252, 0.82);
+            background: rgba(255,255,255,0.17);
+            color: #e9fffd;
+            font-size: 18px;
+            line-height: 1;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.11);
+        }
+
+        .dashboard-nav-link.active .nav-icon {
+            background: rgba(255,255,255,0.26);
+            border-color: #c9fffb;
+            color: #fff;
+        }
+
+        .nav-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-pill {
+            min-width: 32px;
+            justify-self: end;
+            border-radius: 999px;
+            padding: 2px 8px;
+            background: rgba(255,255,255,0.17);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .nav-pill.beta {
+            background: linear-gradient(135deg, #ffb72c, #ffd15b);
+            color: #fff;
+            box-shadow: 0 5px 12px rgba(255,183,44,0.25);
+            transform: translateY(1px);
+        }
+
+        .nav-pill.hidden {
+            display: none;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 14px 18px 18px;
+            border-top: 1px solid rgba(255,255,255,0.12);
+            background: rgba(0, 25, 38, 0.13);
+            color: rgba(255,255,255,0.72);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .sidebar-footer strong {
+            color: #b9fffa;
+            font-size: 13px;
+        }
+
+        .sidebar-mobile-toggle {
+            display: none;
+            position: fixed;
+            z-index: 260;
+            top: 14px;
+            right: 14px;
+            width: 46px;
+            height: 46px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(5, 82, 105, 0.96);
+            color: #fff;
+            font-size: 22px;
+            box-shadow: 0 14px 35px rgba(0,0,0,0.25);
+            cursor: pointer;
+        }
+
+        .sidebar-mobile-overlay {
+            display: none;
+            position: fixed;
+            z-index: 210;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.48);
+            backdrop-filter: blur(3px);
+        }
+
+        /* إخفاء التبويبات العلوية القديمة بصرياً فقط، مع إبقائها عاملة للجافاسكربت */
+        .main-content > .tabs {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .header,
+        .stats-grid,
+        .tab-content,
+        .out-of-stock-section,
+        .form-modal {
+            position: relative;
+        }
+
+        @media (max-width: 1180px) {
+            :root { --octo-sidebar-w: 266px; }
+            .sidebar-brand-title { font-size: 27px; }
+            .dashboard-nav-link { font-size: 15px; grid-template-columns: 39px 1fr auto; }
+            .nav-icon { width: 36px; height: 36px; font-size: 16px; }
+            .main-content { padding-right: calc(var(--octo-sidebar-w) + 36px) !important; }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 72px 12px 12px 12px !important;
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+
+            .sidebar-mobile-toggle {
+                display: grid;
+                place-items: center;
+            }
+
+            .dashboard-sidebar {
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: min(86vw, 310px);
+                border-radius: 0 0 0 28px;
+                transform: translateX(105%);
+                transition: transform 0.28s ease;
+            }
+
+            body.dashboard-sidebar-open .dashboard-sidebar {
+                transform: translateX(0);
+            }
+
+            body.dashboard-sidebar-open .sidebar-mobile-overlay {
+                display: block;
+            }
+
+            .sidebar-brand {
+                padding-top: 26px;
+            }
+
+            .sidebar-brand-title {
+                font-size: 29px;
+            }
+
+            .dashboard-nav-link {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .sidebar-brand-title { font-size: 25px; }
+            .sidebar-logo { width: 50px; height: 50px; flex-basis: 50px; font-size: 26px; }
+            .dashboard-nav-link { min-height: 46px; font-size: 15px; }
+        }
+
     </style>
 </head>
 <body>
@@ -1659,16 +2326,70 @@
     <!-- ===== المحتوى الرئيسي ===== -->
     <div class="main-content" id="mainContent" style="display:none;">
 
+        <!-- ===== سايدبار Octomatic ===== -->
+        <button class="sidebar-mobile-toggle" type="button" aria-label="فتح القائمة" onclick="toggleDashboardSidebar()">☰</button>
+        <div class="sidebar-mobile-overlay" onclick="toggleDashboardSidebar(false)"></div>
+        <aside class="dashboard-sidebar" aria-label="القائمة الجانبية للوحة التحكم">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-title">WebStore</div>
+                <div class="sidebar-logo" aria-hidden="true">Wb</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button type="button" class="dashboard-nav-link active" data-tab="products" onclick="switchDashboardTab('products', this)">
+                    <span class="nav-icon">⌂</span>
+                    <span class="nav-text">الرئيسية</span>
+                    <span class="nav-pill hidden"></span>
+                </button>
+                <button type="button" class="dashboard-nav-link" data-tab="orders" onclick="switchDashboardTab('orders', this)">
+                    <span class="nav-icon">▦</span>
+                    <span class="nav-text">تأكيد الطلبات</span>
+                    <span class="nav-pill sidebar-orders-badge hidden">0</span>
+                </button>
+                <button type="button" class="dashboard-nav-link" data-tab="customers" onclick="switchDashboardTab('customers', this)">
+                    <span class="nav-icon">⇅</span>
+                    <span class="nav-text">التحقق</span>
+                    <span class="nav-pill hidden"></span>
+                </button>
+                <button type="button" class="dashboard-nav-link" data-tab="products" onclick="switchDashboardTab('products', this)">
+                    <span class="nav-icon">☁</span>
+                    <span class="nav-text">إدارة المخزون</span>
+                    <span class="nav-pill hidden"></span>
+                </button>
+                <button type="button" class="dashboard-nav-link" data-tab="finance" onclick="switchDashboardTab('finance', this)">
+                    <span class="nav-icon">▤</span>
+                    <span class="nav-text">الحسابات المالية</span>
+                    <span class="nav-pill beta">Beta</span>
+                </button>
+                <button type="button" class="dashboard-nav-link" data-tab="settings" onclick="switchDashboardTab('settings', this)">
+                    <span class="nav-icon">⚙</span>
+                    <span class="nav-text">الإعدادات</span>
+                    <span class="nav-pill hidden"></span>
+                </button>
+                <button type="button" class="dashboard-nav-link" data-tab="settings" onclick="switchDashboardTab('settings', this)">
+                    <span class="nav-icon">▻</span>
+                    <span class="nav-text">فيديوهات تعليمية</span>
+                    <span class="nav-pill hidden"></span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <strong>صفحتنا الرسمية</strong><br>
+                <a href="https://www.facebook.com/WebStores0/" target="_blank" rel="noopener" style="color:#b9fffa; text-decoration:none; font-weight:800;">facebook.com/WebStores0</a>
+            </div>
+        </aside>
+
+
         <!-- ===== الهيدر ===== -->
         <header class="header">
             <h1>
                 ⚙️ لوحة التحكم
-                <span class="notification-badge" id="notificationBadge">🔔 جديد</span>
+                <span class="" id="notificationBadge">جديد</span>
             </h1>
             <div class="header-actions">
                 <button class="btn btn-primary" onclick="openAddForm()">➕ إضافة منتج</button>
-                <a href="index.html" class="btn btn-outline" target="_blank">👁️ معاينة الموقع</a>
-                <button class="btn btn-danger" onclick="logout()" style="background:rgba(255,59,48,0.1); color:#ff3b30; border:1px solid rgba(255,59,48,0.05);">🚪 خروج</button>
+                <a href="index.html" class="btn btn-outline" target="_blank">🔍  عرض الموقع </a>
+                <button class="btn btn-danger" onclick="logout()" style="background:rgba(255,59,48,0.1); color:#35759d; border:1px solid rgba(193, 49, 42, 0.05);">🛃 Log Out</button>
             </div>
         </header>
 
@@ -1711,6 +2432,7 @@
             <button class="tab-btn" data-tab="orders">📋 الطلبات <span class="badge badge-danger" id="ordersTabBadge" style="display:none; font-size:10px; padding:1px 8px;">0</span></button>
             <button class="tab-btn" data-tab="customers">👤 العملاء</button>
             <button class="tab-btn" data-tab="settings">⚙️ الإعدادات</button>
+            <button class="tab-btn" data-tab="finance">▤ الحسابات المالية</button>
         </div>
 
         <!-- ===== تبويب المنتجات ===== -->
@@ -1937,6 +2659,52 @@
                     <i class="fas fa-info-circle"></i> يمكنك استخدام روابط يوتيوب (سيتم تحويلها تلقائياً) أو روابط مباشرة للفيديو، أو رفع فيديو من جهازك
                 </div>
             </div>
+
+            <!-- ===== خلفية فيديو index ===== -->
+            <div class="settings-section">
+                <h3>🎬 خلفية فيديو index</h3>
+                <p style="color:rgba(255,255,255,0.2); font-size:13px; margin-bottom:12px;">
+                    هذه الخانة تتحكم فقط في خلفية ملف index.html من خلال رابط فيديو أو رفع فيديو من جهازك
+                </p>
+                <div style="display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center;">
+                    <input type="text" class="video-url-input" id="indexVideoUrlInput" placeholder="https://www.youtube.com/watch?v=... أو رابط مباشر" value="">
+                    <button class="btn btn-upload btn-sm" onclick="document.getElementById('indexVideoFileInput').click()" style="white-space:nowrap;">
+                        📁 رفع فيديو
+                    </button>
+                </div>
+                <input type="file" id="indexVideoFileInput" accept="video/*" style="display:none;" onchange="uploadIndexVideoFile(event)">
+                <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn btn-success" onclick="saveIndexVideoBackground()">💾 حفظ فيديو index</button>
+                    <button class="btn btn-outline" onclick="removeIndexVideoBackground()">🗑️ إزالة فيديو index</button>
+                </div>
+                <div class="video-preview" id="indexVideoPreview">
+                    <video controls id="indexPreviewVideo"></video>
+                </div>
+                <div style="margin-top:12px; font-size:12px; color:rgba(255,255,255,0.08);">
+                    <i class="fas fa-info-circle"></i> يمكنك استخدام روابط يوتيوب أو روابط مباشرة للفيديو، أو رفع فيديو من جهازك ليظهر كخلفية في index.html
+                </div>
+            </div>
+            
+            <!-- ===== أشكال خلفية index ===== -->
+            <div class="settings-section">
+                <h3>✨ أشكال خلفية index</h3>
+                <p style="color:rgba(255,255,255,0.2); font-size:13px; margin-bottom:12px;">
+                    ضع هنا كود HTML/CSS للأشكال التي تظهر فوق خلفية ملف index.html. عند حفظ كود مخصص سيتم إخفاء الجزيئات الافتراضية واستبدالها بالكود الذي تضعه هنا.
+                </p>
+                <textarea id="indexShapesCodeInput" placeholder="مثال:
+&lt;style&gt;
+.my-shape{position:absolute;width:70px;height:70px;border-radius:50%;background:rgba(255,215,0,.25);animation:float 8s infinite alternate;}
+@keyframes float{from{transform:translate(10vw,90vh)}to{transform:translate(80vw,10vh)}}
+&lt;/style&gt;
+&lt;div class='my-shape'&gt;&lt;/div&gt;" style="min-height:180px; direction:ltr; text-align:left;"></textarea>
+                <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn btn-success" onclick="saveIndexShapesCode()">💾 حفظ أشكال index</button>
+                    <button class="btn btn-outline" onclick="removeIndexShapesCode()">🔄 استرجاع الأشكال الافتراضية</button>
+                </div>
+                <div style="margin-top:12px; font-size:12px; color:rgba(255,255,255,0.08); line-height:1.7;">
+                    <i class="fas fa-info-circle"></i> استخدم عناصر HTML مع CSS. اجعل العناصر <code>position:absolute</code> أو <code>position:fixed</code> حتى تظهر كأشكال في الخلفية، ولا تستخدم وسوم script.
+                </div>
+            </div>
             
             <div style="margin-top:20px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:16px; padding:20px;">
                 <h3 style="font-weight:900; margin-bottom:12px;">📊 إحصائيات سريعة</h3>
@@ -1949,98 +2717,140 @@
             </div>
         </div>
 
+
+
+        <!-- ===== تبويب الحسابات المالية ===== -->
+        <div class="tab-content" id="tab-finance">
+            <div class="settings-section">
+                <h3>▤ الحسابات المالية</h3>
+                <div class="orders-stats">
+                    <div class="stat-box stat-shipped">
+                        <div class="num" id="financeShippedTotal">0 دج</div>
+                        <div class="lbl">مجموع سعر الطلبات التي تم شحنها</div>
+                    </div>
+                    <div class="stat-box stat-shipped">
+                        <div class="num" id="financeShippedCount">0</div>
+                        <div class="lbl">عدد الطلبات المشحونة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ===== نموذج إضافة/تعديل منتج ===== -->
         <div class="form-modal" id="productFormModal">
-            <div class="form-container">
+            <div class="form-container product-art-shell">
                 <button class="close-form" onclick="closeForm()">✕</button>
-                <h2 id="formTitle">➕ إضافة منتج جديد</h2>
+                <div class="product-art-header">
+                    <h2 id="formTitle">➕ إضافة منتج جديد</h2>
+                    <div class="product-art-subtitle">بطاقة معلومات فنية ومنظمة لإدخال بيانات السلعة أو تعديلها بدون تغيير سلوك لوحة التحكم.</div>
+                </div>
                 <form id="productForm" onsubmit="saveProduct(event)">
                     <input type="hidden" id="editId" value="">
 
-                    <div class="form-group">
-                        <label>اسم المنتج <span class="required">*</span></label>
-                        <input type="text" id="productName" placeholder="مثال: قميص قطني مريح" required>
-                    </div>
+                    <div class="product-form-grid">
+                        <div class="product-form-column">
+                            <div class="product-info-card">
+                                <div class="product-info-card-title"><span>✦</span> المعلومات الأساسية</div>
+                                <div class="form-group">
+                                    <label>اسم المنتج <span class="required">*</span></label>
+                                    <input type="text" id="productName" placeholder="مثال: قميص قطني مريح" required>
+                                </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>السعر الحالي (دج) <span class="required">*</span></label>
-                            <input type="number" id="productPrice" placeholder="2500" required>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>السعر الحالي (دج) <span class="required">*</span></label>
+                                        <input type="number" id="productPrice" placeholder="2500" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>السعر السابق (دج) - للتخفيض</label>
+                                        <input type="number" id="productOldPrice" placeholder="3500">
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>التصنيف الرئيسي <span class="required">*</span></label>
+                                        <select id="productCategory" required>
+                                            <option value="mens">👔 رجالي</option>
+                                            <option value="womens">👗 نسائي</option>
+                                            <option value="kids">🧒 أطفال</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>النوع الفرعي <span class="required">*</span></label>
+                                        <select id="productSubCategory" required>
+                                            <option value="clothing">👕 ملابس</option>
+                                            <option value="accessories">⌚ إكسسوارات</option>
+                                            <option value="shoes">👟 أحذية</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>وصف المنتج</label>
+                                    <textarea id="productDesc" placeholder="وصف تفصيلي للمنتج..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="product-info-card card-accent-blue">
+                                <div class="product-info-card-title"><span>🎨</span> خيارات السلعة</div>
+                                <div class="form-group">
+                                    <label>اختر الألوان المتوفرة <span class="required">*</span></label>
+                                    <div class="color-picker" id="colorPicker"></div>
+                                    <small style="color:rgba(255,255,255,0.12); font-size:12px;">اضغط على اللون لتحديده / إلغاء تحديده</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>اختر المقاسات المتوفرة <span class="required">*</span></label>
+                                    <div class="size-picker" id="sizePicker"></div>
+                                    <small style="color:rgba(255,255,255,0.12); font-size:12px;">اضغط على المقاس لتحديده / إلغاء تحديده</small>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>السعر السابق (دج) - للتخفيض</label>
-                            <input type="number" id="productOldPrice" placeholder="3500">
+
+                        <div class="product-form-column">
+                            <div class="product-info-card card-accent-green">
+                                <div class="product-info-card-title"><span>📦</span> المخزون والظهور</div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>الكمية في المخزون <span class="required">*</span></label>
+                                        <input type="number" id="productStock" placeholder="12" required min="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>🏷️ علامة رائجة (PIN)</label>
+                                        <select id="productPopular">
+                                            <option value="false">❌ لا</option>
+                                            <option value="true">📍 نعم، رائج</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>🏷️ شعار إضافي (اختياري)</label>
+                                    <input type="text" id="productBadge" placeholder="مثال: تخفيض، جديد، الأكثر مبيعاً...">
+                                </div>
+                            </div>
+
+                            <div class="product-info-card card-accent-pink">
+                                <div class="product-info-card-title"><span>🖼️</span> معرض صور المنتج</div>
+                                <div class="form-group">
+                                    <label>صور المنتج</label>
+                                    <div class="image-upload-area" onclick="document.getElementById('imageInput').click()">
+                                        <div>📸 اضغط لرفع الصور</div>
+                                        <div style="font-size:12px; color:rgba(255,255,255,0.10);">يمكنك رفع عدة صور</div>
+                                        <input type="file" id="imageInput" accept="image/*" multiple>
+                                    </div>
+                                    <div class="image-preview-grid" id="imagePreviewGrid"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>التصنيف الرئيسي <span class="required">*</span></label>
-                            <select id="productCategory" required>
-                                <option value="mens">👔 رجالي</option>
-                                <option value="womens">👗 نسائي</option>
-                                <option value="kids">🧒 أطفال</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>النوع الفرعي <span class="required">*</span></label>
-                            <select id="productSubCategory" required>
-                                <option value="clothing">👕 ملابس</option>
-                                <option value="accessories">⌚ إكسسوارات</option>
-                                <option value="shoes">👟 أحذية</option>
-                            </select>
-                        </div>
+                    <div class="product-form-submit-card">
+                        <button type="submit" class="btn btn-success" style="width:100%; padding:16px; font-size:16px; margin-top:0;">
+                            💾 حفظ المنتج
+                        </button>
                     </div>
-
-                    <div class="form-group">
-                        <label>وصف المنتج</label>
-                        <textarea id="productDesc" placeholder="وصف تفصيلي للمنتج..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>اختر الألوان المتوفرة <span class="required">*</span></label>
-                        <div class="color-picker" id="colorPicker"></div>
-                        <small style="color:rgba(255,255,255,0.12); font-size:12px;">اضغط على اللون لتحديده / إلغاء تحديده</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label>اختر المقاسات المتوفرة <span class="required">*</span></label>
-                        <div class="size-picker" id="sizePicker"></div>
-                        <small style="color:rgba(255,255,255,0.12); font-size:12px;">اضغط على المقاس لتحديده / إلغاء تحديده</small>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>الكمية في المخزون <span class="required">*</span></label>
-                            <input type="number" id="productStock" placeholder="12" required min="0">
-                        </div>
-                        <div class="form-group">
-                            <label>🏷️ علامة رائجة (PIN)</label>
-                            <select id="productPopular">
-                                <option value="false">❌ لا</option>
-                                <option value="true">📍 نعم، رائج</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>🏷️ شعار إضافي (اختياري)</label>
-                        <input type="text" id="productBadge" placeholder="مثال: تخفيض، جديد، الأكثر مبيعاً...">
-                    </div>
-
-                    <div class="form-group">
-                        <label>صور المنتج</label>
-                        <div class="image-upload-area" onclick="document.getElementById('imageInput').click()">
-                            <div>📸 اضغط لرفع الصور</div>
-                            <div style="font-size:12px; color:rgba(255,255,255,0.06);">يمكنك رفع عدة صور</div>
-                            <input type="file" id="imageInput" accept="image/*" multiple>
-                        </div>
-                        <div class="image-preview-grid" id="imagePreviewGrid"></div>
-                    </div>
-
-                    <button type="submit" class="btn btn-success" style="width:100%; padding:16px; font-size:16px; margin-top:10px;">
-                        💾 حفظ المنتج
-                    </button>
                 </form>
             </div>
         </div>
@@ -2087,6 +2897,119 @@
         let rotationTimer = null;
         let backgrounds = [];
         let allBgData = {};
+
+
+        // ============================================================
+        // دوال أمان لتوحيد شكل البيانات القادمة من Firebase
+        // تمنع توقف عرض الجداول إذا وُجد سجل ناقص أو مصفوفة محفوظة ككائن.
+        // ============================================================
+        function toArraySafe(value) {
+            if (Array.isArray(value)) {
+                return value.filter(item => item !== null && item !== undefined && String(item).trim() !== '');
+            }
+            if (value && typeof value === 'object') {
+                return Object.values(value).filter(item => item !== null && item !== undefined && String(item).trim() !== '');
+            }
+            if (typeof value === 'string' && value.trim()) {
+                return value.split(',').map(item => item.trim()).filter(Boolean);
+            }
+            return [];
+        }
+
+        function toNumberSafe(value, fallback = 0) {
+            const num = Number(value);
+            return Number.isFinite(num) ? num : fallback;
+        }
+
+        function safeText(value, fallback = '') {
+            if (value === null || value === undefined) return fallback;
+            const text = String(value).trim();
+            return text || fallback;
+        }
+
+        function setTextIfExists(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        function normalizeProductRecord(id, raw) {
+            const p = (raw && typeof raw === 'object') ? raw : {};
+            return {
+                ...p,
+                id,
+                name: safeText(p.name || p.title || p.productName, 'منتج بدون اسم'),
+                description: safeText(p.description, ''),
+                category: safeText(p.category, 'mens'),
+                subCategory: safeText(p.subCategory, 'clothing'),
+                price: toNumberSafe(p.price, 0),
+                oldPrice: toNumberSafe(p.oldPrice, 0),
+                stock: toNumberSafe(p.stock, 0),
+                colors: toArraySafe(p.colors),
+                sizes: toArraySafe(p.sizes),
+                images: toArraySafe(p.images),
+                popular: p.popular === true || p.popular === 'true',
+                badge: safeText(p.badge, '')
+            };
+        }
+
+        function normalizePhone(phone) {
+            return safeText(phone, '').replace(/\s+/g, '');
+        }
+
+        function normalizeCustomerRecord(id, raw) {
+            const c = (raw && typeof raw === 'object') ? raw : {};
+            return {
+                ...c,
+                id,
+                name: safeText(c.name || c.customerName, 'غير معروف'),
+                phone: normalizePhone(c.phone),
+                totalOrders: toNumberSafe(c.totalOrders, 0),
+                cancelledOrders: toNumberSafe(c.cancelledOrders, 0),
+                totalSpent: toNumberSafe(c.totalSpent, 0),
+                lastOrder: c.lastOrder || c.updatedAt || c.createdAt || ''
+            };
+        }
+
+        function buildCustomersFromOrders(ordersData) {
+            const grouped = {};
+            if (!ordersData) return [];
+
+            Object.keys(ordersData).forEach(orderId => {
+                const order = ordersData[orderId] || {};
+                const phone = normalizePhone(order.phone);
+                const key = phone || safeText(order.userId, '') || orderId;
+                const createdAt = order.createdAt || '';
+                const amount = toNumberSafe(order.grandTotal || order.total, 0);
+
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        id: key,
+                        name: safeText(order.customerName || order.name, 'غير معروف'),
+                        phone: phone || '-',
+                        state: safeText(order.state, ''),
+                        city: safeText(order.city, ''),
+                        totalOrders: 0,
+                        cancelledOrders: 0,
+                        totalSpent: 0,
+                        lastOrder: createdAt,
+                        userId: order.userId || null,
+                        userEmail: order.userEmail || null
+                    };
+                }
+
+                grouped[key].totalOrders += 1;
+                grouped[key].totalSpent += amount;
+                if (order.status === 'ملغي') grouped[key].cancelledOrders += 1;
+                if (!grouped[key].lastOrder || (createdAt && new Date(createdAt) > new Date(grouped[key].lastOrder))) {
+                    grouped[key].lastOrder = createdAt;
+                    grouped[key].name = safeText(order.customerName || order.name, grouped[key].name);
+                    grouped[key].state = safeText(order.state, grouped[key].state);
+                    grouped[key].city = safeText(order.city, grouped[key].city);
+                }
+            });
+
+            return Object.values(grouped).sort((a, b) => (b.totalOrders || 0) - (a.totalOrders || 0));
+        }
 
         // ============================================================
         // 3. دوال تسجيل الدخول
@@ -2149,6 +3072,8 @@
                 loadCustomersFromDB();
                 loadBackgroundsFromDB();
                 loadVideoBackground();
+                loadIndexVideoBackground();
+                loadIndexShapesCode();
                 startOrderNotifications();
             } else {
                 errorEl.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
@@ -2182,6 +3107,8 @@
                 loadCustomersFromDB();
                 loadBackgroundsFromDB();
                 loadVideoBackground();
+                loadIndexVideoBackground();
+                loadIndexShapesCode();
                 startOrderNotifications();
             }
         }
@@ -2272,7 +3199,7 @@
 
             const badge = document.getElementById('notificationBadge');
             if (totalNew > 0 || totalProcessing > 0) {
-                badge.textContent = `🔔 ${totalNew + totalProcessing} جديد`;
+                badge.textContent = ` ${totalNew + totalProcessing} `;
                 badge.classList.add('show');
             } else {
                 badge.classList.remove('show');
@@ -2547,15 +3474,20 @@
         function loadProductsFromDB() {
             database.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data) {
-                    products = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                } else {
-                    products = [];
-                }
+                products = data
+                    ? Object.keys(data).map(key => normalizeProductRecord(key, data[key]))
+                    : [];
                 applyProductFilters();
                 updateStats(products);
                 updateSettingsStats(products);
                 updateOutOfStockSection();
+            }, (error) => {
+                console.error('خطأ في جلب المنتجات:', error);
+                const tbody = document.getElementById('productsTableBody');
+                if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:#ff3b30; font-weight:700;">⚠️ حدث خطأ في تحميل المنتجات</td></tr>`;
+                }
+                showToast('⚠️ حدث خطأ في تحميل المنتجات');
             });
         }
 
@@ -2566,22 +3498,25 @@
             const sort = document.getElementById('searchSort').value;
 
             let filtered = products.filter(p => {
+                const name = safeText(p.name, '').toLowerCase();
+                const description = safeText(p.description, '').toLowerCase();
+                const price = safeText(p.price, '');
                 const matchSearch = !searchTerm || 
-                    p.name.toLowerCase().includes(searchTerm) ||
-                    (p.description && p.description.toLowerCase().includes(searchTerm)) ||
-                    p.price.toString().includes(searchTerm);
+                    name.includes(searchTerm) ||
+                    description.includes(searchTerm) ||
+                    price.includes(searchTerm);
                 const matchCategory = category === 'all' || p.category === category;
                 const matchSubCategory = subCategory === 'all' || p.subCategory === subCategory;
                 return matchSearch && matchCategory && matchSubCategory;
             });
 
             switch(sort) {
-                case 'name-asc': filtered.sort((a, b) => a.name.localeCompare(b.name)); break;
-                case 'name-desc': filtered.sort((a, b) => b.name.localeCompare(a.name)); break;
-                case 'price-asc': filtered.sort((a, b) => a.price - b.price); break;
-                case 'price-desc': filtered.sort((a, b) => b.price - a.price); break;
-                case 'stock-asc': filtered.sort((a, b) => (a.stock || 0) - (b.stock || 0)); break;
-                case 'stock-desc': filtered.sort((a, b) => (b.stock || 0) - (a.stock || 0)); break;
+                case 'name-asc': filtered.sort((a, b) => safeText(a.name).localeCompare(safeText(b.name))); break;
+                case 'name-desc': filtered.sort((a, b) => safeText(b.name).localeCompare(safeText(a.name))); break;
+                case 'price-asc': filtered.sort((a, b) => toNumberSafe(a.price) - toNumberSafe(b.price)); break;
+                case 'price-desc': filtered.sort((a, b) => toNumberSafe(b.price) - toNumberSafe(a.price)); break;
+                case 'stock-asc': filtered.sort((a, b) => toNumberSafe(a.stock) - toNumberSafe(b.stock)); break;
+                case 'stock-desc': filtered.sort((a, b) => toNumberSafe(b.stock) - toNumberSafe(a.stock)); break;
                 case 'created-desc': filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)); break;
                 case 'created-asc': filtered.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)); break;
                 default: break;
@@ -2872,6 +3807,7 @@
                 renderOrders(orders);
                 document.getElementById('settingsTotalOrders').textContent = orders.length;
                 updateOrderStats(orders);
+                updateFinancialAccounts(orders);
                 updateNotificationBadges(orders);
             });
         }
@@ -2881,6 +3817,35 @@
             document.getElementById('processingOrdersCount').textContent = orders.filter(o => o.status === 'قيد المعالجة').length;
             document.getElementById('shippedOrdersCount').textContent = orders.filter(o => o.status === 'تم الشحن').length;
             document.getElementById('cancelledOrdersCount').textContent = orders.filter(o => o.status === 'ملغي').length;
+        }
+
+
+        function toFinancialNumber(value, fallback = 0) {
+            if (typeof value === 'number' && Number.isFinite(value)) return value;
+            if (value === null || value === undefined) return fallback;
+            const normalized = String(value).replace(/[^0-9.\-]/g, '');
+            const num = Number(normalized);
+            return Number.isFinite(num) ? num : fallback;
+        }
+
+        function getOrderFinancialTotal(order) {
+            const directTotal = toFinancialNumber(order && (order.total ?? order.grandTotal ?? order.totalPrice), 0);
+            if (directTotal > 0) return directTotal;
+
+            const items = toArraySafe(order && (order.products || order.items || order.cart));
+            return items.reduce((sum, item) => {
+                const price = toFinancialNumber(item && item.price, 0);
+                const quantity = toFinancialNumber(item && (item.quantity || item.qty), 1);
+                return sum + (price * quantity);
+            }, 0);
+        }
+
+        function updateFinancialAccounts(orders = allOrders) {
+            const shippedOrders = (orders || []).filter(order => order.status === 'تم الشحن');
+            const shippedTotal = shippedOrders.reduce((sum, order) => sum + getOrderFinancialTotal(order), 0);
+
+            setTextIfExists('financeShippedTotal', `${Math.round(shippedTotal).toLocaleString('ar-DZ')} دج`);
+            setTextIfExists('financeShippedCount', shippedOrders.length.toLocaleString('ar-DZ'));
         }
 
         function updateOrderStatus(orderId, newStatus) {
@@ -3173,14 +4138,28 @@
                 'قيد المعالجة': '⚙️ قيد المعالجة',
                 'تم الشحن': '🚚 تم الشحن',
                 'ملغي': '❌ ملغي'
-            }[order.status] || order.status || 'جديد';
+            }[order.status] || order.status || 'ياسين';
 
             const paymentText = order.paymentMethod === 'cash' ? '💵 الدفع عند الاستلام' : '🏦 تحويل بنكي';
 
             printCard.innerHTML = `
+                <div class="print-brand-strip">
+                    <div style="display:flex; align-items:center; gap:10px; text-align:right;">
+                        <div class="brand-mark">م</div>
+                        <div>
+                            <div class="brand-title">متجر موضة اليوم</div>
+                            <div class="brand-subtitle"> طلــــب الزبــــون</div>
+                        </div>
+                    </div>
+                    <div class="order-summary-chip">
+                        <div><strong>رقم الطلب:</strong> #${String(allOrders.indexOf(order) + 1).padStart(3, '0')}</div>
+                        <div><strong>الحالة:</strong> ${statusText}</div>
+                    </div>
+                </div>
+
                 <div class="print-header">
-                    <h1>🧾 فاتورة الطلب</h1>
-                    <div class="store-info">🛍️ متجر موضة اليوم - التوصيل إلى جميع الولايات</div>
+                    <h1>🧾 استمارة معلومات الزبون والطلب</h1>
+                    <div class="store-info">🛍️ متجر موضة اليوم </div>
                     <div class="order-status-print ${statusClass}">${statusText}</div>
                 </div>
 
@@ -3204,6 +4183,7 @@
                 </div>
 
                 <div class="print-customer-box">
+                    <div class="section-title">👤 معلومات الزبون</div>
                     <div class="customer-row">
                         <div class="field">
                             <div class="label">👤 العميل</div>
@@ -3226,6 +4206,7 @@
                     </div>
                 </div>
 
+                <div class="section-title">📦 تفاصيل المنتجات</div>
                 <div class="print-products">
                     <table>
                         <thead>
@@ -3252,7 +4233,8 @@
 
                 <div class="print-footer">
                     <div class="store-name">🛍️ متجر موضة اليوم</div>
-                    <div class="store-details">📌 التوصيل إلى جميع الولايات · الدفع عند الاستلام متاح</div>
+                    <div class="store-details"></div>
+                    <div class="store-details">🌐 صفحتنا الرسمية: <a href="https://www.facebook.com/WebStores0/" target="_blank" rel="noopener">https://www.facebook.com/WebStores0/</a></div>
                 </div>
 
                 <div style="text-align:center; margin-top:16px; direction:ltr;" class="no-print">
@@ -3279,15 +4261,39 @@
             database.ref('customers').on('value', (snapshot) => {
                 const data = snapshot.val();
                 let customers = [];
+
                 if (data) {
-                    customers = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                    customers.sort((a, b) => (b.totalOrders || 0) - (a.totalOrders || 0));
+                    customers = Object.keys(data)
+                        .map(key => normalizeCustomerRecord(key, data[key]))
+                        .sort((a, b) => (b.totalOrders || 0) - (a.totalOrders || 0));
                 }
+
+                // دعم البيانات القديمة: إذا لم يكن مسار customers موجوداً، تُبنى قائمة العملاء من الطلبات.
+                if (customers.length === 0) {
+                    database.ref('orders').once('value').then((ordersSnapshot) => {
+                        customers = buildCustomersFromOrders(ordersSnapshot.val());
+                        allCustomers = customers;
+                        renderCustomersTable(customers);
+                        setTextIfExists('settingsTotalCustomers', customers.length);
+                        setTextIfExists('repeatCustomers', customers.filter(c => (c.totalOrders || 0) > 1).length);
+                        updateSelectedCount();
+                    }).catch((error) => {
+                        console.error('خطأ في بناء العملاء من الطلبات:', error);
+                        allCustomers = [];
+                        renderCustomersTable([]);
+                    });
+                    return;
+                }
+
                 allCustomers = customers;
                 renderCustomersTable(customers);
-                document.getElementById('settingsTotalCustomers').textContent = customers.length;
-                document.getElementById('repeatCustomers').textContent = customers.filter(c => (c.totalOrders || 0) > 1).length;
+                setTextIfExists('settingsTotalCustomers', customers.length);
+                setTextIfExists('repeatCustomers', customers.filter(c => (c.totalOrders || 0) > 1).length);
                 updateSelectedCount();
+            }, (error) => {
+                console.error('خطأ في جلب العملاء:', error);
+                renderCustomersTable([]);
+                showToast('⚠️ حدث خطأ في تحميل العملاء');
             });
         }
 
@@ -3605,7 +4611,7 @@
             
             const activeBgs = backgrounds.filter(b => b.active === true);
             if (activeBgs.length < 2) {
-                showToast('⚠️ تحتاج إلى خلفيتين نشطتين على الأقل للتناوب');
+                showToast('مرحبا بك من جديد');
                 document.getElementById('rotationEnabled').value = 'false';
                 document.getElementById('rotationStatus').textContent = '⏸️ غير مفعل (لا توجد خلفيات كافية)';
                 document.getElementById('rotationStatus').className = 'rotation-status';
@@ -3715,12 +4721,7 @@
                 return;
             }
 
-            let videoUrl = url;
-            const youtubeRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
-            const match = url.match(youtubeRegex);
-            if (match) {
-                videoUrl = `https://www.youtube.com/embed/${match[1]}?autoplay=1&mute=1&loop=1&playlist=${match[1]}&controls=0&showinfo=0&rel=0&modestbranding=1`;
-            }
+            const videoUrl = getBackgroundVideoUrl(url);
 
             database.ref('settings/video').set({ url: videoUrl, originalUrl: url })
                 .then(() => {
@@ -3741,10 +4742,15 @@
                     document.getElementById('videoBg').classList.remove('active');
                     document.getElementById('videoBgOverlay').classList.remove('active');
                     document.getElementById('videoPreview').classList.remove('show');
+                    document.getElementById('previewVideo').style.display = 'block';
+                    document.getElementById('previewVideo').removeAttribute('src');
+                    const previewIframe = document.querySelector('#videoPreview .video-preview-iframe');
+                    if (previewIframe) previewIframe.remove();
                     document.getElementById('defaultBg').classList.remove('hidden');
                     
                     const iframe = document.querySelector('.video-bg-iframe');
                     if (iframe) iframe.remove();
+                    removeYouTubeFallback('.youtube-bg-fallback');
                     
                     showToast('✅ تم إزالة خلفية الفيديو');
                     applyActiveBackground();
@@ -3756,41 +4762,357 @@
         }
 
         function applyVideoBackground(url) {
+            const youtubeId = extractYouTubeVideoId(url);
+            url = getBackgroundVideoUrl(url);
             const videoBg = document.getElementById('videoBg');
             const videoOverlay = document.getElementById('videoBgOverlay');
             const defaultBg = document.getElementById('defaultBg');
-            const previewVideo = document.getElementById('previewVideo');
 
-            const previewContainer = document.getElementById('videoPreview');
-            previewContainer.classList.add('show');
-            previewVideo.src = url;
-            previewVideo.load();
+            showVideoPreview('videoPreview', 'previewVideo', url, 'video-preview-iframe');
 
-            if (url.includes('youtube.com/embed')) {
-                const iframe = document.createElement('iframe');
-                iframe.src = url;
-                iframe.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;width:100%;height:100%;border:none;pointer-events:none;';
-                iframe.allow = 'autoplay; encrypted-media';
-                iframe.setAttribute('allowfullscreen', '');
-                
-                const oldIframe = document.querySelector('.video-bg-iframe');
-                if (oldIframe) oldIframe.remove();
-                iframe.className = 'video-bg-iframe';
-                document.body.prepend(iframe);
-                
+            const oldIframe = document.querySelector('.video-bg-iframe');
+            if (oldIframe) oldIframe.remove();
+            removeYouTubeFallback('.youtube-bg-fallback');
+
+            if (isYouTubeEmbedUrl(url)) {
+                videoBg.pause();
+                videoBg.removeAttribute('src');
+                videoBg.load();
                 videoBg.classList.remove('active');
                 defaultBg.classList.add('hidden');
                 videoOverlay.classList.add('active');
+
+                if (!canUseYouTubeEmbed() && youtubeId) {
+                    addYouTubeFallback('youtube-bg-fallback', youtubeId, document.body, true);
+                    return;
+                }
+
+                const iframe = document.createElement('iframe');
+                iframe.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;width:100%;height:100%;border:none;pointer-events:none;';
+                iframe.className = 'video-bg-iframe';
+                configureYouTubeIframe(iframe);
+                iframe.src = url;
+                document.body.prepend(iframe);
+                startYouTubeIframePlayback(iframe);
             } else {
-                const oldIframe = document.querySelector('.video-bg-iframe');
-                if (oldIframe) oldIframe.remove();
-                
+                videoBg.muted = true;
+                videoBg.autoplay = true;
+                videoBg.loop = true;
+                videoBg.playsInline = true;
+                videoBg.setAttribute('muted', '');
+                videoBg.setAttribute('playsinline', '');
                 videoBg.src = url;
+                videoBg.load();
                 videoBg.classList.add('active');
                 defaultBg.classList.add('hidden');
                 videoOverlay.classList.add('active');
-                videoBg.play().catch(e => console.log('Auto-play prevented:', e));
+                setTimeout(() => videoBg.play().catch(e => console.log('Auto-play prevented:', e)), 100);
             }
+        }
+
+        // ============================================================
+        // 19.1 خلفية فيديو index
+        // ============================================================
+        function loadIndexVideoBackground() {
+            database.ref('settings/indexVideo').once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.url) {
+                    document.getElementById('indexVideoUrlInput').value = data.originalUrl || data.url;
+                    showIndexVideoPreview(data.url);
+                }
+            });
+        }
+
+        function uploadIndexVideoFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 50 * 1024 * 1024) {
+                showToast('⚠️ حجم الفيديو كبير جداً (الحد الأقصى 50MB)');
+                return;
+            }
+
+            showToast('📤 جاري رفع فيديو index...');
+
+            const storageRef = storage.ref(`index-videos/${Date.now()}_${file.name}`);
+            const uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    showToast(`📤 جاري الرفع: ${Math.round(progress)}%`);
+                },
+                (error) => {
+                    console.error('خطأ في رفع فيديو index:', error);
+                    showToast('⚠️ حدث خطأ في رفع فيديو index');
+                },
+                () => {
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        document.getElementById('indexVideoUrlInput').value = downloadURL;
+                        showToast('✅ تم رفع فيديو index بنجاح! اضغط حفظ لحفظه');
+                    });
+                }
+            );
+        }
+
+        function extractYouTubeVideoId(url) {
+            const cleanUrl = (url || '').trim();
+            try {
+                const parsedUrl = new URL(cleanUrl);
+                const host = parsedUrl.hostname.replace(/^www\./, '').replace(/^m\./, '');
+                if (host === 'youtu.be') {
+                    return parsedUrl.pathname.split('/').filter(Boolean)[0] || null;
+                }
+                if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+                    const videoParam = parsedUrl.searchParams.get('v');
+                    if (videoParam) return videoParam;
+                    const parts = parsedUrl.pathname.split('/').filter(Boolean);
+                    const marker = ['embed', 'shorts', 'live', 'v'].find(type => parts[0] === type);
+                    if (marker && parts[1]) return parts[1];
+                }
+            } catch (error) {
+                // الرابط قد لا يكون بصيغة URL كاملة، لذلك نستخدم الفحص الاحتياطي بالأسفل
+            }
+
+            const fallbackMatch = cleanUrl.match(/(?:v=|\/embed\/|\/shorts\/|\/live\/|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+            return fallbackMatch ? fallbackMatch[1] : null;
+        }
+
+        function isYouTubeEmbedUrl(url) {
+            const cleanUrl = (url || '').trim();
+            try {
+                const parsedUrl = new URL(cleanUrl);
+                const host = parsedUrl.hostname.replace(/^www\./, '').replace(/^m\./, '');
+                return (host === 'youtube.com' || host === 'youtube-nocookie.com') && parsedUrl.pathname.includes('/embed/');
+            } catch (error) {
+                return /youtube(?:-nocookie)?\.com\/embed\//i.test(cleanUrl);
+            }
+        }
+
+        function canUseYouTubeEmbed() {
+            return window.location && (window.location.protocol === 'http:' || window.location.protocol === 'https:');
+        }
+
+        function buildYouTubeThumbnailUrl(videoId) {
+            return `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+        }
+
+        function addYouTubeFallback(className, videoId, parent, prepend = false) {
+            const fallback = document.createElement('div');
+            fallback.className = className;
+            fallback.style.backgroundImage = `url("${buildYouTubeThumbnailUrl(videoId)}")`;
+            fallback.title = 'YouTube يحتاج تشغيل الصفحة من استضافة HTTP/HTTPS ليعمل كفيديو خلفية';
+            if (prepend) {
+                parent.prepend(fallback);
+            } else {
+                parent.appendChild(fallback);
+            }
+            return fallback;
+        }
+
+        function removeYouTubeFallback(selector) {
+            document.querySelectorAll(selector).forEach(item => item.remove());
+        }
+
+        function buildYouTubeEmbedUrl(videoId) {
+            const params = new URLSearchParams({
+                autoplay: '1',
+                mute: '1',
+                loop: '1',
+                playlist: videoId,
+                controls: '0',
+                rel: '0',
+                modestbranding: '1',
+                playsinline: '1',
+                enablejsapi: '1',
+                disablekb: '1',
+                fs: '0',
+                iv_load_policy: '3',
+                cc_load_policy: '0',
+                start: '1'
+            });
+
+            if (canUseYouTubeEmbed()) {
+                params.set('origin', window.location.origin);
+                params.set('widget_referrer', window.location.href.split('#')[0]);
+            }
+
+            return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
+        }
+
+        function configureYouTubeIframe(iframe) {
+            iframe.allow = 'autoplay; encrypted-media; picture-in-picture; web-share; fullscreen';
+            iframe.referrerPolicy = 'origin-when-cross-origin';
+            iframe.setAttribute('referrerpolicy', 'origin-when-cross-origin');
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('loading', 'eager');
+        }
+
+        function startYouTubeIframePlayback(iframe) {
+            if (!iframe) return;
+            const sendCommand = (func) => {
+                try {
+                    if (iframe.contentWindow) {
+                        iframe.contentWindow.postMessage(JSON.stringify({
+                            event: 'command',
+                            func: func,
+                            args: []
+                        }), '*');
+                    }
+                } catch (error) {
+                    console.log('YouTube background command skipped:', error);
+                }
+            };
+            const start = () => {
+                sendCommand('mute');
+                sendCommand('playVideo');
+            };
+            iframe.addEventListener('load', () => {
+                start();
+                setTimeout(start, 400);
+                setTimeout(start, 1200);
+                setTimeout(start, 2500);
+            });
+            setTimeout(start, 800);
+        }
+
+        function getBackgroundVideoUrl(url) {
+            const cleanUrl = (url || '').trim();
+            const youtubeId = extractYouTubeVideoId(cleanUrl);
+            if (youtubeId) {
+                return buildYouTubeEmbedUrl(youtubeId);
+            }
+            return cleanUrl;
+        }
+
+        function showVideoPreview(containerId, videoId, url, iframeClassName) {
+            const youtubeId = extractYouTubeVideoId(url);
+            url = getBackgroundVideoUrl(url);
+            const previewContainer = document.getElementById(containerId);
+            const previewVideo = document.getElementById(videoId);
+            if (!previewContainer || !previewVideo) return;
+
+            previewContainer.classList.add('show');
+            const oldIframe = previewContainer.querySelector(`.${iframeClassName}`);
+            if (oldIframe) oldIframe.remove();
+
+            if (isYouTubeEmbedUrl(url)) {
+                previewVideo.pause();
+                previewVideo.removeAttribute('src');
+                previewVideo.load();
+                previewVideo.style.display = 'none';
+
+                if (!canUseYouTubeEmbed() && youtubeId) {
+                    const fallback = addYouTubeFallback(iframeClassName, youtubeId, previewContainer);
+                    fallback.style.cssText += 'width:100%;height:220px;border:none;display:block;border-radius:12px;background-size:cover;background-position:center;';
+                    return;
+                }
+
+                const iframe = document.createElement('iframe');
+                iframe.className = iframeClassName;
+                iframe.style.cssText = 'width:100%;height:220px;border:none;display:block;border-radius:12px;';
+                configureYouTubeIframe(iframe);
+                iframe.src = url;
+                previewContainer.appendChild(iframe);
+                startYouTubeIframePlayback(iframe);
+                return;
+            }
+
+            previewVideo.style.display = 'block';
+            previewVideo.src = url;
+            previewVideo.load();
+        }
+
+        function loadIndexShapesCode() {
+            const input = document.getElementById('indexShapesCodeInput');
+            if (!input) return;
+
+            database.ref('settings/indexShapes').once('value', (snapshot) => {
+                const data = snapshot.val();
+                input.value = data && data.code ? data.code : '';
+            });
+        }
+
+        function saveIndexShapesCode() {
+            const input = document.getElementById('indexShapesCodeInput');
+            const code = input ? input.value.trim() : '';
+
+            if (!code) {
+                showToast('⚠️ يرجى وضع كود الأشكال أولاً');
+                return;
+            }
+
+            database.ref('settings/indexShapes').set({
+                code: code,
+                updatedAt: new Date().toISOString()
+            })
+                .then(() => {
+                    showToast('✅ تم حفظ أشكال خلفية index بنجاح!');
+                })
+                .catch((error) => {
+                    console.error(error);
+                    showToast('⚠️ حدث خطأ في حفظ أشكال index');
+                });
+        }
+
+        function removeIndexShapesCode() {
+            if (!confirm('هل تريد استرجاع الأشكال الافتراضية في index؟')) return;
+
+            database.ref('settings/indexShapes').remove()
+                .then(() => {
+                    const input = document.getElementById('indexShapesCodeInput');
+                    if (input) input.value = '';
+                    showToast('✅ تم استرجاع أشكال index الافتراضية');
+                })
+                .catch((error) => {
+                    console.error(error);
+                    showToast('⚠️ حدث خطأ في إزالة كود أشكال index');
+                });
+        }
+
+        function saveIndexVideoBackground() {
+            const url = document.getElementById('indexVideoUrlInput').value.trim();
+            if (!url) {
+                showToast('⚠️ يرجى إدخال رابط فيديو index أو رفع فيديو');
+                return;
+            }
+
+            const videoUrl = getBackgroundVideoUrl(url);
+            database.ref('settings/indexVideo').set({
+                url: videoUrl,
+                originalUrl: url,
+                updatedAt: new Date().toISOString()
+            })
+                .then(() => {
+                    showToast('✅ تم حفظ فيديو index بنجاح!');
+                    showIndexVideoPreview(videoUrl);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    showToast('⚠️ حدث خطأ في حفظ فيديو index');
+                });
+        }
+
+        function removeIndexVideoBackground() {
+            if (!confirm('هل أنت متأكد من إزالة خلفية فيديو index؟')) return;
+            database.ref('settings/indexVideo').remove()
+                .then(() => {
+                    document.getElementById('indexVideoUrlInput').value = '';
+                    document.getElementById('indexVideoPreview').classList.remove('show');
+                    document.getElementById('indexPreviewVideo').style.display = 'block';
+                    document.getElementById('indexPreviewVideo').removeAttribute('src');
+                    const indexPreviewIframe = document.querySelector('#indexVideoPreview .index-video-preview-iframe');
+                    if (indexPreviewIframe) indexPreviewIframe.remove();
+                    showToast('✅ تم إزالة خلفية فيديو index');
+                })
+                .catch((error) => {
+                    console.error(error);
+                    showToast('⚠️ حدث خطأ');
+                });
+        }
+
+        function showIndexVideoPreview(url) {
+            showVideoPreview('indexVideoPreview', 'indexPreviewVideo', url, 'index-video-preview-iframe');
         }
 
         // ============================================================
@@ -3875,6 +5197,90 @@
         console.log('   📌 تحديث المخزون تلقائياً عند الشحن');
         console.log('   📌 قسم نفاذ المخزن (المنتجات غير المتوفرة)');
         console.log('👨‍💻 تم التطوير بواسطة LordOfShdow');
+    </script>
+
+
+    <script>
+        // ===== ربط السايدبار الجديد بالتبويبات الأصلية بدون تغيير منطق لوحة التحكم =====
+        (function () {
+            function setSidebarActiveByTab(tabId, preferredButton) {
+                const links = document.querySelectorAll('.dashboard-nav-link');
+                links.forEach(link => link.classList.remove('active'));
+
+                if (preferredButton) {
+                    preferredButton.classList.add('active');
+                    return;
+                }
+
+                const firstMatch = document.querySelector(`.dashboard-nav-link[data-tab="${tabId}"]`);
+                if (firstMatch) firstMatch.classList.add('active');
+            }
+
+            window.switchDashboardTab = function (tabId, clickedButton) {
+                const originalTabButton = document.querySelector(`.tabs .tab-btn[data-tab="${tabId}"]`);
+
+                if (originalTabButton) {
+                    originalTabButton.click();
+                }
+
+                // ضمان فتح نفس التبويب حتى لو لم تُحمّل بعض سكربتات الصفحة الخارجية أثناء المعاينة المحلية
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                const targetContent = document.getElementById(`tab-${tabId}`);
+                if (targetContent) targetContent.classList.add('active');
+
+                if (tabId === 'finance' && typeof updateFinancialAccounts === 'function') {
+                    updateFinancialAccounts(window.allOrders || allOrders || []);
+                }
+
+                setSidebarActiveByTab(tabId, clickedButton || null);
+                toggleDashboardSidebar(false);
+            };
+
+            window.toggleDashboardSidebar = function (force) {
+                const shouldOpen = typeof force === 'boolean'
+                    ? force
+                    : !document.body.classList.contains('dashboard-sidebar-open');
+
+                document.body.classList.toggle('dashboard-sidebar-open', shouldOpen);
+            };
+
+            function mirrorOrdersBadge() {
+                const source = document.getElementById('ordersTabBadge') || document.getElementById('ordersBadge');
+                const targets = document.querySelectorAll('.sidebar-orders-badge');
+                if (!source || !targets.length) return;
+
+                const value = (source.textContent || '').trim();
+                const visible = source.style.display !== 'none' && value && value !== '0';
+
+                targets.forEach(target => {
+                    target.textContent = value || '0';
+                    target.classList.toggle('hidden', !visible);
+                });
+            }
+
+            document.querySelectorAll('.tabs .tab-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    setSidebarActiveByTab(this.dataset.tab, null);
+                });
+            });
+
+            const ordersBadge = document.getElementById('ordersTabBadge') || document.getElementById('ordersBadge');
+            if (ordersBadge && 'MutationObserver' in window) {
+                new MutationObserver(mirrorOrdersBadge).observe(ordersBadge, {
+                    childList: true,
+                    characterData: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['style', 'class']
+                });
+            }
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') toggleDashboardSidebar(false);
+            });
+
+            mirrorOrdersBadge();
+        })();
     </script>
 
 </body>
