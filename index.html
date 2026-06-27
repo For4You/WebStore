@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
     <title>موضة اليوم - تشكيلة الصيف</title>
     
     <!-- ===== FontAwesome ===== -->
@@ -48,6 +49,37 @@
             transition: opacity 0.5s;
         }
         .animated-bg.hidden { opacity: 0; }
+
+        .video-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .video-bg.active { display: block; }
+        .index-video-bg-iframe {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none;
+        }
+        .index-youtube-bg-fallback {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            pointer-events: none;
+        }
 
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
@@ -108,6 +140,16 @@
             pointer-events: none;
             overflow: hidden;
         }
+        .index-shapes-layer {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+            display: none;
+        }
+        .index-shapes-layer.active { display: block; }
+        .index-shapes-layer * { pointer-events: none; }
         .particle {
             position: absolute;
             border-radius: 50%;
@@ -2457,6 +2499,782 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
             width: 100%;
             height: 100%;
         }
+    
+
+        /* ===== إصلاح خلفية YouTube + تجاوب شامل للهاتف ===== */
+        .index-video-bg-iframe {
+            top: 50% !important;
+            left: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 177.78vh !important;
+            height: 100vh !important;
+            min-width: 100vw !important;
+            min-height: 56.25vw !important;
+            transform: translate(-50%, -50%) !important;
+        }
+
+        .index-youtube-bg-fallback {
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            transform: none !important;
+        }
+
+        html { max-width: 100%; -webkit-text-size-adjust: 100%; }
+        body { max-width: 100%; }
+        img, video, iframe { max-width: 100%; }
+
+        @media (max-width: 768px) {
+            body { overflow-x: hidden !important; }
+            .main-content { width: 100% !important; min-height: auto !important; }
+            .delivery-bar { padding: 7px 10px !important; }
+            .delivery-bar .scrolling-text { font-size: 11px !important; }
+            .header {
+                padding: 10px 12px !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+            .logo {
+                width: 100% !important;
+                text-align: center !important;
+                font-size: clamp(34px, 13vw, 54px) !important;
+                line-height: 1.05 !important;
+            }
+            .header-actions {
+                width: 100% !important;
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 8px !important;
+            }
+            .search-box {
+                grid-column: 1 / -1 !important;
+                width: 100% !important;
+                padding: 8px 14px !important;
+            }
+            .search-box input { width: 100% !important; min-width: 0 !important; font-size: 16px !important; }
+            .cart-icon, .dark-toggle, .sizes-btn { justify-content: center !important; width: 100% !important; min-height: 40px !important; }
+            .services-bar {
+                grid-template-columns: 1fr !important;
+                margin: 10px !important;
+                padding: 12px !important;
+                gap: 10px !important;
+                border-radius: 16px !important;
+            }
+            .services-bar .service-item {
+                display: flex !important;
+                align-items: center !important;
+                text-align: right !important;
+                gap: 12px !important;
+                padding: 12px !important;
+            }
+            .services-bar .service-item .icon { margin-bottom: 0 !important; flex-shrink: 0 !important; }
+            .hero {
+                margin: 10px !important;
+                padding: 24px 16px !important;
+                min-height: auto !important;
+                border-radius: 18px !important;
+            }
+            .hero h1 { font-size: clamp(22px, 7vw, 30px) !important; line-height: 1.25 !important; }
+            .hero p { font-size: 14px !important; line-height: 1.7 !important; }
+            .hero-slide .promo-images { gap: 10px !important; }
+            .hero-slide .promo-images .person-card { width: 58px !important; height: 58px !important; font-size: 26px !important; }
+            .controls-bar {
+                margin: 10px !important;
+                padding: 12px !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 10px !important;
+            }
+            .filter-group {
+                width: 100% !important;
+                display: flex !important;
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+                gap: 8px !important;
+                padding-bottom: 4px !important;
+                -webkit-overflow-scrolling: touch !important;
+            }
+            .filter-btn, .sub-filter-btn { flex: 0 0 auto !important; white-space: nowrap !important; padding: 8px 14px !important; }
+            .sort-select { width: 100% !important; font-size: 16px !important; }
+            .section-header { padding: 0 12px !important; gap: 6px !important; }
+            .section-title { font-size: 24px !important; line-height: 1.25 !important; }
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 10px !important;
+                padding: 10px !important;
+                margin: 0 !important;
+            }
+            .product-card { border-radius: 18px !important; min-width: 0 !important; }
+            .product-card:hover { transform: translateY(-4px) scale(1.01) !important; }
+            .product-image { height: auto !important; aspect-ratio: 1 / 1.15 !important; }
+            .product-info { padding: 10px !important; }
+            .product-name { font-size: 13px !important; line-height: 1.4 !important; }
+            .product-price { font-size: 16px !important; }
+            .product-colors, .product-stock { font-size: 11px !important; }
+            .size-badge { font-size: 10px !important; padding: 3px 7px !important; }
+            .product-actions { display: grid !important; grid-template-columns: 1fr !important; gap: 6px !important; }
+            .product-actions button, .btn-glass, .btn-glass-buy, .btn-preview { width: 100% !important; min-height: 34px !important; font-size: 12px !important; }
+            .modal-overlay {
+                align-items: flex-start !important;
+                padding: 10px !important;
+                overflow-y: auto !important;
+            }
+            .modal-content {
+                width: 100% !important;
+                max-width: 560px !important;
+                max-height: none !important;
+                margin: 0 auto !important;
+                padding: 18px !important;
+                border-radius: 18px !important;
+            }
+            .modal-content .product-image, .gallery-container .gallery-main { height: 240px !important; }
+            .modal-actions { flex-direction: column !important; }
+            .cart-item { flex-wrap: wrap !important; gap: 10px !important; }
+            .cart-item .item-info { min-width: 0 !important; flex: 1 1 140px !important; }
+            .checkout-item { padding: 12px !important; }
+            .checkout-item .item-header { flex-wrap: wrap !important; gap: 8px !important; }
+            .checkout-item .item-options { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; }
+            .checkout-item .item-options .option-group { width: 100% !important; }
+            .delivery-options { grid-template-columns: 1fr !important; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 16px !important; }
+            .toast { left: 10px !important; right: 10px !important; bottom: 12px !important; max-width: none !important; }
+            .footer, .about-section, .policy-section { padding-left: 12px !important; padding-right: 12px !important; }
+        }
+
+        @media (max-width: 480px) {
+            .header-actions { grid-template-columns: 1fr 1fr !important; }
+            .logo { font-size: clamp(30px, 12vw, 42px) !important; }
+            .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; padding: 8px !important; }
+            .product-info { padding: 8px !important; }
+            .product-name { font-size: 12px !important; }
+            .product-price { font-size: 15px !important; }
+            .product-actions button { font-size: 11px !important; padding: 7px 6px !important; }
+            .modal-content .product-image, .gallery-container .gallery-main { height: 210px !important; }
+        }
+
+        @media (max-width: 360px) {
+            .product-grid { grid-template-columns: 1fr !important; }
+            .header-actions { grid-template-columns: 1fr !important; }
+        }
+
+
+        /* ===== تذييل عالمي مطوّر ===== */
+        .about-section,
+        .policy-section {
+            display: none !important;
+        }
+
+        .footer {
+            margin: 28px 20px 26px !important;
+            padding: 0 !important;
+            border-top: none !important;
+            color: rgba(255,255,255,0.62) !important;
+            text-align: right !important;
+            position: relative;
+            z-index: 2;
+        }
+        .footer .global-footer-shell {
+            position: relative;
+            overflow: hidden;
+            border-radius: 28px;
+            padding: 28px;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(255,215,0,0.14), transparent 34%),
+                radial-gradient(circle at 92% 0%, rgba(255,107,107,0.16), transparent 36%),
+                linear-gradient(135deg, rgba(255,255,255,0.095), rgba(255,255,255,0.035));
+            border: 1px solid rgba(255,255,255,0.095);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.28);
+        }
+        .footer .global-footer-shell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+            transform: translateX(100%);
+            animation: footerShine 7s ease-in-out infinite;
+        }
+        @keyframes footerShine {
+            0%, 78% { transform: translateX(100%); opacity: 0; }
+            88% { opacity: 1; }
+            100% { transform: translateX(-100%); opacity: 0; }
+        }
+        .footer .global-footer-grid {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(260px, 1.2fr) minmax(260px, 1.4fr) minmax(220px, 0.9fr);
+            gap: 24px;
+            align-items: stretch;
+        }
+        .footer .footer-brand,
+        .footer .footer-policies,
+        .footer .footer-social-card {
+            background: rgba(0,0,0,0.16);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 22px;
+            padding: 20px;
+        }
+        .footer .footer-logo-line {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .footer .footer-logo-mark {
+            width: 46px;
+            height: 46px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            color: #151515;
+            font-size: 20px;
+            box-shadow: 0 12px 32px rgba(255,107,107,0.18);
+        }
+        .footer .footer-brand-name {
+            display: block;
+            font-size: 22px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.4px;
+        }
+        .footer .footer-brand-tagline {
+            display: block;
+            margin-top: 2px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.36);
+            font-weight: 600;
+        }
+        .footer .footer-brand p {
+            color: rgba(255,255,255,0.48);
+            font-size: 13px;
+            line-height: 1.9;
+            margin: 0 0 16px;
+        }
+        .footer .footer-trust-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .footer .trust-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            color: rgba(255,255,255,0.64);
+            background: rgba(255,255,255,0.055);
+            border: 1px solid rgba(255,255,255,0.055);
+        }
+        .footer .trust-pill i { color: #ffd700; }
+        .footer .footer-section-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin: 0 0 14px;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 900;
+        }
+        .footer .footer-section-title i { color: #ffd700; }
+        .footer .footer-policy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .footer .footer-policy-link {
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.66);
+            text-decoration: none;
+            padding: 12px 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            transition: all 0.25s ease;
+        }
+        .footer .footer-policy-link i {
+            width: 28px;
+            height: 28px;
+            border-radius: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,215,0,0.08);
+            color: #ffd700;
+            flex-shrink: 0;
+        }
+        .footer .footer-policy-link:hover {
+            color: #fff;
+            border-color: rgba(255,215,0,0.18);
+            background: rgba(255,215,0,0.08);
+            transform: translateY(-2px);
+        }
+        .footer .social-links {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+            margin: 0 0 14px !important;
+            justify-content: stretch !important;
+        }
+        .footer .social-links a {
+            min-height: 48px;
+            width: 100%;
+            padding: 12px 14px !important;
+            border-radius: 16px !important;
+            justify-content: center;
+            gap: 10px !important;
+            color: #fff !important;
+            font-size: 13px !important;
+            font-weight: 900 !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+            animation: none !important;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+        .footer .social-links a .icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.18);
+            font-size: 15px !important;
+        }
+        .footer .social-links a .label-text { font-size: 13px !important; }
+        .footer .social-links .social-btn-telegram {
+            background: linear-gradient(135deg, #0088cc, #31b4f2) !important;
+            border-color: rgba(49,180,242,0.42) !important;
+        }
+        .footer .social-links .social-btn-facebook {
+            background: linear-gradient(135deg, #1877f2, #3b8cff) !important;
+            border-color: rgba(24,119,242,0.42) !important;
+        }
+        .footer .social-links a:hover {
+            transform: translateY(-3px) scale(1.01) !important;
+            box-shadow: 0 18px 38px rgba(0,0,0,0.26);
+        }
+        .footer .footer-help-text {
+            color: rgba(255,255,255,0.46);
+            font-size: 12px;
+            line-height: 1.7;
+            margin: 0;
+        }
+        .footer .footer-bottom-bar {
+            position: relative;
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            color: rgba(255,255,255,0.34);
+            font-size: 12px;
+            text-align: center;
+        }
+        .footer .footer-bottom-bar strong { color: rgba(255,215,0,0.74); }
+        .footer .footer-mini-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .footer .footer-mini-links button {
+            border: 0;
+            background: transparent;
+            color: rgba(255,255,255,0.38);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 8px;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+        }
+        .footer .footer-mini-links button:hover {
+            color: #ffd700;
+            background: rgba(255,215,0,0.08);
+        }
+
+        body.light-mode .footer { color: rgba(0,0,0,0.62) !important; }
+        body.light-mode .footer .global-footer-shell {
+            background:
+                radial-gradient(circle at 10% 10%, rgba(232,62,140,0.10), transparent 34%),
+                radial-gradient(circle at 92% 0%, rgba(255,107,107,0.12), transparent 36%),
+                linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,255,255,0.70));
+            border-color: rgba(0,0,0,0.06);
+            box-shadow: 0 24px 70px rgba(0,0,0,0.10);
+        }
+        body.light-mode .footer .footer-brand,
+        body.light-mode .footer .footer-policies,
+        body.light-mode .footer .footer-social-card {
+            background: rgba(255,255,255,0.60);
+            border-color: rgba(0,0,0,0.06);
+        }
+        body.light-mode .footer .footer-brand-name,
+        body.light-mode .footer .footer-section-title { color: #1d1d1f; }
+        body.light-mode .footer .footer-brand-tagline,
+        body.light-mode .footer .footer-brand p,
+        body.light-mode .footer .footer-help-text { color: rgba(0,0,0,0.54); }
+        body.light-mode .footer .trust-pill,
+        body.light-mode .footer .footer-policy-link {
+            color: rgba(0,0,0,0.62);
+            background: rgba(0,0,0,0.035);
+            border-color: rgba(0,0,0,0.05);
+        }
+        body.light-mode .footer .footer-policy-link:hover {
+            color: #e83e8c;
+            border-color: rgba(232,62,140,0.14);
+            background: rgba(232,62,140,0.055);
+        }
+        body.light-mode .footer .footer-bottom-bar {
+            color: rgba(0,0,0,0.42);
+            border-top-color: rgba(0,0,0,0.06);
+        }
+        body.light-mode .footer .footer-mini-links button { color: rgba(0,0,0,0.48); }
+        body.light-mode .footer .footer-mini-links button:hover {
+            color: #e83e8c;
+            background: rgba(232,62,140,0.06);
+        }
+
+        @media (max-width: 900px) {
+            .footer { margin: 22px 14px 22px !important; }
+            .footer .global-footer-shell { padding: 20px; border-radius: 24px; }
+            .footer .global-footer-grid { grid-template-columns: 1fr; gap: 14px; }
+            .footer .footer-brand,
+            .footer .footer-policies,
+            .footer .footer-social-card { padding: 18px; }
+        }
+        @media (max-width: 520px) {
+            .footer { margin: 18px 10px 18px !important; }
+            .footer .global-footer-shell { padding: 14px; border-radius: 20px; }
+            .footer .footer-logo-line { align-items: flex-start; }
+            .footer .footer-brand-name { font-size: 19px; }
+            .footer .footer-policy-grid { grid-template-columns: 1fr; }
+            .footer .footer-policy-link { padding: 11px 12px; font-size: 12px; }
+            .footer .footer-bottom-bar { justify-content: center; font-size: 11px; }
+            .footer .footer-mini-links button { font-size: 11px; padding: 5px 7px; }
+        }
+
+
+        /* ===== تحديث بطاقة السياسات السفلية والنوافذ الزجاجية ===== */
+        .policy-popup,
+        .about-popup {
+            width: min(92vw, 390px) !important;
+            max-width: 390px !important;
+            padding: 20px 22px 18px !important;
+            border-radius: 22px !important;
+            background: linear-gradient(145deg, rgba(24,24,28,0.72), rgba(18,18,22,0.56)) !important;
+            border: 1px solid rgba(255,255,255,0.18) !important;
+            box-shadow: 0 24px 70px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+            backdrop-filter: blur(22px) saturate(150%) !important;
+            -webkit-backdrop-filter: blur(22px) saturate(150%) !important;
+            overflow: hidden !important;
+        }
+        .policy-popup::before,
+        .about-popup::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 15% 0%, rgba(255,215,0,0.18), transparent 34%),
+                        radial-gradient(circle at 88% 12%, rgba(255,107,107,0.14), transparent 32%);
+        }
+        .policy-popup::after,
+        .about-popup::after {
+            content: '';
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 10px;
+            height: 3px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            transform-origin: right center;
+            transform: scaleX(0);
+            opacity: 0;
+        }
+        .policy-popup.show::after,
+        .about-popup.show::after {
+            animation: policyAutoCloseBar 7s linear forwards;
+            opacity: 0.9;
+        }
+        @keyframes policyAutoCloseBar {
+            from { transform: scaleX(1); }
+            to { transform: scaleX(0); }
+        }
+        .policy-popup .popup-icon,
+        .about-popup .popup-icon {
+            position: relative;
+            z-index: 1;
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 10px !important;
+            border-radius: 18px;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 27px !important;
+            background: rgba(255,255,255,0.10);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .policy-popup h3,
+        .about-popup h3 {
+            position: relative;
+            z-index: 1;
+            margin: 0 0 8px !important;
+            color: #ffe477 !important;
+            font-size: 19px !important;
+            line-height: 1.35 !important;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+        }
+        .policy-popup p,
+        .about-popup p {
+            position: relative;
+            z-index: 1;
+            margin: 0 !important;
+            color: rgba(255,255,255,0.92) !important;
+            font-size: 13.5px !important;
+            line-height: 1.9 !important;
+            font-weight: 650 !important;
+            text-shadow: 0 1px 10px rgba(0,0,0,0.28);
+        }
+        .policy-popup .popup-close,
+        .about-popup .popup-close {
+            position: relative;
+            z-index: 1;
+            margin-top: 14px !important;
+            padding: 7px 24px !important;
+            min-height: 34px;
+            color: #181818 !important;
+            background: linear-gradient(135deg, #ffe477, #ffd700) !important;
+            border: 0 !important;
+            box-shadow: 0 12px 28px rgba(255,215,0,0.18) !important;
+            font-size: 12px !important;
+        }
+
+        .footer {
+            margin: 18px 14px 18px !important;
+        }
+        .footer .global-footer-shell {
+            padding: 0 !important;
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            overflow: visible !important;
+        }
+        .footer .global-footer-shell::before {
+            display: none !important;
+        }
+        .footer .global-footer-grid {
+            grid-template-columns: minmax(220px, 0.95fr) minmax(280px, 1.15fr) minmax(210px, 0.85fr) !important;
+            gap: 12px !important;
+            align-items: start !important;
+        }
+        .footer .footer-brand,
+        .footer .footer-policies,
+        .footer .footer-social-card {
+            border-radius: 18px !important;
+            padding: 14px !important;
+            background: rgba(255,255,255,0.055) !important;
+            border: 1px solid rgba(255,255,255,0.10) !important;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.16) !important;
+            backdrop-filter: blur(14px) !important;
+            -webkit-backdrop-filter: blur(14px) !important;
+        }
+        .footer .footer-policies {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        .footer .footer-section-title {
+            margin-bottom: 9px !important;
+            font-size: 14px !important;
+            color: rgba(255,255,255,0.96) !important;
+        }
+        .footer .footer-policy-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)) !important;
+            gap: 8px !important;
+            align-items: stretch !important;
+        }
+        .footer .footer-policy-link {
+            min-height: 42px !important;
+            width: 100% !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+            border-radius: 14px !important;
+            background: linear-gradient(145deg, rgba(255,255,255,0.105), rgba(255,255,255,0.045)) !important;
+            color: rgba(255,255,255,0.94) !important;
+            padding: 8px 9px !important;
+            gap: 7px !important;
+            font-size: 11.5px !important;
+            font-weight: 900 !important;
+            line-height: 1.25 !important;
+            font-family: inherit !important;
+            text-align: right !important;
+            justify-content: flex-start !important;
+            box-shadow: 0 10px 26px rgba(0,0,0,0.13) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+        }
+        .footer .footer-policy-link i {
+            width: 25px !important;
+            height: 25px !important;
+            min-width: 25px !important;
+            border-radius: 9px !important;
+            background: rgba(255,215,0,0.14) !important;
+            color: #ffe477 !important;
+            font-size: 12px !important;
+        }
+        .footer .footer-policy-link:hover,
+        .footer .footer-policy-link:focus-visible {
+            color: #ffffff !important;
+            border-color: rgba(255,215,0,0.38) !important;
+            background: linear-gradient(145deg, rgba(255,215,0,0.18), rgba(255,255,255,0.07)) !important;
+            transform: translateY(-2px) scale(1.01) !important;
+            outline: none !important;
+        }
+        .footer .footer-brand-name {
+            color: #fff !important;
+            font-size: 20px !important;
+        }
+        .footer .footer-brand-tagline,
+        .footer .footer-brand p,
+        .footer .footer-help-text,
+        .footer .footer-bottom-bar,
+        .footer .footer-mini-links button {
+            color: rgba(255,255,255,0.72) !important;
+        }
+        .footer .trust-pill {
+            color: rgba(255,255,255,0.86) !important;
+            padding: 6px 10px !important;
+            font-size: 10.5px !important;
+        }
+        .footer .footer-bottom-bar {
+            margin-top: 10px !important;
+            padding-top: 10px !important;
+            gap: 8px !important;
+            font-weight: 700 !important;
+        }
+        .footer .footer-mini-links button {
+            background: rgba(255,255,255,0.055) !important;
+            border: 1px solid rgba(255,255,255,0.08) !important;
+            padding: 5px 8px !important;
+            font-weight: 900 !important;
+        }
+        body.light-mode .policy-popup,
+        body.light-mode .about-popup {
+            background: linear-gradient(145deg, rgba(255,255,255,0.86), rgba(255,255,255,0.70)) !important;
+            color: #171717 !important;
+            border-color: rgba(0,0,0,0.10) !important;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.8) !important;
+        }
+        body.light-mode .policy-popup h3,
+        body.light-mode .about-popup h3 {
+            color: #b71b63 !important;
+            text-shadow: none !important;
+        }
+        body.light-mode .policy-popup p,
+        body.light-mode .about-popup p {
+            color: rgba(0,0,0,0.82) !important;
+            text-shadow: none !important;
+        }
+        body.light-mode .footer .footer-brand,
+        body.light-mode .footer .footer-social-card {
+            background: rgba(255,255,255,0.72) !important;
+            border-color: rgba(0,0,0,0.08) !important;
+        }
+        body.light-mode .footer .footer-section-title,
+        body.light-mode .footer .footer-brand-name {
+            color: #1d1d1f !important;
+        }
+        body.light-mode .footer .footer-policy-link {
+            color: rgba(0,0,0,0.82) !important;
+            background: linear-gradient(145deg, rgba(255,255,255,0.88), rgba(255,255,255,0.62)) !important;
+            border-color: rgba(0,0,0,0.09) !important;
+        }
+        body.light-mode .footer .footer-policy-link:hover,
+        body.light-mode .footer .footer-policy-link:focus-visible {
+            color: #b71b63 !important;
+            background: rgba(232,62,140,0.08) !important;
+            border-color: rgba(232,62,140,0.22) !important;
+        }
+        body.light-mode .footer .footer-brand-tagline,
+        body.light-mode .footer .footer-brand p,
+        body.light-mode .footer .footer-help-text,
+        body.light-mode .footer .footer-bottom-bar,
+        body.light-mode .footer .footer-mini-links button {
+            color: rgba(0,0,0,0.68) !important;
+        }
+        @media (max-width: 900px) {
+            .footer .global-footer-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+            .footer .footer-policy-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+        }
+        @media (max-width: 520px) {
+            .footer {
+                margin: 12px 8px 14px !important;
+            }
+            .footer .footer-brand,
+            .footer .footer-social-card {
+                padding: 12px !important;
+            }
+            .footer .footer-policy-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 7px !important;
+            }
+            .footer .footer-policy-link {
+                min-height: 39px !important;
+                padding: 7px 8px !important;
+                font-size: 10.5px !important;
+                border-radius: 13px !important;
+            }
+            .footer .footer-policy-link i {
+                width: 22px !important;
+                height: 22px !important;
+                min-width: 22px !important;
+                font-size: 11px !important;
+            }
+            .policy-popup,
+            .about-popup {
+                padding: 18px 16px 17px !important;
+                max-width: 340px !important;
+            }
+            .policy-popup h3,
+            .about-popup h3 {
+                font-size: 17px !important;
+            }
+            .policy-popup p,
+            .about-popup p {
+                font-size: 12.5px !important;
+                line-height: 1.85 !important;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -2472,12 +3290,14 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
     </div>
 
     <!-- ===== خلفيات ===== -->
+    <video class="video-bg" id="indexVideoBg" autoplay loop muted playsinline></video>
     <div class="animated-bg" id="defaultBg"></div>
     <div class="custom-bg" id="customBg"></div>
     <div class="bg-overlay"></div>
 
     <!-- ===== جزيئات متحركة ===== -->
     <div class="particles-container" id="particlesContainer"></div>
+    <div class="index-shapes-layer" id="indexShapesLayer"></div>
 
     <!-- ===== المحتوى الرئيسي ===== -->
     <div class="main-content">
@@ -2874,42 +3694,66 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
             </div>
         </div>
 
-        <!-- ===== زر من نحن (مثل السياسات) ===== -->
-        <div class="about-section">
-            <a onclick="showAboutPopup()"><i class="fas fa-info-circle"></i> من نحن</a>
-        </div>
-
-        <!-- ===== سياسة الاستخدام ===== -->
-        <div class="policy-section">
-            <a onclick="showPolicyPopup('privacy')"><i class="fas fa-shield-alt"></i> سياسة الخصوصية</a>
-            <span class="policy-divider">|</span>
-            <a onclick="showPolicyPopup('terms')"><i class="fas fa-file-contract"></i> شروط الاستخدام</a>
-            <span class="policy-divider">|</span>
-            <a onclick="showPolicyPopup('return')"><i class="fas fa-undo-alt"></i> الاستبدال والاسترجاع</a>
-            <span class="policy-divider">|</span>
-            <a onclick="showPolicyPopup('payment')"><i class="fas fa-credit-card"></i> سياسة الدفع</a>
-            <span class="policy-divider">|</span>
-            <a onclick="showPolicyPopup('delivery')"><i class="fas fa-truck"></i> سياسة التوصيل</a>
-        </div>
-
-        <!-- ===== التذييل ===== -->
+        <!-- ===== التذييل العالمي ===== -->
         <footer class="footer">
-            <div class="social-links">
-                <a href="https://t.me/LordOfShdow" target="_blank" class="social-btn-telegram" title="تيليغرام">
-                    <span class="icon"><i class="fab fa-telegram-plane"></i></span>
-                    <span class="label-text">تيليغرام</span>
-                </a>
-                <a href="https://www.facebook.com/people/For4You/61590728677256/" target="_blank" class="social-btn-facebook" title="فيسبوك">
-                    <span class="icon"><i class="fab fa-facebook-f"></i></span>
-                    <span class="label-text">فيسبوك</span>
-                </a>
+            <div class="global-footer-shell">
+                <div class="global-footer-grid">
+                    <div class="footer-brand">
+                        <div class="footer-logo-line">
+                            <span class="footer-logo-mark"><i class="fas fa-gem"></i></span>
+                            <span>
+                                <span class="footer-brand-name">موضة اليوم</span>
+                                <span class="footer-brand-tagline">منصة تسوّق عصرية بثقة عالمية</span>
+                            </span>
+                        </div>
+                        <p>
+                            تجربة شراء أنيقة وآمنة، مع سياسات واضحة، دعم سريع، وتوصيل منظّم إلى مختلف الولايات.
+                        </p>
+                        <div class="footer-trust-row">
+                            <span class="trust-pill"><i class="fas fa-lock"></i> حماية البيانات</span>
+                            <span class="trust-pill"><i class="fas fa-truck-fast"></i> توصيل موثوق</span>
+                            <span class="trust-pill"><i class="fas fa-headset"></i> دعم العملاء</span>
+                        </div>
+                    </div>
+
+                    <div class="footer-policies">
+                        <h3 class="footer-section-title"><i class="fas fa-scale-balanced"></i> السياسات والخدمات</h3>
+                        <div class="footer-policy-grid">
+                            <button type="button" class="footer-policy-link" onclick="showPolicyPopup('privacy')"><i class="fas fa-shield-halved"></i><span>سياسة الخصوصية</span></button>
+                            <button type="button" class="footer-policy-link" onclick="showPolicyPopup('terms')"><i class="fas fa-file-signature"></i><span>شروط الاستخدام</span></button>
+                            <button type="button" class="footer-policy-link" onclick="showPolicyPopup('return')"><i class="fas fa-rotate-left"></i><span>الاستبدال والاسترجاع</span></button>
+                            <button type="button" class="footer-policy-link" onclick="showPolicyPopup('payment')"><i class="fas fa-credit-card"></i><span>سياسة الدفع</span></button>
+                            <button type="button" class="footer-policy-link" onclick="showPolicyPopup('delivery')"><i class="fas fa-truck"></i><span>سياسة التوصيل</span></button>
+                            <button type="button" class="footer-policy-link" onclick="showAboutPopup()"><i class="fas fa-circle-info"></i><span>من نحن</span></button>
+                        </div>
+                    </div>
+
+                    <div class="footer-social-card">
+                        <h3 class="footer-section-title"><i class="fas fa-share-nodes"></i> تواصل معنا</h3>
+                        <div class="social-links">
+                            <a href="https://t.me/LordOfShdow" target="_blank" rel="noopener noreferrer" class="social-btn-telegram" title="تيليغرام">
+                                <span class="icon"><i class="fab fa-telegram-plane"></i></span>
+                                <span class="label-text">تيليغرام</span>
+                            </a>
+                            <a href="https://www.facebook.com/people/For4You/61590728677256/" target="_blank" rel="noopener noreferrer" class="social-btn-facebook" title="فيسبوك">
+                                <span class="icon"><i class="fab fa-facebook-f"></i></span>
+                                <span class="label-text">فيسبوك</span>
+                            </a>
+                        </div>
+                        <p class="footer-help-text">تابع آخر العروض والتحديثات، أو تواصل معنا مباشرة لأي استفسار حول الطلبات والمنتجات.</p>
+                    </div>
+                </div>
+
+                <div class="footer-bottom-bar">
+                    <span><i class="fas fa-copyright"></i> 2026 <strong>موضة اليوم</strong> — جميع الحقوق محفوظة</span>
+                    <div class="footer-mini-links">
+                        <button type="button" onclick="showPolicyPopup('privacy')">الخصوصية</button>
+                        <button type="button" onclick="showPolicyPopup('terms')">الشروط</button>
+                        <button type="button" onclick="showPolicyPopup('delivery')">التوصيل</button>
+                    </div>
+                    <span><i class="fas fa-code"></i> تطوير <strong>LordOfShdow</strong></span>
+                </div>
             </div>
-            <span style="display:block; font-size:12px; margin-top:6px; color:rgba(255,255,255,0.06);">
-                <i class="fas fa-copyright"></i> 2026 <strong style="color:rgba(255,215,0,0.08);">موضة اليوم</strong> — جميع الحقوق محفوظة
-            </span>
-            <span style="display:block; font-size:10px; margin-top:2px; color:rgba(255,255,255,0.03);">
-                <i class="fas fa-code"></i> مصمم ومطور بواسطة <strong style="color:rgba(255,215,0,0.05);">LordOfShdow</strong>
-            </span>
         </footer>
 
         <!-- ===== Toast ===== -->
@@ -2919,7 +3763,7 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
         </div>
 
         <!-- ===== بطاقات السياسات المنبثقة ===== -->
-        <div class="policy-popup" id="policyPopup">
+        <div class="policy-popup" id="policyPopup" role="dialog" aria-live="polite" aria-modal="true">
             <span class="popup-icon" id="popupIcon">📜</span>
             <h3 id="popupTitle">سياسة الخصوصية</h3>
             <p id="popupContent">نحن نحمي بياناتك الشخصية ولا نشاركها مع أي طرف ثالث. يتم استخدام بياناتك فقط لتأكيد الطلبات والتواصل معك.</p>
@@ -2927,7 +3771,7 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
         </div>
 
         <!-- ===== بطاقة من نحن المنبثقة ===== -->
-        <div class="about-popup" id="aboutPopup">
+        <div class="about-popup" id="aboutPopup" role="dialog" aria-live="polite" aria-modal="true">
             <span class="popup-icon">🌟</span>
             <h3>من نحن</h3>
             <p>
@@ -3033,6 +3877,9 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
         // ============================================================
         function createParticles() {
             const container = document.getElementById('particlesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            container.style.display = 'block';
             const colors = ['#ff6b6b', '#ffd700', '#4cd964', '#5ac8fa', '#ff9500', '#e83e8c', '#23d5ab', '#af52de'];
             for (let i = 0; i < 45; i++) {
                 const particle = document.createElement('div');
@@ -3088,6 +3935,100 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
         const database = firebase.database();
         const auth = firebase.auth();
 
+
+        // ============================================================
+        // دوال أمان لتوحيد شكل بيانات Firebase
+        // ============================================================
+        function toArraySafe(value) {
+            if (Array.isArray(value)) {
+                return value.filter(item => item !== null && item !== undefined && String(item).trim() !== '');
+            }
+            if (value && typeof value === 'object') {
+                return Object.values(value).filter(item => item !== null && item !== undefined && String(item).trim() !== '');
+            }
+            if (typeof value === 'string' && value.trim()) {
+                return value.split(',').map(item => item.trim()).filter(Boolean);
+            }
+            return [];
+        }
+
+        function toNumberSafe(value, fallback = 0) {
+            const num = Number(value);
+            return Number.isFinite(num) ? num : fallback;
+        }
+
+        function safeText(value, fallback = '') {
+            if (value === null || value === undefined) return fallback;
+            const text = String(value).trim();
+            return text || fallback;
+        }
+
+        function normalizeProductRecord(id, raw) {
+            const p = (raw && typeof raw === 'object') ? raw : {};
+            return {
+                ...p,
+                id,
+                name: safeText(p.name || p.title || p.productName, 'منتج بدون اسم'),
+                description: safeText(p.description, ''),
+                category: safeText(p.category, 'mens'),
+                subCategory: safeText(p.subCategory, 'clothing'),
+                price: toNumberSafe(p.price, 0),
+                oldPrice: toNumberSafe(p.oldPrice, 0),
+                stock: toNumberSafe(p.stock, 0),
+                colors: toArraySafe(p.colors),
+                sizes: toArraySafe(p.sizes),
+                images: toArraySafe(p.images),
+                popular: p.popular === true || p.popular === 'true',
+                badge: safeText(p.badge, '')
+            };
+        }
+
+        function normalizePhone(phone) {
+            return safeText(phone, '').replace(/\s+/g, '');
+        }
+
+        async function saveCustomerRecord(orderData) {
+            const phone = normalizePhone(orderData.phone);
+            if (!phone) return;
+
+            const orderAmount = toNumberSafe(orderData.grandTotal || orderData.total, 0);
+            const customerInfo = {
+                name: safeText(orderData.customerName, 'غير معروف'),
+                phone,
+                state: safeText(orderData.state, ''),
+                city: safeText(orderData.city, ''),
+                userId: orderData.userId || null,
+                userEmail: orderData.userEmail || null,
+                lastOrder: orderData.createdAt,
+                updatedAt: new Date().toISOString()
+            };
+
+            const existing = await database.ref('customers').orderByChild('phone').equalTo(phone).once('value');
+            if (existing.exists()) {
+                const updates = {};
+                existing.forEach(child => {
+                    const current = child.val() || {};
+                    updates[`customers/${child.key}`] = {
+                        ...current,
+                        ...customerInfo,
+                        totalOrders: toNumberSafe(current.totalOrders, 0) + 1,
+                        totalSpent: toNumberSafe(current.totalSpent, 0) + orderAmount,
+                        cancelledOrders: toNumberSafe(current.cancelledOrders, 0)
+                    };
+                    return true;
+                });
+                return database.ref().update(updates);
+            }
+
+            return database.ref('customers').push().set({
+                ...customerInfo,
+                totalOrders: 1,
+                totalSpent: orderAmount,
+                cancelledOrders: 0,
+                createdAt: new Date().toISOString()
+            });
+        }
+
         // ============================================================
         // 5. دالة تحويل كود اللون إلى اسم
         // ============================================================
@@ -3133,6 +4074,7 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
         let policyTimer = null;
         let aboutTimer = null;
         let confirmationTimer = null;
+        let indexVideoBackgroundActive = false;
 
         // ============================================================
         // 7. أسعار التوصيل حسب الولاية
@@ -3300,27 +4242,27 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
                 privacy: {
                     icon: '🔒',
                     title: 'سياسة الخصوصية',
-                    content: 'نحن نحمي بياناتك الشخصية ولا نشاركها مع أي طرف ثالث. يتم استخدام بياناتك فقط لتأكيد الطلبات والتواصل معك. يمكنك طلب حذف بياناتك في أي وقت.'
+                    content: 'نلتزم بحماية بياناتك الشخصية وفق أعلى معايير السرية. تُستخدم معلوماتك فقط لمعالجة الطلبات، تأكيد الشحن، تحسين تجربة التسوق، والتواصل معك عند الحاجة. لا نبيع بياناتك ولا نشاركها مع أطراف غير مرتبطة بالخدمة.'
                 },
                 terms: {
                     icon: '📋',
                     title: 'شروط الاستخدام',
-                    content: 'باستخدامك لهذا الموقع، فإنك توافق على الالتزام بجميع الشروط والأحكام المذكورة. يرجى قراءة الشروط بعناية قبل إجراء أي عملية شراء.'
+                    content: 'باستخدامك لمنصة موضة اليوم، فإنك توافق على احترام شروط الشراء والاستخدام العادل للموقع. نحتفظ بحق تحديث المنتجات والأسعار والعروض حسب التوفر، مع الحرص على عرض المعلومات بوضوح قبل تأكيد الطلب.'
                 },
                 return: {
                     icon: '🔄',
                     title: 'الاستبدال والاسترجاع',
-                    content: 'نوفر لك حق الاستبدال أو الاسترجاع خلال 12 ساعة فقط من تاريخ الاستلام، بشرط أن يكون المنتج بحالته الأصلية وغير مستخدم.'
+                    content: 'يمكن طلب الاستبدال أو الاسترجاع خلال 12 ساعة من الاستلام، بشرط أن يكون المنتج بحالته الأصلية وغير مستخدم ومع نفس التغليف. تتم مراجعة الطلبات بسرعة لضمان تجربة عادلة وواضحة للعملاء.'
                 },
                 payment: {
                     icon: '💳',
                     title: 'سياسة الدفع',
-                    content: 'نوفر طرق دفع آمنة ومتنوعة، مع إمكانية الدفع عند الاستلام. جميع المعاملات المالية مشفرة ومحمية بالكامل.'
+                    content: 'نوفر تجربة دفع واضحة وآمنة، مع دعم الدفع عند الاستلام عند توفره. يتم تأكيد تفاصيل الطلب قبل الشحن، ولا يتم طلب أي معلومات حساسة خارج قنوات التواصل الرسمية الخاصة بالمتجر.'
                 },
                 delivery: {
                     icon: '🚚',
                     title: 'سياسة التوصيل',
-                    content: 'نوصل طلباتك إلى جميع ولايات الجزائر خلال 2-5 أيام عمل. تكلفة التوصيل تختلف حسب الولاية وطريقة التوصيل المختارة.'
+                    content: 'نوفر التوصيل إلى مختلف ولايات الجزائر عبر خيارات منظمة حسب الولاية وطريقة الاستلام. يتم توضيح التكلفة والمدة المتوقعة قبل تأكيد الطلب، وقد تختلف مدة التوصيل حسب المنطقة والضغط على شركات النقل.'
                 }
             };
             
@@ -3334,7 +4276,7 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
             if (policyTimer) clearTimeout(policyTimer);
             policyTimer = setTimeout(() => {
                 closePolicyPopup();
-            }, 5000);
+            }, 7000);
         }
 
         function closePolicyPopup() {
@@ -3356,7 +4298,7 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
             if (aboutTimer) clearTimeout(aboutTimer);
             aboutTimer = setTimeout(() => {
                 closeAboutPopup();
-            }, 5000);
+            }, 7000);
         }
 
         function closeAboutPopup() {
@@ -3372,10 +4314,13 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
             const policyPopup = document.getElementById('policyPopup');
             const aboutPopup = document.getElementById('aboutPopup');
             
-            if (policyPopup.classList.contains('show') && !policyPopup.contains(e.target) && !e.target.closest('.policy-section a')) {
+            const isPolicyTrigger = e.target.closest('.policy-section a, .footer-policy-link, .footer-mini-links button, [onclick*="showPolicyPopup"]');
+            const isAboutTrigger = e.target.closest('.about-section a, [onclick*="showAboutPopup"]');
+
+            if (policyPopup.classList.contains('show') && !policyPopup.contains(e.target) && !isPolicyTrigger) {
                 closePolicyPopup();
             }
-            if (aboutPopup.classList.contains('show') && !aboutPopup.contains(e.target) && !e.target.closest('.about-section a')) {
+            if (aboutPopup.classList.contains('show') && !aboutPopup.contains(e.target) && !isAboutTrigger) {
                 closeAboutPopup();
             }
         });
@@ -3937,14 +4882,9 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
         function loadProductsFromFirebase() {
             database.ref('products').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data) {
-                    products = Object.keys(data).map(key => ({
-                        id: key,
-                        ...data[key]
-                    }));
-                } else {
-                    products = [];
-                }
+                products = data
+                    ? Object.keys(data).map(key => normalizeProductRecord(key, data[key]))
+                    : [];
                 renderProducts();
                 updateCartCount();
             }, (error) => {
@@ -3965,20 +4905,20 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
             const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
             if (searchTerm) {
                 filtered = filtered.filter(p =>
-                    p.name.toLowerCase().includes(searchTerm) ||
-                    (p.description && p.description.toLowerCase().includes(searchTerm))
+                    safeText(p.name).toLowerCase().includes(searchTerm) ||
+                    safeText(p.description).toLowerCase().includes(searchTerm)
                 );
             }
 
             switch (currentSort) {
                 case 'price-asc':
-                    filtered.sort((a, b) => a.price - b.price);
+                    filtered.sort((a, b) => toNumberSafe(a.price) - toNumberSafe(b.price));
                     break;
                 case 'price-desc':
-                    filtered.sort((a, b) => b.price - a.price);
+                    filtered.sort((a, b) => toNumberSafe(b.price) - toNumberSafe(a.price));
                     break;
                 case 'name':
-                    filtered.sort((a, b) => a.name.localeCompare(b.name));
+                    filtered.sort((a, b) => safeText(a.name).localeCompare(safeText(b.name)));
                     break;
                 case 'popular':
                     filtered.sort((a, b) => (b.popular || 0) - (a.popular || 0));
@@ -4061,23 +5001,278 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
         // ============================================================
         // 20. خلفية مخصصة
         // ============================================================
+        function loadIndexShapesCode() {
+            database.ref('settings/indexShapes').on('value', (snapshot) => {
+                const data = snapshot.val();
+                applyIndexShapesCode(data && data.code ? data.code : '');
+            });
+        }
+
+        function applyIndexShapesCode(code) {
+            const shapesLayer = document.getElementById('indexShapesLayer');
+            const particlesContainer = document.getElementById('particlesContainer');
+            if (!shapesLayer || !particlesContainer) return;
+
+            const oldStyle = document.getElementById('indexShapesDynamicStyle');
+            if (oldStyle) oldStyle.remove();
+
+            if (code && code.trim()) {
+                particlesContainer.innerHTML = '';
+                particlesContainer.style.display = 'none';
+
+                // نضع CSS في head حتى يشتغل حتى لو كان داخل textarea ثم innerHTML
+                const temp = document.createElement('div');
+                temp.innerHTML = code;
+                let cssText = '';
+                temp.querySelectorAll('style').forEach((styleTag) => {
+                    cssText += '\n' + styleTag.textContent;
+                    styleTag.remove();
+                });
+                if (cssText.trim()) {
+                    const style = document.createElement('style');
+                    style.id = 'indexShapesDynamicStyle';
+                    style.textContent = cssText;
+                    document.head.appendChild(style);
+                }
+
+                shapesLayer.innerHTML = temp.innerHTML;
+                shapesLayer.style.display = 'block';
+                shapesLayer.classList.add('active');
+            } else {
+                shapesLayer.classList.remove('active');
+                shapesLayer.style.display = 'none';
+                shapesLayer.innerHTML = '';
+                particlesContainer.style.display = 'block';
+                createParticles();
+            }
+        }
+
         function loadCustomBackground() {
             database.ref('settings/background').on('value', (snapshot) => {
                 const bgData = snapshot.val();
-                const customBg = document.getElementById('customBg');
-                const defaultBg = document.getElementById('defaultBg');
+                applyCustomBackgroundData(bgData);
+            });
+        }
 
-                if (bgData && bgData.css) {
-                    customBg.style.cssText = bgData.css;
-                    customBg.classList.add('active');
-                    defaultBg.classList.add('hidden');
+        function applyCustomBackgroundData(bgData) {
+            const customBg = document.getElementById('customBg');
+            const defaultBg = document.getElementById('defaultBg');
+
+            if (indexVideoBackgroundActive) {
+                customBg.classList.remove('active');
+                defaultBg.classList.add('hidden');
+                return;
+            }
+
+            if (bgData && bgData.css) {
+                customBg.style.cssText = bgData.css;
+                customBg.classList.add('active');
+                defaultBg.classList.add('hidden');
+            } else {
+                customBg.classList.remove('active');
+                defaultBg.classList.remove('hidden');
+            }
+        }
+
+        function extractIndexYouTubeVideoId(url) {
+            const cleanUrl = (url || '').trim();
+            try {
+                const parsedUrl = new URL(cleanUrl);
+                const host = parsedUrl.hostname.replace(/^www\./, '').replace(/^m\./, '');
+                if (host === 'youtu.be') {
+                    return parsedUrl.pathname.split('/').filter(Boolean)[0] || null;
+                }
+                if (host.endsWith('youtube.com') || host.endsWith('youtube-nocookie.com')) {
+                    const videoParam = parsedUrl.searchParams.get('v');
+                    if (videoParam) return videoParam;
+                    const parts = parsedUrl.pathname.split('/').filter(Boolean);
+                    const marker = ['embed', 'shorts', 'live', 'v'].find(type => parts[0] === type);
+                    if (marker && parts[1]) return parts[1];
+                }
+            } catch (error) {
+                // الرابط قد لا يكون بصيغة URL كاملة، لذلك نستخدم الفحص الاحتياطي بالأسفل
+            }
+
+            const fallbackMatch = cleanUrl.match(/(?:v=|\/embed\/|\/shorts\/|\/live\/|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+            return fallbackMatch ? fallbackMatch[1] : null;
+        }
+
+        function isIndexYouTubeEmbedUrl(url) {
+            const cleanUrl = (url || '').trim();
+            try {
+                const parsedUrl = new URL(cleanUrl);
+                const host = parsedUrl.hostname.replace(/^www\./, '').replace(/^m\./, '');
+                return (host === 'youtube.com' || host === 'youtube-nocookie.com') && parsedUrl.pathname.includes('/embed/');
+            } catch (error) {
+                return /youtube(?:-nocookie)?\.com\/embed\//i.test(cleanUrl);
+            }
+        }
+
+        function canUseIndexYouTubeEmbed() {
+            return window.location && (window.location.protocol === 'http:' || window.location.protocol === 'https:');
+        }
+
+        function buildIndexYouTubeThumbnailUrl(videoId) {
+            return `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+        }
+
+        function removeIndexYouTubeFallback() {
+            document.querySelectorAll('.index-youtube-bg-fallback').forEach(item => item.remove());
+        }
+
+        function buildIndexYouTubeEmbedUrl(videoId) {
+            const params = new URLSearchParams({
+                autoplay: '1',
+                mute: '1',
+                loop: '1',
+                playlist: videoId,
+                controls: '0',
+                rel: '0',
+                modestbranding: '1',
+                playsinline: '1',
+                enablejsapi: '1',
+                disablekb: '1',
+                fs: '0',
+                iv_load_policy: '3',
+                cc_load_policy: '0',
+                start: '1'
+            });
+
+            if (canUseIndexYouTubeEmbed()) {
+                params.set('origin', window.location.origin);
+                params.set('widget_referrer', window.location.href.split('#')[0]);
+            }
+
+            return `https://www.youtube.com/embed/${encodeURIComponent(videoId)}?${params.toString()}`;
+        }
+
+        function configureIndexYouTubeIframe(iframe) {
+            iframe.allow = 'autoplay; encrypted-media; picture-in-picture; web-share; fullscreen';
+            iframe.referrerPolicy = 'origin-when-cross-origin';
+            iframe.setAttribute('referrerpolicy', 'origin-when-cross-origin');
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('loading', 'eager');
+        }
+
+        function startIndexYouTubeIframePlayback(iframe) {
+            if (!iframe) return;
+            const sendCommand = (func) => {
+                try {
+                    if (iframe.contentWindow) {
+                        iframe.contentWindow.postMessage(JSON.stringify({
+                            event: 'command',
+                            func: func,
+                            args: []
+                        }), '*');
+                    }
+                } catch (error) {
+                    console.log('YouTube background command skipped:', error);
+                }
+            };
+            const start = () => {
+                sendCommand('mute');
+                sendCommand('playVideo');
+            };
+            iframe.addEventListener('load', () => {
+                start();
+                setTimeout(start, 400);
+                setTimeout(start, 1200);
+                setTimeout(start, 2500);
+            });
+            setTimeout(start, 800);
+        }
+
+        function getIndexBackgroundVideoUrl(url) {
+            const cleanUrl = (url || '').trim();
+            const youtubeId = extractIndexYouTubeVideoId(cleanUrl);
+            if (youtubeId) {
+                return buildIndexYouTubeEmbedUrl(youtubeId);
+            }
+            return cleanUrl;
+        }
+
+        function loadIndexVideoBackground() {
+            database.ref('settings/indexVideo').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && data.url) {
+                    applyIndexVideoBackground(data.url);
                 } else {
-                    customBg.classList.remove('active');
-                    defaultBg.classList.remove('hidden');
+                    resetIndexVideoBackground();
                 }
             });
         }
+
+        function applyIndexVideoBackground(url) {
+            const youtubeId = extractIndexYouTubeVideoId(url);
+            const videoUrl = getIndexBackgroundVideoUrl(url);
+            const videoBg = document.getElementById('indexVideoBg');
+            const defaultBg = document.getElementById('defaultBg');
+            const customBg = document.getElementById('customBg');
+            const oldIframe = document.querySelector('.index-video-bg-iframe');
+            if (oldIframe) oldIframe.remove();
+            removeIndexYouTubeFallback();
+
+            indexVideoBackgroundActive = true;
+            customBg.classList.remove('active');
+            defaultBg.classList.add('hidden');
+
+            if (isIndexYouTubeEmbedUrl(videoUrl)) {
+                videoBg.pause();
+                videoBg.removeAttribute('src');
+                videoBg.load();
+                videoBg.classList.remove('active');
+
+                if (!canUseIndexYouTubeEmbed() && youtubeId) {
+                    const fallback = document.createElement('div');
+                    fallback.className = 'index-youtube-bg-fallback';
+                    fallback.style.backgroundImage = `url("${buildIndexYouTubeThumbnailUrl(youtubeId)}")`;
+                    fallback.title = 'YouTube يحتاج تشغيل الصفحة من استضافة HTTP/HTTPS ليعمل كفيديو خلفية';
+                    document.body.insertBefore(fallback, defaultBg);
+                    return;
+                }
+
+                const iframe = document.createElement('iframe');
+                iframe.className = 'index-video-bg-iframe';
+                configureIndexYouTubeIframe(iframe);
+                iframe.src = videoUrl;
+                document.body.insertBefore(iframe, defaultBg);
+                startIndexYouTubeIframePlayback(iframe);
+            } else {
+                videoBg.muted = true;
+                videoBg.autoplay = true;
+                videoBg.loop = true;
+                videoBg.playsInline = true;
+                videoBg.setAttribute('muted', '');
+                videoBg.setAttribute('playsinline', '');
+                videoBg.src = videoUrl;
+                videoBg.load();
+                videoBg.classList.add('active');
+                setTimeout(() => videoBg.play().catch(e => console.log('Auto-play prevented:', e)), 100);
+            }
+        }
+
+        function resetIndexVideoBackground() {
+            const videoBg = document.getElementById('indexVideoBg');
+            const defaultBg = document.getElementById('defaultBg');
+            const oldIframe = document.querySelector('.index-video-bg-iframe');
+            if (oldIframe) oldIframe.remove();
+            removeIndexYouTubeFallback();
+
+            indexVideoBackgroundActive = false;
+            videoBg.pause();
+            videoBg.removeAttribute('src');
+            videoBg.load();
+            videoBg.classList.remove('active');
+            defaultBg.classList.remove('hidden');
+
+            database.ref('settings/background').once('value', (snapshot) => {
+                applyCustomBackgroundData(snapshot.val());
+            });
+        }
+
         loadCustomBackground();
+        loadIndexVideoBackground();
+        loadIndexShapesCode();
 
         // ============================================================
         // 21. Toast
@@ -4571,6 +5766,12 @@ body.light-mode .confirmation-message .msg-details .customer-info .field .value.
             };
 
             database.ref('orders').push().set(orderData)
+                .then(() => {
+                    return saveCustomerRecord(orderData).catch((error) => {
+                        // لا نُلغي الطلب إذا تعذر تحديث سجل العميل، لأن الطلب نفسه تم حفظه بنجاح.
+                        console.warn('تم حفظ الطلب، لكن تعذر تحديث سجل العميل:', error);
+                    });
+                })
                 .then(() => {
                     progressBar.style.width = '100%';
                     setTimeout(() => {
