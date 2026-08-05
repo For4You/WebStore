@@ -106,6 +106,8 @@
       sizes: row.sizes || [],
       colors: row.colors || [],
       visible: row.visible !== false,
+      featured: row.featured === true,
+      featuredOrder: Number(row.featured_order) || 0,
       images: productImages,
       image: productImages[0] || "",
       pos: row.image_position || "center",
@@ -128,6 +130,10 @@
       sizes: Array.isArray(product.sizes) ? product.sizes : [],
       colors: Array.isArray(product.colors) ? product.colors : [],
       visible: product.visible !== false,
+      featured: product.featured === true,
+      featured_order: product.featured === true
+        ? Math.max(1, Math.floor(Number(product.featuredOrder) || 1))
+        : 0,
       images: productImages,
       image_position: product.pos || "center",
       code: String(product.code || "").trim(),
@@ -373,7 +379,7 @@
     $("#productList").innerHTML = shown
       .map(
         (product) =>
-          `<article class="product-row" data-id="${esc(product.id)}"><div class="thumb" style="${imageStyle(product)}"></div><div class="main-data"><strong>${esc(product.name)}</strong><small>${esc(product.code || "دون رمز")} · ${fmt(safeImages(product).length)} صور · ${esc(product.badge || "دون شارة")}</small></div><div class="meta category-cell"><strong>${esc(categories[product.category] || product.category)}</strong><small>القسم</small></div><div class="meta price-cell"><strong>${fmt(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<small><s>${fmt(product.oldPrice)} دج</s></small>` : "<small>السعر</small>"}</div><div class="stock-cell"><span class="chip ${Number(product.stock || 0) <= 5 ? "low" : ""}">${fmt(product.stock)} قطعة</span><span class="chip ${product.visible === false ? "off" : ""}">${product.visible === false ? "مخفي" : "ظاهر"}</span></div><div class="row-actions"><button class="btn small edit">تعديل</button><button class="btn small copy">نسخ</button><button class="btn small danger delete">حذف</button></div></article>`,
+          `<article class="product-row" data-id="${esc(product.id)}"><div class="thumb" style="${imageStyle(product)}"></div><div class="main-data"><strong>${esc(product.name)}</strong><small>${esc(product.code || "دون رمز")} · ${fmt(safeImages(product).length)} صور · ${esc(product.badge || "دون شارة")}</small></div><div class="meta category-cell"><strong>${esc(categories[product.category] || product.category)}</strong><small>القسم</small></div><div class="meta price-cell"><strong>${fmt(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<small><s>${fmt(product.oldPrice)} دج</s></small>` : "<small>السعر</small>"}</div><div class="stock-cell"><span class="chip ${Number(product.stock || 0) <= 5 ? "low" : ""}">${fmt(product.stock)} قطعة</span><span class="chip ${product.visible === false ? "off" : ""}">${product.visible === false ? "مخفي" : "ظاهر"}</span><span class="chip ${product.featured ? "" : "off"}">${product.featured ? `إعلان ${fmt(product.featuredOrder || 1)}` : "عادي"}</span></div><div class="row-actions"><button class="btn small edit">تعديل</button><button class="btn small copy">نسخ</button><button class="btn small danger delete">حذف</button></div></article>`,
       )
       .join("");
   }
@@ -399,6 +405,11 @@
     $("#pBadge").value = editing ? product.badge || "" : "";
     $("#pCode").value = editing ? product.code || "" : "";
     $("#pVisible").checked = editing ? product.visible !== false : true;
+    $("#pFeatured").checked = editing ? product.featured === true : false;
+    $("#pFeaturedOrder").value = editing
+      ? Math.max(1, Number(product.featuredOrder) || 1)
+      : 1;
+    $("#pFeaturedOrder").disabled = !$("#pFeatured").checked;
     images = editing ? safeImages(product) : [];
     previewImages();
     $("#productModal").hidden = false;
@@ -731,6 +742,8 @@
                 id: crypto.randomUUID(),
                 name: `${product.name} — نسخة`,
                 code: product.code ? `${product.code}-COPY` : "",
+                featured: false,
+                featuredOrder: 0,
               });
               await loadProducts();
               toast("تم نسخ المنتج");
@@ -798,6 +811,12 @@
       event.target.value = "";
     };
 
+    $("#pFeatured").onchange = () => {
+      $("#pFeaturedOrder").disabled = !$("#pFeatured").checked;
+      if ($("#pFeatured").checked && !Number($("#pFeaturedOrder").value))
+        $("#pFeaturedOrder").value = 1;
+    };
+
     $("#productForm").onsubmit = async (event) => {
       event.preventDefault();
       const button = event.submitter;
@@ -819,6 +838,10 @@
         badge: $("#pBadge").value.trim(),
         code: $("#pCode").value.trim(),
         visible: $("#pVisible").checked,
+        featured: $("#pFeatured").checked,
+        featuredOrder: $("#pFeatured").checked
+          ? Math.max(1, Math.floor(Number($("#pFeaturedOrder").value) || 1))
+          : 0,
         images: [...images],
         image: images[0] || "",
         pos: existing.pos || "center",
