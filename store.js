@@ -180,7 +180,7 @@
       $("#featuredName").textContent = slide.title;
       $("#featuredDescription").textContent =
         slide.subtitle || "صور نختارها لتساعدك على تنسيق بيتك بطريقة بسيطة.";
-      $("#featuredPrice").textContent = "صورة من اختيارنا";
+      $("#featuredPrice").textContent = "ا";
       $("#featuredOldPrice").hidden = true;
       $("#featuredOpen").disabled = false;
       panel.classList.remove("feature-changing");
