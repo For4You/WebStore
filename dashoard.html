@@ -1081,7 +1081,109 @@
         cursor: wait;
         opacity: 0.62;
       }
-    </style>
+    
+      .panel-help {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.6;
+      }
+      .showcase-limit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 64px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: var(--soft);
+        color: var(--accent);
+        font-weight: 900;
+        direction: ltr;
+      }
+      .showcase-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        padding: 20px;
+      }
+      .showcase-card {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: var(--surface);
+        box-shadow: 0 14px 35px color-mix(in srgb, var(--text) 7%, transparent);
+      }
+      .showcase-preview {
+        min-height: 230px;
+        position: relative;
+        background-image: var(--showcase-image);
+        background-size: cover;
+        background-position: center;
+      }
+      .showcase-preview::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,.45));
+      }
+      .showcase-order {
+        position: absolute;
+        z-index: 1;
+        top: 13px;
+        right: 13px;
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.9);
+        color: #2a211d;
+        font-weight: 900;
+      }
+      .showcase-hidden {
+        position: absolute;
+        z-index: 1;
+        left: 13px;
+        bottom: 13px;
+        padding: 6px 9px;
+        border-radius: 999px;
+        background: rgba(0,0,0,.72);
+        color: #fff;
+        font-size: 9px;
+        font-weight: 900;
+      }
+      .showcase-body {
+        display: grid;
+        gap: 10px;
+        padding: 16px;
+      }
+      .showcase-body input,
+      .showcase-body textarea {
+        width: 100%;
+        padding: 10px 11px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        outline: 0;
+        background: var(--bg);
+      }
+      .showcase-body textarea {
+        min-height: 72px;
+        resize: vertical;
+      }
+      .showcase-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+      .showcase-actions .btn {
+        flex: 1 1 auto;
+      }
+      @media (max-width: 780px) {
+        .showcase-grid { grid-template-columns: 1fr; padding: 13px; }
+        .showcase-preview { min-height: 210px; }
+      }
+</style>
   </head>
   <body>
     <header class="top">
@@ -1107,6 +1209,7 @@
         ><button class="tab" data-view="orders">
           الطلبات
           <span class="nav-badge" id="orderTabBadge" hidden>٠</span></button
+        ><button class="tab" data-view="showcase">صور الدائرة</button
         ><button class="tab" data-view="settings">الإعدادات</button>
       </nav>
 
@@ -1158,6 +1261,39 @@
             </div>
           </div>
           <div id="productList"></div>
+        </section>
+      </section>
+
+      <section class="view" id="showcaseView" hidden>
+        <div class="hero">
+          <div>
+            <h2>صور الدائرة الإعلانية</h2>
+            <p>
+              ارفع حتى أربع صور للأواني أو الديكور من اختيارك. هذه الصور مستقلة
+              عن المنتجات وتتبدل في واجهة المتجر كل ثانيتين.
+            </p>
+          </div>
+          <div class="actions">
+            <button class="btn" id="refreshShowcase" type="button">تحديث</button>
+            <button class="btn primary" id="addShowcaseImages" type="button">＋ إضافة صور</button>
+            <input
+              id="showcaseInput"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              hidden
+            />
+          </div>
+        </div>
+        <section class="panel showcase-panel">
+          <div class="panel-head">
+            <div>
+              <h3>الصور المعروضة في الدائرة</h3>
+              <small class="panel-help">رتّب الصور، عدّل النص، أو أخفِ أي صورة من دون ربطها بمنتج.</small>
+            </div>
+            <span class="showcase-limit" id="showcaseCount">٠ / ٤</span>
+          </div>
+          <div class="showcase-grid" id="showcaseList"></div>
         </section>
       </section>
 
@@ -1361,27 +1497,6 @@
             <div class="field">
               <label for="pCode">رمز المنتج</label
               ><input id="pCode" placeholder="SKU-1001" />
-            </div>
-            <div class="toggle">
-              <div>
-                <strong>منتج مميز في الإعلان الدائري</strong>
-                <small style="display: block; margin-top: 4px; color: var(--muted)">
-                  يعرض المتجر أول ٤ منتجات مميزة حسب الترتيب
-                </small>
-              </div>
-              <input id="pFeatured" type="checkbox" />
-            </div>
-            <div class="field">
-              <label for="pFeaturedOrder">ترتيب الظهور</label>
-              <input
-                id="pFeaturedOrder"
-                type="number"
-                min="1"
-                max="99"
-                step="1"
-                value="1"
-                disabled
-              />
             </div>
             <div class="toggle full">
               <div>
