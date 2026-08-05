@@ -1362,6 +1362,27 @@
               <label for="pCode">رمز المنتج</label
               ><input id="pCode" placeholder="SKU-1001" />
             </div>
+            <div class="toggle">
+              <div>
+                <strong>منتج مميز في الإعلان الدائري</strong>
+                <small style="display: block; margin-top: 4px; color: var(--muted)">
+                  يعرض المتجر أول ٤ منتجات مميزة حسب الترتيب
+                </small>
+              </div>
+              <input id="pFeatured" type="checkbox" />
+            </div>
+            <div class="field">
+              <label for="pFeaturedOrder">ترتيب الظهور</label>
+              <input
+                id="pFeaturedOrder"
+                type="number"
+                min="1"
+                max="99"
+                step="1"
+                value="1"
+                disabled
+              />
+            </div>
             <div class="toggle full">
               <div>
                 <strong>إظهار المنتج في المتجر</strong
