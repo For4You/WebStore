@@ -7,21 +7,21 @@
       name="description"
       content="دار وأناقة — متجر عربي أنيق للأواني المنزلية ومستلزمات المطبخ والمائدة والتنظيم."
     />
-    <meta name="theme-color" content="#f8f1e7" />
+    <meta name="theme-color" content="#f6efe6" />
     <title>متجر دار وأناقة | تفاصيل تصنع البيت</title>
     <style>
       :root {
-        --bg: #f8f1e7;
-        --surface: #fffaf2;
-        --surface-2: #eee0ce;
-        --text: #282522;
-        --muted: #756b62;
-        --line: #dfd1c0;
-        --accent: #ee5a3f;
-        --accent-2: #c7442f;
-        --soft: #f6b598;
-        --gold: #b78d46;
-        --shadow: 0 25px 70px rgba(88, 48, 25, 0.12);
+        --bg: #f6efe6;
+        --surface: #fffdf9;
+        --surface-2: #eadbc9;
+        --text: #2d241e;
+        --muted: #74655a;
+        --line: #decbb5;
+        --accent: #b85f43;
+        --accent-2: #8f412e;
+        --soft: #e9b69e;
+        --gold: #a47a3f;
+        --shadow: 0 25px 70px rgba(84, 49, 29, 0.11);
         --hero-img: url("assets/hero-light.png");
         color-scheme: light;
       }
@@ -2676,7 +2676,110 @@
           transition: none;
         }
       }
-    </style>
+    
+      /* تحسين الوضع النهاري وإظهار المنتجات مبكرًا */
+      :root:not([data-theme="dark"]) body {
+        background:
+          radial-gradient(circle at 88% 5%, rgba(184, 95, 67, 0.10), transparent 29%),
+          radial-gradient(circle at 8% 35%, rgba(164, 122, 63, 0.07), transparent 24%),
+          var(--bg);
+      }
+      :root:not([data-theme="dark"]) .header,
+      :root:not([data-theme="dark"]) .search-bar,
+      :root:not([data-theme="dark"]) .product-card {
+        background: rgba(255, 253, 249, 0.94);
+      }
+      :root:not([data-theme="dark"]) .hero-copy {
+        background: linear-gradient(145deg, #fffdf9 0%, #f5eadc 100%);
+      }
+      :root:not([data-theme="dark"]) .trust-strip {
+        background: #fffaf4;
+      }
+      .products {
+        padding-top: clamp(58px, 7vw, 94px);
+        padding-bottom: clamp(62px, 7vw, 100px);
+      }
+      .products .heading {
+        margin-bottom: 28px;
+      }
+      .product-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 24px 18px;
+      }
+      .product-image {
+        height: 285px;
+      }
+      .product-info {
+        padding: 16px 17px 0;
+      }
+      .product-info h3 {
+        font-size: 16px;
+      }
+      .product-summary {
+        min-height: 38px;
+        font-size: 10px;
+        line-height: 1.7;
+      }
+      .add {
+        padding: 11px;
+        font-size: 11px;
+      }
+      @media (max-width: 1180px) {
+        .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+      @media (max-width: 780px) {
+        .products {
+          max-width: 100%;
+          padding-inline: 0;
+          overflow: hidden;
+        }
+        .products .heading {
+          align-items: stretch;
+          padding-inline: 18px;
+        }
+        .filter-tabs {
+          max-width: 100%;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+        .product-grid {
+          display: flex;
+          gap: 13px;
+          overflow-x: auto;
+          padding: 3px 18px 20px;
+          scroll-snap-type: x mandatory;
+          scroll-padding-inline: 18px;
+          overscroll-behavior-inline: contain;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+        .product-grid::-webkit-scrollbar { display: none; }
+        .product-card {
+          flex: 0 0 min(72vw, 245px);
+          scroll-snap-align: start;
+          border-radius: 20px;
+        }
+        .product-image {
+          height: 205px;
+          border-radius: 20px 20px 0 0;
+        }
+        .product-info { padding: 13px 14px 0; }
+        .product-info h3 { font-size: 14px; }
+        .product-summary { min-height: 34px; -webkit-line-clamp: 2; }
+        .products .store-empty { min-width: calc(100vw - 36px); }
+      }
+      @media (max-width: 680px) {
+        .hero-copy { padding: 48px 20px 38px; }
+        .hero h1 { font-size: clamp(36px, 11vw, 52px); }
+        .proof { margin-top: 35px; gap: 10px; }
+        .proof strong { font-size: 14px; }
+        .product-feature-panel { bottom: 72px; padding: 16px; }
+        .product-feature-panel strong { font-size: 18px; }
+        .feature-price { margin-top: 8px; }
+        .wheel-controls { bottom: 22px; }
+      }
+</style>
   </head>
   <body>
     <div class="announcement" aria-label="معلومات التوصيل">
@@ -2757,7 +2860,7 @@
         id="productWheel"
         role="region"
         aria-roledescription="عرض دائري"
-        aria-label="منتجات مميزة متحركة"
+        aria-label="صور أوانٍ ملهمة متحركة"
       >
         <div class="wheel-viewport" aria-hidden="true">
           <div class="product-wheel" id="productWheelDisc"></div>
@@ -2768,12 +2871,12 @@
           <div class="feature-copy">
             <div class="feature-meta">
               <span class="feature-counter" id="featuredCounter">٠١ / ٠٤</span>
-              <span class="feature-badge" id="featuredBadge">مختار لكِ</span>
+              <span class="feature-badge" id="featuredBadge">إلهام للأواني</span>
             </div>
-            <small>دائرة المنتجات المميزة</small>
+            <small>صور مختارة مستقلة عن المنتجات</small>
             <strong id="featuredName">اختيارات دار وأناقة</strong>
             <p id="featuredDescription">
-              أربع صور ووصف متزامن في مساحة واحدة، من دون تكديس الإعلانات.
+              صور أوانٍ من اختيارنا تتبدل تلقائيًا كل ثانيتين.
             </p>
             <div class="feature-price">
               <b id="featuredPrice">—</b>
@@ -2784,7 +2887,7 @@
             class="round-link feature-open"
             id="featuredOpen"
             type="button"
-            aria-label="فتح المنتج المميز"
+            aria-label="الانتقال إلى المنتجات"
             disabled
           >
             ←
@@ -2792,9 +2895,9 @@
         </div>
 
         <div class="wheel-controls" aria-label="التحكم في الإعلان الدائري">
-          <button id="featurePrev" type="button" aria-label="المنتج السابق">→</button>
-          <div class="wheel-dots" id="featureDots" aria-label="اختيار منتج مميز"></div>
-          <button id="featureNext" type="button" aria-label="المنتج التالي">←</button>
+          <button id="featurePrev" type="button" aria-label="الصورة السابقة">→</button>
+          <div class="wheel-dots" id="featureDots" aria-label="اختيار صورة من الدائرة"></div>
+          <button id="featureNext" type="button" aria-label="الصورة التالية">←</button>
         </div>
       </div>
     </section>
@@ -2824,6 +2927,23 @@
       </article>
     </section>
 
+    <section class="section products" id="products">
+      <div class="heading">
+        <div>
+          <p class="eyebrow"><i></i>مختاراتنا لكِ</p>
+          <h2>قطع ستُحبين استخدامها كل يوم</h2>
+        </div>
+        <div class="filter-tabs">
+          <button class="active" data-filter="all">الكل</button
+          ><button data-filter="kitchen">المطبخ</button
+          ><button data-filter="table">المائدة</button
+          ><button data-filter="storage">التنظيم</button>
+        </div>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+    </section>
+
+
     <section class="section" id="categories">
       <div class="heading">
         <div>
@@ -2847,22 +2967,6 @@
           <em>←</em>
         </button>
       </div>
-    </section>
-
-    <section class="section products" id="products">
-      <div class="heading">
-        <div>
-          <p class="eyebrow"><i></i>مختاراتنا لكِ</p>
-          <h2>قطع ستُحبين استخدامها كل يوم</h2>
-        </div>
-        <div class="filter-tabs">
-          <button class="active" data-filter="all">الكل</button
-          ><button data-filter="kitchen">المطبخ</button
-          ><button data-filter="table">المائدة</button
-          ><button data-filter="storage">التنظيم</button>
-        </div>
-      </div>
-      <div class="product-grid" id="productGrid"></div>
     </section>
 
     <section class="offer" id="offer">
@@ -2947,7 +3051,7 @@
       <div>
         <h3>خدمة العملاء</h3>
         <p>السبت–الخميس<br />٩ صباحًا–٩ مساءً</p>
-        <a href="tel:+213500000000">0672156686</a>
+        <a href="tel:06721566686">06721566686</a>
       </div>
       <div class="copyright">
         <span>© ٢٠٢٦ دار وأناقة. جميع الحقوق محفوظة.</span
