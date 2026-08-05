@@ -68,6 +68,11 @@
   let currentSearch = "";
   let toastTimer;
   let reloadTimer;
+  let featuredProducts = [];
+  let featuredIndex = 0;
+  let featuredTimer;
+  let featuredUpdateTimer;
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   let theme =
     localStorage.getItem("dar-theme") ||
     (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
@@ -88,6 +93,8 @@
       sizes: row.sizes || [],
       colors: row.colors || [],
       visible: row.visible !== false,
+      featured: row.featured === true,
+      featuredOrder: Number(row.featured_order) || 0,
       images,
       image: images[0] || "",
       pos: row.image_position || "center",
@@ -112,13 +119,130 @@
       nextTheme === "dark" ? "#071e19" : "#f8f1e7";
   }
 
-  function updateFeaturedProduct() {
-    const featured = products.find(
-      (product) => product.visible !== false && Number(product.stock || 0) > 0,
+  function featuredCandidates() {
+    const available = products.filter(
+      (product) =>
+        product.visible !== false &&
+        Number(product.stock || 0) > 0 &&
+        safeImages(product).length,
     );
-    $("#featuredName").textContent = featured
-      ? featured.name
-      : "اختيارات دار وأناقة";
+    const selected = available
+      .filter((product) => product.featured === true)
+      .sort(
+        (first, second) =>
+          Number(first.featuredOrder || 0) - Number(second.featuredOrder || 0),
+      );
+    const selectedIds = new Set(selected.map((product) => String(product.id)));
+    const remainder = available.filter(
+      (product) => !selectedIds.has(String(product.id)),
+    );
+    return [...selected, ...remainder].slice(0, 4);
+  }
+
+  function stopFeaturedRotation() {
+    clearInterval(featuredTimer);
+    featuredTimer = null;
+  }
+
+  function startFeaturedRotation() {
+    stopFeaturedRotation();
+    if (reducedMotion.matches || featuredProducts.length < 2) return;
+    featuredTimer = setInterval(
+      () => setFeaturedProduct(featuredIndex + 1, false),
+      5200,
+    );
+  }
+
+  function setFeaturedProduct(nextIndex, restart = true) {
+    if (!featuredProducts.length) return;
+    featuredIndex =
+      (Number(nextIndex) + featuredProducts.length) % featuredProducts.length;
+    const activeIndex = featuredIndex;
+    const product = featuredProducts[activeIndex];
+    const angle = activeIndex * 90;
+    const panel = $("#featuredPanel");
+    const disc = $("#productWheelDisc");
+
+    disc.style.setProperty("--wheel-angle", `${-angle}deg`);
+    disc.style.setProperty("--counter-angle", `${angle}deg`);
+    disc.querySelectorAll(".wheel-slice").forEach((slice, index) => {
+      slice.classList.toggle("active", index === featuredIndex);
+    });
+
+    panel.classList.add("feature-changing");
+    clearTimeout(featuredUpdateTimer);
+    featuredUpdateTimer = window.setTimeout(() => {
+      $("#featuredCounter").textContent =
+        `${format(activeIndex + 1).padStart(2, "٠")} / ${format(featuredProducts.length).padStart(2, "٠")}`;
+      $("#featuredBadge").textContent = product.badge || "مختار لكِ";
+      $("#featuredName").textContent = product.name;
+      $("#featuredDescription").textContent =
+        product.description ||
+        `قطعة مميزة من قسم ${categoryLabels[product.category] || "المنزل"}. افتحي التفاصيل لاختيار الكمية والمواصفات.`;
+      $("#featuredPrice").textContent = `${format(product.price)} دج`;
+      $("#featuredOldPrice").hidden = !(Number(product.oldPrice) > 0);
+      $("#featuredOldPrice").textContent = Number(product.oldPrice) > 0
+        ? `${format(product.oldPrice)} دج`
+        : "";
+      $("#featuredOpen").disabled = false;
+      panel.classList.remove("feature-changing");
+    }, reducedMotion.matches ? 0 : 170);
+
+    $("#featureDots")
+      .querySelectorAll(".wheel-dot")
+      .forEach((dot, index) => {
+        const active = index === featuredIndex;
+        dot.classList.toggle("active", active);
+        dot.setAttribute("aria-current", active ? "true" : "false");
+      });
+
+    if (restart) startFeaturedRotation();
+  }
+
+  function updateFeaturedProduct() {
+    featuredProducts = featuredCandidates();
+    featuredIndex = Math.min(
+      featuredIndex,
+      Math.max(0, featuredProducts.length - 1),
+    );
+    const stage = $("#productWheel");
+    const disc = $("#productWheelDisc");
+    const dots = $("#featureDots");
+    stage.classList.toggle("wheel-ready", Boolean(featuredProducts.length));
+
+    if (!featuredProducts.length) {
+      stopFeaturedRotation();
+      disc.innerHTML = "";
+      dots.innerHTML = "";
+      $("#featuredCounter").textContent = "٠٠ / ٠٠";
+      $("#featuredBadge").textContent = "قريباً";
+      $("#featuredName").textContent = "اختيارات دار وأناقة";
+      $("#featuredDescription").textContent =
+        "أضيفي صوراً لمنتجات ظاهرة ومتوفرة لتظهر هنا تلقائياً.";
+      $("#featuredPrice").textContent = "—";
+      $("#featuredOldPrice").hidden = true;
+      $("#featuredOpen").disabled = true;
+      $("#featurePrev").disabled = true;
+      $("#featureNext").disabled = true;
+      return;
+    }
+
+    disc.innerHTML = featuredProducts
+      .map((product, index) => {
+        const source = safeImages(product)[0];
+        return `<span class="wheel-slice${index === featuredIndex ? " active" : ""}" style="--slice-angle:${index * 90}deg;--slice-back-angle:${index * -90}deg;--wheel-image:url('${source.replace(/'/g, "%27")}')"><span class="wheel-slice-art"></span></span>`;
+      })
+      .join("");
+    dots.innerHTML = featuredProducts
+      .map(
+        (product, index) =>
+          `<button class="wheel-dot${index === featuredIndex ? " active" : ""}" type="button" data-feature-index="${index}" aria-label="عرض ${esc(product.name)}" aria-current="${index === featuredIndex ? "true" : "false"}"></button>`,
+      )
+      .join("");
+    $("#featurePrev").disabled = featuredProducts.length < 2;
+    $("#featureNext").disabled = featuredProducts.length < 2;
+    setFeaturedProduct(featuredIndex, false);
+    startFeaturedRotation();
   }
 
   function setLocked(locked) {
@@ -479,6 +603,23 @@
         $("#products").scrollIntoView({ behavior: "smooth" });
       };
     });
+    $("#featurePrev").onclick = () => setFeaturedProduct(featuredIndex - 1);
+    $("#featureNext").onclick = () => setFeaturedProduct(featuredIndex + 1);
+    $("#featureDots").onclick = (event) => {
+      const dot = event.target.closest("[data-feature-index]");
+      if (dot) setFeaturedProduct(Number(dot.dataset.featureIndex));
+    };
+    $("#featuredOpen").onclick = () => {
+      const product = featuredProducts[featuredIndex];
+      if (product) openOrder(product.id);
+    };
+    $("#productWheel").addEventListener("mouseenter", stopFeaturedRotation);
+    $("#productWheel").addEventListener("mouseleave", startFeaturedRotation);
+    $("#productWheel").addEventListener("focusin", stopFeaturedRotation);
+    $("#productWheel").addEventListener("focusout", (event) => {
+      if (!$("#productWheel").contains(event.relatedTarget)) startFeaturedRotation();
+    });
+    reducedMotion.addEventListener?.("change", startFeaturedRotation);
     $("#productGrid").onclick = (event) => {
       const card = event.target.closest(".product-card");
       if (!card) return;
