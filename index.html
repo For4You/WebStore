@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       name="description"
-      content="دار وأناقة — متجر عربي أنيق للأواني المنزلية ومستلزمات المطبخ والمائدة والتنظيم."
+      content="أواني للمطبخ والمائدة وحلول تنظيم نختارها بعناية، مع توصيل إلى جميع البلديات والدفع عند الاستلام."
     />
     <meta name="theme-color" content="#f6efe6" />
-    <title>متجر دار وأناقة | تفاصيل تصنع البيت</title>
+    <title>دار وأناقة | أوانٍ نختارها كما نختار لبيوتنا</title>
+    <link rel="icon" href="assets/dar-wa-anaqa-logo.svg" type="image/svg+xml" />
     <style>
       :root {
         --bg: #f6efe6;
@@ -22,7 +23,7 @@
         --soft: #e9b69e;
         --gold: #a47a3f;
         --shadow: 0 25px 70px rgba(84, 49, 29, 0.11);
-        --hero-img: url("assets/hero-light.png");
+        --hero-img: url("assets/dar-wa-anaqa-cover.svg");
         color-scheme: light;
       }
       :root[data-theme="dark"] {
@@ -37,7 +38,7 @@
         --soft: #6c582d;
         --gold: #d8aa4e;
         --shadow: 0 30px 90px rgba(0, 0, 0, 0.32);
-        --hero-img: url("assets/hero-dark.png");
+        --hero-img: url("assets/dar-wa-anaqa-cover.svg");
         color-scheme: dark;
       }
       * {
@@ -126,6 +127,14 @@
         font-weight: 900;
         letter-spacing: -0.04em;
       }
+      .brand-logo {
+        width: 48px;
+        height: 48px;
+        flex: 0 0 48px;
+        object-fit: contain;
+        border-radius: 16px;
+        filter: drop-shadow(0 8px 14px color-mix(in srgb, var(--text) 15%, transparent));
+      }
       .brand-mark {
         width: 39px;
         height: 39px;
@@ -146,7 +155,7 @@
         color: var(--muted);
         font-size: 8px;
         font-weight: 500;
-        letter-spacing: 0.14em;
+        letter-spacing: 0;
       }
       .nav {
         display: flex;
@@ -1145,9 +1154,10 @@
         .brand {
           font-size: 18px;
         }
-        .brand-mark {
-          width: 33px;
-          height: 33px;
+        .brand-logo {
+          width: 40px;
+          height: 40px;
+          flex-basis: 40px;
         }
         .brand small {
           display: none;
@@ -2784,14 +2794,14 @@
   <body>
     <div class="announcement" aria-label="معلومات التوصيل">
       <span class="announcement-track"
-        >توصيل سريع لجميع البلديات داخل الولاية وخارج الولاية</span
+        >اطلبي براحتك — نوصل إلى جميع البلديات داخل الولاية وخارجها</span
       >
     </div>
     <header class="header">
       <a class="brand" href="#top"
-        ><span class="brand-mark">د</span
+        ><img class="brand-logo" src="assets/dar-wa-anaqa-logo.svg" alt="شعار دار وأناقة"
         ><span class="brand-copy"
-          >دار وأناقة<small>تفاصيل تصنع البيت</small></span
+          >دار وأناقة<small>أوانٍ نختارها لبيوتنا</small></span
         ></a
       >
       <nav class="nav" id="nav">
@@ -2829,7 +2839,7 @@
     </header>
     <div class="search-bar" id="searchBar" hidden>
       <span>⌕</span
-      ><input placeholder="ابحث عن قدر، طقم تقديم، أو قطعة تنظيم..." /><button
+      ><input placeholder="ماذا تبحثين عنه اليوم؟ قدر، طقم تقديم، أو منظم..." /><button
         id="closeSearch"
       >
         ×
@@ -2838,21 +2848,21 @@
 
     <section class="hero" id="top">
       <div class="hero-copy">
-        <p class="eyebrow"><i></i>مختارات راقية لمنزل يشبهك</p>
-        <h1>أدوات تصنع فرقًا<br />في كل زاوية من منزلك</h1>
+        <p class="eyebrow"><i></i>قطع جميلة نستعملها ونثق بها</p>
+        <h1>أوانٍ تسهّل يومك<br />وتجعل البيت أرتب</h1>
         <p class="hero-desc">
-          قطع مختارة بعناية تجمع بين الجمال العملي والجودة التي تدوم، لتصنعي من
-          التفاصيل اليومية لحظات تستحق.
+          نبحث عن القطع التي تنفع فعلًا في البيت: سهلة الاستعمال، جميلة على
+          المائدة، وسعرها واضح من البداية.
         </p>
         <div class="hero-actions">
           <a class="primary" href="#products"
-            >تسوّق المجموعة <span class="arrow">←</span></a
-          ><a class="text-link" href="#story">اكتشف حكايتنا</a>
+            >شاهدي المنتجات <span class="arrow">←</span></a
+          ><a class="text-link" href="#story">كيف نختار منتجاتنا؟</a>
         </div>
         <div class="proof">
-          <div><strong>+١٢ ألف</strong><span>بيت أكثر أناقة</span></div>
-          <div><strong>٤٫٩/٥</strong><span>من تقييمات عملائنا</span></div>
-          <div><strong>ضمان و  جودة</strong><span>على القطع المختارة</span></div>
+          <div><strong>اختيار واضح</strong><span>صور وأسعار كما هي</span></div>
+          <div><strong>تغليف بعناية</strong><span>حتى تصل القطعة سليمة</span></div>
+          <div><strong>دفع عند الاستلام</strong><span>من دون خطوات معقدة</span></div>
         </div>
       </div>
       <div
@@ -2871,12 +2881,12 @@
           <div class="feature-copy">
             <div class="feature-meta">
               <span class="feature-counter" id="featuredCounter">٠١ / ٠٤</span>
-              <span class="feature-badge" id="featuredBadge">إلهام للأواني</span>
+              <span class="feature-badge" id="featuredBadge">من بيتنا لبيتك</span>
             </div>
-            <small>صور مختارة مستقلة عن المنتجات</small>
-            <strong id="featuredName">اختيارات دار وأناقة</strong>
+            <small>صور نختارها لأفكار بسيطة في المطبخ والمائدة</small>
+            <strong id="featuredName">أفكار قريبة من بيتك</strong>
             <p id="featuredDescription">
-              صور أوانٍ من اختيارنا تتبدل تلقائيًا كل ثانيتين.
+              صور أوانٍ نختارها من لوحة التحكم وتتغير كل ثانيتين.
             </p>
             <div class="feature-price">
               <b id="featuredPrice">—</b>
@@ -2905,24 +2915,24 @@
       <article class="trust-item">
         <span class="trust-icon">♢</span>
         <div>
-          <strong>جودة مختارة</strong><span>قطع عملية بخامات موثوقة</span>
+          <strong>نختار ما نعرضه</strong><span>لا نملأ المتجر بقطع عشوائية</span>
         </div>
       </article>
       <article class="trust-item">
         <span class="trust-icon">↗</span>
-        <div><strong>توصيل سريع</strong><span>داخل الولاية وخارجها</span></div>
+        <div><strong>نجهز الطلب بسرعة</strong><span>ونبقيك على اطلاع</span></div>
       </article>
       <article class="trust-item">
         <span class="trust-icon">⌁</span>
         <div>
-          <strong>تغطية جميع البلديات</strong
-          ><span>تغليف آمن حتى باب المنزل</span>
+          <strong>نوصل لكل البلديات</strong
+          ><span>داخل الولاية وخارجها</span>
         </div>
       </article>
       <article class="trust-item">
         <span class="trust-icon">✓</span>
         <div>
-          <strong>دفع عند الاستلام</strong><span>اطلبي الآن وادفعي بأمان</span>
+          <strong>الدفع عند الاستلام</strong><span>بعد وصول طلبك</span>
         </div>
       </article>
     </section>
@@ -2930,8 +2940,8 @@
     <section class="section products" id="products">
       <div class="heading">
         <div>
-          <p class="eyebrow"><i></i>مختاراتنا لكِ</p>
-          <h2>قطع ستُحبين استخدامها كل يوم</h2>
+          <p class="eyebrow"><i></i>المتوفر في المتجر</p>
+          <h2>اختاري القطعة التي تحتاجينها اليوم</h2>
         </div>
         <div class="filter-tabs">
           <button class="active" data-filter="all">الكل</button
@@ -2947,23 +2957,23 @@
     <section class="section" id="categories">
       <div class="heading">
         <div>
-          <p class="eyebrow"><i></i>اختاري مساحتك</p>
-          <h2>كل ركن، له تفاصيله</h2>
+          <p class="eyebrow"><i></i>تسوّقي حسب المكان</p>
+          <h2>ابدئي من الركن الذي تريدين ترتيبه</h2>
         </div>
         <a class="text-link" href="#products">عرض كل الأقسام ←</a>
       </div>
       <div class="category-grid">
         <button class="category-card" data-jump="kitchen">
           <b>٠١</b>
-          <div><small>أوانٍ بطابع معاصر</small><strong>المطبخ</strong></div>
+          <div><small>قدور وأدوات للاستخدام اليومي</small><strong>المطبخ</strong></div>
           <em>←</em></button
         ><button class="category-card" data-jump="table">
           <b>٠٢</b>
-          <div><small>تفاصيل لضيافة أجمل</small><strong>المائدة</strong></div>
+          <div><small>صحون وتقديم للبيت والضيوف</small><strong>المائدة</strong></div>
           <em>←</em></button
         ><button class="category-card" data-jump="storage">
           <b>٠٣</b>
-          <div><small>نظام يليق بمنزلك</small><strong>التنظيم</strong></div>
+          <div><small>حلول بسيطة تقلل الفوضى</small><strong>التنظيم</strong></div>
           <em>←</em>
         </button>
       </div>
@@ -2971,13 +2981,13 @@
 
     <section class="offer" id="offer">
       <div class="offer-copy">
-        <p class="eyebrow"><i></i>مجموعة الموسم</p>
-        <h2>دفء المائدة يبدأ<br />من قطعة تحبينها</h2>
+        <p class="eyebrow"><i></i>العروض المتوفرة</p>
+        <h2>أسعار أخف على<br />قطع تستحق</h2>
         <p>
-          نسّقنا لكِ ألوان الطين والعاج مع خامات طبيعية تمنح مائدتك حضورًا
-          هادئًا ومميزًا.
+          ستجدين هنا القطع المخفّضة فعلًا، مع السعر القديم والجديد واضحين قبل
+          أن ترسلي طلبك.
         </p>
-        <a class="secondary-light" href="#products">اكتشفي المجموعة ←</a>
+        <a class="secondary-light" href="#products">شاهدي العروض ←</a>
       </div>
       <div class="sale-orb">
         <span>حتى</span><strong>٣٠٪</strong><span>خصم على أطقم المائدة</span>
@@ -2988,27 +2998,27 @@
         <span>بيتٌ<br />يحكيكِ</span>
       </div>
       <div class="story-copy">
-        <p class="eyebrow"><i></i>فلسفتنا</p>
-        <h2>لا نختار القطع الجميلة فقط، بل التي تعيش معك</h2>
+        <p class="eyebrow"><i></i>كيف نختار؟</p>
+        <h2>نفضّل القطعة التي ستستخدمينها كل يوم</h2>
         <p>
-          من أول فنجان في الصباح إلى آخر طبق على مائدة العائلة، نبحث عن خامات
-          موثوقة وتصاميم تسهّل يومك وتبقى جميلة لسنوات.
+          قبل إضافة أي منتج، ننظر إلى فائدته، وسهولة تنظيفه، وشكله في البيت.
+          هدفنا أن تشتري ما تحتاجينه فعلًا، لا ما يملأ الخزانة.
         </p>
         <div class="values">
           <div>
-            <strong>مختار بعناية</strong
-            ><span>جودة نجرّبها قبل أن تصل إليكِ</span>
+            <strong>فائدة قبل الشكل</strong
+            ><span>القطعة الجميلة يجب أن تكون عملية أيضًا</span>
           </div>
           <div>
-            <strong>تغليف آمن</strong><span>يحمي كل قطعة حتى باب منزلك</span>
+            <strong>تغليف يهتم بالتفاصيل</strong><span>لأن الأواني تحتاج عناية في الطريق</span>
           </div>
         </div>
       </div>
     </section>
     <section class="newsletter">
-      <p class="eyebrow"><i></i>رسائل جميلة فقط</p>
-      <h2>كوني أول من يعرف الجديد</h2>
-      <p>إلهام أسبوعي للمنزل، وصول مبكر للمجموعات، وعروض خاصة للمشتركات.</p>
+      <p class="eyebrow"><i></i>الجديد من دون إزعاج</p>
+      <h2>نخبرك عندما تصل قطع تستحق المشاهدة</h2>
+      <p>رسالة قصيرة عند وصول منتج جديد أو عرض حقيقي. لا رسائل يومية ولا كلام زائد.</p>
       <form id="newsletter">
         <input type="email" required placeholder="بريدك الإلكتروني" /><button>
           اشتركي الآن ←
@@ -3018,12 +3028,12 @@
     <footer>
       <div class="footer-brand">
         <a class="brand" href="#top"
-          ><span class="brand-mark">د</span
+          ><img class="brand-logo" src="assets/dar-wa-anaqa-logo.svg" alt="شعار دار وأناقة"
           ><span class="brand-copy"
-            >دار وأناقة<small>تفاصيل تصنع البيت</small></span
+            >دار وأناقة<small>أوانٍ نختارها لبيوتنا</small></span
           ></a
         >
-        <p>نختار لمنزلك قطعًا عملية، جميلة، ومصنوعة لتدوم.</p>
+        <p>أوانٍ للمطبخ والمائدة وحلول تنظيم نختارها كما نختار لبيوتنا.</p>
         <a
           class="facebook-cta"
           href="https://www.facebook.com/WebStores0/"
@@ -3055,7 +3065,7 @@
       </div>
       <div class="copyright">
         <span>© ٢٠٢٦ دار وأناقة. جميع الحقوق محفوظة.</span
-        ><span>صُنع بحب للبيوت الجزائرية.</span>
+        ><span>من متجر جزائري إلى بيوت الجزائر.</span>
       </div>
     </footer>
 
@@ -3281,7 +3291,7 @@
             price: 235,
             oldPrice: 0,
             category: "table",
-            description: "طقم تقديم أنيق بملمس طبيعي ولمسة عصرية.",
+            description: "طقم تقديم عملي بلمسة هادئة، مناسب للقهوة والضيافة اليومية.",
             badge: "جديد",
             stock: 12,
             sizes: ["طقم كامل"],
@@ -3297,7 +3307,7 @@
             price: 185,
             oldPrice: 0,
             category: "kitchen",
-            description: "مقلاة عميقة سهلة الاستخدام والتنظيف.",
+            description: "مقلاة عميقة للطبخ اليومي، سهلة الحمل والتنظيف.",
             badge: "",
             stock: 9,
             sizes: ["متوسط", "كبير"],
@@ -3313,7 +3323,7 @@
             price: 89,
             oldPrice: 0,
             category: "storage",
-            description: "مرطبان زجاجي محكم يحافظ على المكونات مرتبة وواضحة.",
+            description: "مرطبان زجاجي محكم يساعدك على ترتيب المكونات ورؤيتها بسرعة.",
             badge: "",
             stock: 25,
             sizes: ["صغير", "متوسط", "كبير"],
@@ -3329,7 +3339,7 @@
             price: 115,
             oldPrice: 0,
             category: "table",
-            description: "وعاء تقديم بلون دافئ يناسب المائدة اليومية والضيافة.",
+            description: "وعاء تقديم بلون دافئ، جميل على مائدة العائلة وعند استقبال الضيوف.",
             badge: "",
             stock: 14,
             sizes: ["متوسط"],
@@ -3345,7 +3355,7 @@
             price: 160,
             oldPrice: 195,
             category: "storage",
-            description: "حل عملي وأنيق لتنظيم أدوات المطبخ والحمام.",
+            description: "منظّم بسيط يجمع الأدوات الصغيرة ويخفف الفوضى في المطبخ أو الحمام.",
             badge: "خصم ١٨٪",
             stock: 7,
             sizes: ["طقم كامل"],
@@ -3427,7 +3437,7 @@
           );
           $("#featuredName").textContent = featured
             ? featured.name
-            : "اختيارات دار وأناقة";
+            : "أفكار قريبة من بيتك";
           document.querySelector('meta[name="theme-color"]').content =
             t === "dark" ? "#071e19" : "#f8f1e7";
         }
@@ -3987,7 +3997,7 @@
             );
             $("#featuredName").textContent = featured
               ? featured.name
-              : "اختيارات دار وأناقة";
+              : "أفكار قريبة من بيتك";
           }
           if (event.key === "dar-theme") setTheme(event.newValue || "light");
         });
