@@ -111,8 +111,8 @@
     return {
       id: row.id,
       image: safeImage(row.image_url),
-      title: row.title || "تفاصيل تصنع البيت",
-      subtitle: row.subtitle || "مختارات ملهمة من عالم الأواني المنزلية",
+      title: row.title || "أفكار للمطبخ والمائدة",
+      subtitle: row.subtitle || "صور نختارها لتساعدك على تنسيق بيتك بطريقة بسيطة",
       displayOrder: Number(row.display_order) || 1,
     };
   }
@@ -176,11 +176,11 @@
     featuredUpdateTimer = window.setTimeout(() => {
       $("#featuredCounter").textContent =
         `${twoArabicDigits(activeIndex + 1)} / ${twoArabicDigits(featuredProducts.length)}`;
-      $("#featuredBadge").textContent = "إلهام للأواني";
+      $("#featuredBadge").textContent = "من بيتنا لبيتك";
       $("#featuredName").textContent = slide.title;
       $("#featuredDescription").textContent =
-        slide.subtitle || "مختارات ملهمة من عالم الأواني المنزلية.";
-      $("#featuredPrice").textContent = "صور من اختيارنا";
+        slide.subtitle || "صور نختارها لتساعدك على تنسيق بيتك بطريقة بسيطة.";
+      $("#featuredPrice").textContent = "صورة من اختيارنا";
       $("#featuredOldPrice").hidden = true;
       $("#featuredOpen").disabled = false;
       panel.classList.remove("feature-changing");
@@ -213,10 +213,10 @@
       disc.innerHTML = "";
       dots.innerHTML = "";
       $("#featuredCounter").textContent = "٠٠ / ٠٠";
-      $("#featuredBadge").textContent = "صور الدائرة";
-      $("#featuredName").textContent = "أضف صور الأواني من لوحة التحكم";
+      $("#featuredBadge").textContent = "مساحة الصور";
+      $("#featuredName").textContent = "ارفعي صور الأواني التي تحبينها";
       $("#featuredDescription").textContent =
-        "هذه المساحة مستقلة عن المنتجات وتعرض الصور التي تختارها أنت.";
+        "ستظهر هنا بالترتيب الذي تختارينه من لوحة التحكم.";
       $("#featuredPrice").textContent = "—";
       $("#featuredOldPrice").hidden = true;
       $("#featuredOpen").disabled = true;
@@ -352,7 +352,7 @@
     );
     if (!visible.length) {
       $("#productGrid").innerHTML =
-        '<div class="store-empty"><div><strong>لا توجد منتجات في هذا القسم الآن</strong><span>جرّبي قسمًا آخر أو عودي قريبًا لمشاهدة الجديد.</span></div></div>';
+        '<div class="store-empty"><div><strong>لا توجد قطع في هذا القسم الآن</strong><span>شاهدي قسمًا آخر، أو عودي لاحقًا بعد إضافة منتجات جديدة.</span></div></div>';
       return;
     }
     $("#productGrid").innerHTML = visible
@@ -777,7 +777,7 @@
     };
     $("#newsletter").onsubmit = (event) => {
       event.preventDefault();
-      toast("أهلًا بكِ في عائلة دار وأناقة");
+      toast("تم تسجيل بريدك، وسنراسلك عند وصول جديد يستحق المشاهدة");
       event.target.reset();
     };
     document.addEventListener("keydown", (event) => {
