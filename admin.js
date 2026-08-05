@@ -145,8 +145,8 @@
     return {
       id: row.id,
       imageUrl: safeImage(row.image_url),
-      title: row.title || "تفاصيل تصنع البيت",
-      subtitle: row.subtitle || "مختارات ملهمة من عالم الأواني المنزلية",
+      title: row.title || "أفكار للمطبخ والمائدة",
+      subtitle: row.subtitle || "صور نختارها لتساعد الزبونة على تنسيق بيتها بطريقة بسيطة",
       displayOrder: Number(row.display_order) || 1,
       visible: row.visible !== false,
     };
@@ -604,8 +604,8 @@
       const imageUrl = await uploadShowcaseImage(prepared);
       const { error } = await client.from("showcase_images").insert({
         image_url: imageUrl,
-        title: "تفاصيل تصنع البيت",
-        subtitle: "مختارات ملهمة من عالم الأواني المنزلية",
+        title: "أفكار للمطبخ والمائدة",
+        subtitle: "صور نختارها لتساعد الزبونة على تنسيق بيتها بطريقة بسيطة",
         display_order: showcaseImages.length + index + 1,
         visible: true,
       });
@@ -864,7 +864,7 @@
       if (!item) return;
       try {
         if (event.target.closest(".save-showcase")) {
-          const title = card.querySelector("[data-showcase-title]").value.trim() || "تفاصيل تصنع البيت";
+          const title = card.querySelector("[data-showcase-title]").value.trim() || "أفكار للمطبخ والمائدة";
           const subtitle = card.querySelector("[data-showcase-subtitle]").value.trim();
           const { error } = await client.from("showcase_images").update({ title, subtitle }).eq("id", item.id);
           if (error) throw error;
