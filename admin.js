@@ -44,6 +44,7 @@
   const legacyProducts = localJSON("dar-products", []);
   let products = [];
   let orders = [];
+  let showcaseImages = [];
   let seenOrders = localJSON("dar-seen-orders", []);
   let images = [];
   let pending = null;
@@ -137,6 +138,17 @@
       images: productImages,
       image_position: product.pos || "center",
       code: String(product.code || "").trim(),
+    };
+  }
+
+  function showcaseFromDb(row) {
+    return {
+      id: row.id,
+      imageUrl: safeImage(row.image_url),
+      title: row.title || "تفاصيل تصنع البيت",
+      subtitle: row.subtitle || "مختارات ملهمة من عالم الأواني المنزلية",
+      displayOrder: Number(row.display_order) || 1,
+      visible: row.visible !== false,
     };
   }
 
@@ -256,12 +268,24 @@
     return orders;
   }
 
+  async function loadShowcaseImages() {
+    const { data, error } = await client
+      .from("showcase_images")
+      .select("*")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) throw error;
+    showcaseImages = (data || []).map(showcaseFromDb).filter((item) => item.imageUrl);
+    renderShowcaseImages();
+    return showcaseImages;
+  }
+
   async function refreshAll(showMessage = false) {
     try {
       setSyncState("جاري مزامنة البيانات…");
-      await Promise.all([loadProducts(), loadOrders()]);
+      await Promise.all([loadProducts(), loadOrders(), loadShowcaseImages()]);
       setSyncState(
-        `متصل — ${fmt(products.length)} منتج و${fmt(orders.length)} طلب مشترك`,
+        `متصل — ${fmt(products.length)} منتج و${fmt(orders.length)} طلب و${fmt(showcaseImages.length)} صورة دائرة`,
       );
       if (showMessage) toast("تم تحديث البيانات من Supabase");
     } catch (error) {
@@ -286,6 +310,11 @@
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "orders" },
+        queueReload,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "showcase_images" },
         queueReload,
       )
       .subscribe();
@@ -379,7 +408,7 @@
     $("#productList").innerHTML = shown
       .map(
         (product) =>
-          `<article class="product-row" data-id="${esc(product.id)}"><div class="thumb" style="${imageStyle(product)}"></div><div class="main-data"><strong>${esc(product.name)}</strong><small>${esc(product.code || "دون رمز")} · ${fmt(safeImages(product).length)} صور · ${esc(product.badge || "دون شارة")}</small></div><div class="meta category-cell"><strong>${esc(categories[product.category] || product.category)}</strong><small>القسم</small></div><div class="meta price-cell"><strong>${fmt(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<small><s>${fmt(product.oldPrice)} دج</s></small>` : "<small>السعر</small>"}</div><div class="stock-cell"><span class="chip ${Number(product.stock || 0) <= 5 ? "low" : ""}">${fmt(product.stock)} قطعة</span><span class="chip ${product.visible === false ? "off" : ""}">${product.visible === false ? "مخفي" : "ظاهر"}</span><span class="chip ${product.featured ? "" : "off"}">${product.featured ? `إعلان ${fmt(product.featuredOrder || 1)}` : "عادي"}</span></div><div class="row-actions"><button class="btn small edit">تعديل</button><button class="btn small copy">نسخ</button><button class="btn small danger delete">حذف</button></div></article>`,
+          `<article class="product-row" data-id="${esc(product.id)}"><div class="thumb" style="${imageStyle(product)}"></div><div class="main-data"><strong>${esc(product.name)}</strong><small>${esc(product.code || "دون رمز")} · ${fmt(safeImages(product).length)} صور · ${esc(product.badge || "دون شارة")}</small></div><div class="meta category-cell"><strong>${esc(categories[product.category] || product.category)}</strong><small>القسم</small></div><div class="meta price-cell"><strong>${fmt(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<small><s>${fmt(product.oldPrice)} دج</s></small>` : "<small>السعر</small>"}</div><div class="stock-cell"><span class="chip ${Number(product.stock || 0) <= 5 ? "low" : ""}">${fmt(product.stock)} قطعة</span><span class="chip ${product.visible === false ? "off" : ""}">${product.visible === false ? "مخفي" : "ظاهر"}</span></div><div class="row-actions"><button class="btn small edit">تعديل</button><button class="btn small copy">نسخ</button><button class="btn small danger delete">حذف</button></div></article>`,
       )
       .join("");
   }
@@ -405,11 +434,6 @@
     $("#pBadge").value = editing ? product.badge || "" : "";
     $("#pCode").value = editing ? product.code || "" : "";
     $("#pVisible").checked = editing ? product.visible !== false : true;
-    $("#pFeatured").checked = editing ? product.featured === true : false;
-    $("#pFeaturedOrder").value = editing
-      ? Math.max(1, Number(product.featuredOrder) || 1)
-      : 1;
-    $("#pFeaturedOrder").disabled = !$("#pFeatured").checked;
     images = editing ? safeImages(product) : [];
     previewImages();
     $("#productModal").hidden = false;
@@ -517,6 +541,91 @@
       .from("products")
       .upsert(record, { onConflict: "id" });
     if (error) throw error;
+  }
+
+  function renderShowcaseImages() {
+    const list = $("#showcaseList");
+    const count = $("#showcaseCount");
+    if (!list || !count) return;
+    count.textContent = `${fmt(showcaseImages.length)} / ٤`;
+    $("#addShowcaseImages").disabled = showcaseImages.length >= 4;
+    if (!showcaseImages.length) {
+      list.innerHTML = '<div class="empty"><div><b>لا توجد صور في الدائرة</b><span>اضغط «إضافة صور» واختر صور الأواني التي تريد عرضها.</span></div></div>';
+      return;
+    }
+    list.innerHTML = showcaseImages
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .map((item, index) => `
+        <article class="showcase-card" data-showcase-id="${esc(item.id)}">
+          <div class="showcase-preview" style="--showcase-image:url('${item.imageUrl.replace(/'/g, "%27")}')">
+            <span class="showcase-order">${fmt(index + 1)}</span>
+            ${item.visible ? "" : '<span class="showcase-hidden">مخفية</span>'}
+          </div>
+          <div class="showcase-body">
+            <input data-showcase-title maxlength="90" value="${esc(item.title)}" aria-label="عنوان الصورة" />
+            <textarea data-showcase-subtitle maxlength="220" aria-label="وصف الصورة">${esc(item.subtitle)}</textarea>
+            <div class="showcase-actions">
+              <button class="btn small save-showcase" type="button">حفظ النص</button>
+              <button class="btn small move-showcase-up" type="button" ${index === 0 ? "disabled" : ""}>↑ تقديم</button>
+              <button class="btn small move-showcase-down" type="button" ${index === showcaseImages.length - 1 ? "disabled" : ""}>↓ تأخير</button>
+              <button class="btn small toggle-showcase" type="button">${item.visible ? "إخفاء" : "إظهار"}</button>
+              <button class="btn small danger delete-showcase" type="button">حذف</button>
+            </div>
+          </div>
+        </article>`)
+      .join("");
+  }
+
+  async function uploadShowcaseImage(dataUrl) {
+    const path = `showcase/${crypto.randomUUID()}.jpg`;
+    const { error } = await client.storage
+      .from("product-images")
+      .upload(path, dataUrlToBlob(dataUrl), {
+        contentType: "image/jpeg",
+        cacheControl: "31536000",
+        upsert: false,
+      });
+    if (error) throw error;
+    const { data } = client.storage.from("product-images").getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  async function addShowcaseFiles(files) {
+    const available = Math.max(0, 4 - showcaseImages.length);
+    const chosen = [...files]
+      .filter((file) => file.size <= 12 * 1024 * 1024)
+      .slice(0, available);
+    if (!chosen.length) {
+      return toast(available ? "اختر صورًا أصغر من 12 ميجابايت" : "الحد الأقصى أربع صور");
+    }
+    for (let index = 0; index < chosen.length; index += 1) {
+      setSyncState(`جاري رفع صورة الدائرة ${fmt(index + 1)} من ${fmt(chosen.length)}…`);
+      const prepared = await resizeImage(chosen[index]);
+      const imageUrl = await uploadShowcaseImage(prepared);
+      const { error } = await client.from("showcase_images").insert({
+        image_url: imageUrl,
+        title: "تفاصيل تصنع البيت",
+        subtitle: "مختارات ملهمة من عالم الأواني المنزلية",
+        display_order: showcaseImages.length + index + 1,
+        visible: true,
+      });
+      if (error) throw error;
+    }
+    await loadShowcaseImages();
+    setSyncState(`تم حفظ ${fmt(showcaseImages.length)} صور للدائرة`);
+  }
+
+  async function saveShowcaseOrder() {
+    for (let index = 0; index < showcaseImages.length; index += 1) {
+      const item = showcaseImages[index];
+      const { error } = await client
+        .from("showcase_images")
+        .update({ display_order: index + 1 })
+        .eq("id", item.id);
+      if (error) throw error;
+      item.displayOrder = index + 1;
+    }
+    renderShowcaseImages();
   }
 
   function ask(message, action) {
@@ -645,9 +754,10 @@
     );
     if (view === "products") renderProducts();
     if (view === "orders") renderOrders();
+    if (view === "showcase") renderShowcaseImages();
     if (view === "settings")
       setSyncState(
-        `متصل — ${fmt(products.length)} منتج و${fmt(orders.length)} طلب مشترك`,
+        `متصل — ${fmt(products.length)} منتج و${fmt(orders.length)} طلب و${fmt(showcaseImages.length)} صورة دائرة`,
       );
   }
 
@@ -723,6 +833,76 @@
     $("#refreshProducts").onclick = () => refreshAll(true);
     $("#productSearch").oninput = renderProducts;
     $("#productFilter").onchange = renderProducts;
+
+    $("#addShowcaseImages").onclick = () => $("#showcaseInput").click();
+    $("#refreshShowcase").onclick = async () => {
+      try {
+        await loadShowcaseImages();
+        toast("تم تحديث صور الدائرة");
+      } catch (error) {
+        toast(friendlyError(error, "تعذر تحميل صور الدائرة"));
+      }
+    };
+    $("#showcaseInput").onchange = async (event) => {
+      const files = event.target.files;
+      if (!files?.length) return;
+      $("#addShowcaseImages").disabled = true;
+      try {
+        await addShowcaseFiles(files);
+        toast("تمت إضافة الصور إلى الدائرة");
+      } catch (error) {
+        toast(friendlyError(error, "تعذر رفع صور الدائرة"));
+      } finally {
+        event.target.value = "";
+        $("#addShowcaseImages").disabled = showcaseImages.length >= 4;
+      }
+    };
+    $("#showcaseList").onclick = async (event) => {
+      const card = event.target.closest("[data-showcase-id]");
+      if (!card) return;
+      const item = showcaseImages.find((entry) => String(entry.id) === card.dataset.showcaseId);
+      if (!item) return;
+      try {
+        if (event.target.closest(".save-showcase")) {
+          const title = card.querySelector("[data-showcase-title]").value.trim() || "تفاصيل تصنع البيت";
+          const subtitle = card.querySelector("[data-showcase-subtitle]").value.trim();
+          const { error } = await client.from("showcase_images").update({ title, subtitle }).eq("id", item.id);
+          if (error) throw error;
+          item.title = title;
+          item.subtitle = subtitle;
+          return toast("تم حفظ نص الصورة");
+        }
+        if (event.target.closest(".move-showcase-up") || event.target.closest(".move-showcase-down")) {
+          const current = showcaseImages.indexOf(item);
+          const next = event.target.closest(".move-showcase-up") ? current - 1 : current + 1;
+          if (next < 0 || next >= showcaseImages.length) return;
+          [showcaseImages[current], showcaseImages[next]] = [showcaseImages[next], showcaseImages[current]];
+          await saveShowcaseOrder();
+          return toast("تم تعديل ترتيب الصور");
+        }
+        if (event.target.closest(".toggle-showcase")) {
+          const { error } = await client.from("showcase_images").update({ visible: !item.visible }).eq("id", item.id);
+          if (error) throw error;
+          item.visible = !item.visible;
+          renderShowcaseImages();
+          return toast(item.visible ? "تم إظهار الصورة" : "تم إخفاء الصورة");
+        }
+        if (event.target.closest(".delete-showcase")) {
+          return ask("هل تريد حذف هذه الصورة من الدائرة؟", async () => {
+            const { error } = await client.from("showcase_images").delete().eq("id", item.id);
+            if (error) return toast(friendlyError(error, "تعذر حذف الصورة"));
+            const path = item.imageUrl.startsWith(storageImagePrefix)
+              ? decodeURIComponent(item.imageUrl.slice(storageImagePrefix.length))
+              : "";
+            if (path) await client.storage.from("product-images").remove([path]);
+            await loadShowcaseImages();
+            toast("تم حذف الصورة");
+          });
+        }
+      } catch (error) {
+        toast(friendlyError(error, "تعذر تعديل صورة الدائرة"));
+      }
+    };
 
     $("#productList").onclick = (event) => {
       const row = event.target.closest("[data-id]");
@@ -811,11 +991,6 @@
       event.target.value = "";
     };
 
-    $("#pFeatured").onchange = () => {
-      $("#pFeaturedOrder").disabled = !$("#pFeatured").checked;
-      if ($("#pFeatured").checked && !Number($("#pFeaturedOrder").value))
-        $("#pFeaturedOrder").value = 1;
-    };
 
     $("#productForm").onsubmit = async (event) => {
       event.preventDefault();
@@ -838,10 +1013,8 @@
         badge: $("#pBadge").value.trim(),
         code: $("#pCode").value.trim(),
         visible: $("#pVisible").checked,
-        featured: $("#pFeatured").checked,
-        featuredOrder: $("#pFeatured").checked
-          ? Math.max(1, Math.floor(Number($("#pFeaturedOrder").value) || 1))
-          : 0,
+        featured: false,
+        featuredOrder: 0,
         images: [...images],
         image: images[0] || "",
         pos: existing.pos || "center",
