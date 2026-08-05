@@ -30,6 +30,10 @@
   };
   const format = (number) =>
     new Intl.NumberFormat("ar-DZ").format(Number(number) || 0);
+  const twoArabicDigits = (number) =>
+    String(Math.max(0, Math.floor(Number(number) || 0)))
+      .padStart(2, "0")
+      .replace(/[0-9]/g, (digit) => "٠١٢٣٤٥٦٧٨٩"[Number(digit)]);
   const esc = (value) =>
     String(value ?? "").replace(
       /[&<>"']/g,
@@ -68,6 +72,7 @@
   let currentSearch = "";
   let toastTimer;
   let reloadTimer;
+  let showcaseImages = [];
   let featuredProducts = [];
   let featuredIndex = 0;
   let featuredTimer;
@@ -102,6 +107,16 @@
     };
   }
 
+  function showcaseFromDb(row) {
+    return {
+      id: row.id,
+      image: safeImage(row.image_url),
+      title: row.title || "تفاصيل تصنع البيت",
+      subtitle: row.subtitle || "مختارات ملهمة من عالم الأواني المنزلية",
+      displayOrder: Number(row.display_order) || 1,
+    };
+  }
+
   function toast(message) {
     $("#toastText").textContent = message;
     $("#toast").hidden = false;
@@ -116,27 +131,14 @@
     $("#themeSymbol").textContent = nextTheme === "dark" ? "☀" : "☾";
     updateFeaturedProduct();
     document.querySelector('meta[name="theme-color"]').content =
-      nextTheme === "dark" ? "#071e19" : "#f8f1e7";
+      nextTheme === "dark" ? "#071e19" : "#f6efe6";
   }
 
   function featuredCandidates() {
-    const available = products.filter(
-      (product) =>
-        product.visible !== false &&
-        Number(product.stock || 0) > 0 &&
-        safeImages(product).length,
-    );
-    const selected = available
-      .filter((product) => product.featured === true)
-      .sort(
-        (first, second) =>
-          Number(first.featuredOrder || 0) - Number(second.featuredOrder || 0),
-      );
-    const selectedIds = new Set(selected.map((product) => String(product.id)));
-    const remainder = available.filter(
-      (product) => !selectedIds.has(String(product.id)),
-    );
-    return [...selected, ...remainder].slice(0, 4);
+    return showcaseImages
+      .filter((item) => item.image)
+      .sort((first, second) => first.displayOrder - second.displayOrder)
+      .slice(0, 4);
   }
 
   function stopFeaturedRotation() {
@@ -149,7 +151,7 @@
     if (reducedMotion.matches || featuredProducts.length < 2) return;
     featuredTimer = setInterval(
       () => setFeaturedProduct(featuredIndex + 1, false),
-      5200,
+      2000,
     );
   }
 
@@ -158,7 +160,7 @@
     featuredIndex =
       (Number(nextIndex) + featuredProducts.length) % featuredProducts.length;
     const activeIndex = featuredIndex;
-    const product = featuredProducts[activeIndex];
+    const slide = featuredProducts[activeIndex];
     const angle = activeIndex * 90;
     const panel = $("#featuredPanel");
     const disc = $("#productWheelDisc");
@@ -173,20 +175,16 @@
     clearTimeout(featuredUpdateTimer);
     featuredUpdateTimer = window.setTimeout(() => {
       $("#featuredCounter").textContent =
-        `${format(activeIndex + 1).padStart(2, "٠")} / ${format(featuredProducts.length).padStart(2, "٠")}`;
-      $("#featuredBadge").textContent = product.badge || "مختار لكِ";
-      $("#featuredName").textContent = product.name;
+        `${twoArabicDigits(activeIndex + 1)} / ${twoArabicDigits(featuredProducts.length)}`;
+      $("#featuredBadge").textContent = "إلهام للأواني";
+      $("#featuredName").textContent = slide.title;
       $("#featuredDescription").textContent =
-        product.description ||
-        `قطعة مميزة من قسم ${categoryLabels[product.category] || "المنزل"}. افتحي التفاصيل لاختيار الكمية والمواصفات.`;
-      $("#featuredPrice").textContent = `${format(product.price)} دج`;
-      $("#featuredOldPrice").hidden = !(Number(product.oldPrice) > 0);
-      $("#featuredOldPrice").textContent = Number(product.oldPrice) > 0
-        ? `${format(product.oldPrice)} دج`
-        : "";
+        slide.subtitle || "مختارات ملهمة من عالم الأواني المنزلية.";
+      $("#featuredPrice").textContent = "صور من اختيارنا";
+      $("#featuredOldPrice").hidden = true;
       $("#featuredOpen").disabled = false;
       panel.classList.remove("feature-changing");
-    }, reducedMotion.matches ? 0 : 170);
+    }, reducedMotion.matches ? 0 : 120);
 
     $("#featureDots")
       .querySelectorAll(".wheel-dot")
@@ -215,10 +213,10 @@
       disc.innerHTML = "";
       dots.innerHTML = "";
       $("#featuredCounter").textContent = "٠٠ / ٠٠";
-      $("#featuredBadge").textContent = "قريباً";
-      $("#featuredName").textContent = "اختيارات دار وأناقة";
+      $("#featuredBadge").textContent = "صور الدائرة";
+      $("#featuredName").textContent = "أضف صور الأواني من لوحة التحكم";
       $("#featuredDescription").textContent =
-        "أضيفي صوراً لمنتجات ظاهرة ومتوفرة لتظهر هنا تلقائياً.";
+        "هذه المساحة مستقلة عن المنتجات وتعرض الصور التي تختارها أنت.";
       $("#featuredPrice").textContent = "—";
       $("#featuredOldPrice").hidden = true;
       $("#featuredOpen").disabled = true;
@@ -228,15 +226,14 @@
     }
 
     disc.innerHTML = featuredProducts
-      .map((product, index) => {
-        const source = safeImages(product)[0];
-        return `<span class="wheel-slice${index === featuredIndex ? " active" : ""}" style="--slice-angle:${index * 90}deg;--slice-back-angle:${index * -90}deg;--wheel-image:url('${source.replace(/'/g, "%27")}')"><span class="wheel-slice-art"></span></span>`;
-      })
+      .map((slide, index) =>
+        `<span class="wheel-slice${index === featuredIndex ? " active" : ""}" style="--slice-angle:${index * 90}deg;--slice-back-angle:${index * -90}deg;--wheel-image:url('${slide.image.replace(/'/g, "%27")}')"><span class="wheel-slice-art"></span></span>`,
+      )
       .join("");
     dots.innerHTML = featuredProducts
       .map(
-        (product, index) =>
-          `<button class="wheel-dot${index === featuredIndex ? " active" : ""}" type="button" data-feature-index="${index}" aria-label="عرض ${esc(product.name)}" aria-current="${index === featuredIndex ? "true" : "false"}"></button>`,
+        (slide, index) =>
+          `<button class="wheel-dot${index === featuredIndex ? " active" : ""}" type="button" data-feature-index="${index}" aria-label="عرض ${esc(slide.title)}" aria-current="${index === featuredIndex ? "true" : "false"}"></button>`,
       )
       .join("");
     $("#featurePrev").disabled = featuredProducts.length < 2;
@@ -380,7 +377,6 @@
     products = (data || []).map(productFromDb);
     renderProducts();
     updateCart();
-    updateFeaturedProduct();
     if (activeProduct) {
       const refreshed = products.find(
         (product) => String(product.id) === String(activeProduct.id),
@@ -391,16 +387,39 @@
     return true;
   }
 
+  async function loadShowcase(showError = true) {
+    const { data, error } = await client
+      .from("showcase_images")
+      .select("*")
+      .eq("visible", true)
+      .order("display_order", { ascending: true })
+      .limit(4);
+    if (error) {
+      showcaseImages = [];
+      updateFeaturedProduct();
+      if (showError) toast("تعذر تحميل صور الدائرة. شغّل ملف إعداد Supabase المحدّث.");
+      return false;
+    }
+    showcaseImages = (data || []).map(showcaseFromDb).filter((item) => item.image);
+    updateFeaturedProduct();
+    return true;
+  }
+
   function subscribeRealtime() {
     const queueReload = () => {
       clearTimeout(reloadTimer);
-      reloadTimer = setTimeout(() => loadProducts(false), 350);
+      reloadTimer = setTimeout(() => Promise.all([loadProducts(false), loadShowcase(false)]), 350);
     };
     client
       .channel("webstore-products-live")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "products" },
+        queueReload,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "showcase_images" },
         queueReload,
       )
       .subscribe();
@@ -609,10 +628,8 @@
       const dot = event.target.closest("[data-feature-index]");
       if (dot) setFeaturedProduct(Number(dot.dataset.featureIndex));
     };
-    $("#featuredOpen").onclick = () => {
-      const product = featuredProducts[featuredIndex];
-      if (product) openOrder(product.id);
-    };
+    $("#featuredOpen").onclick = () =>
+      $("#products").scrollIntoView({ behavior: "smooth" });
     $("#productWheel").addEventListener("mouseenter", stopFeaturedRotation);
     $("#productWheel").addEventListener("mouseleave", startFeaturedRotation);
     $("#productWheel").addEventListener("focusin", stopFeaturedRotation);
@@ -795,7 +812,7 @@
     setupMotion();
     renderProducts(true);
     updateCart();
-    await loadProducts(true);
+    await Promise.all([loadProducts(true), loadShowcase(true)]);
     subscribeRealtime();
   }
 
