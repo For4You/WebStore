@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">شعار دار وأناقة</title>
+  <desc id="desc">رمز لأوانٍ منزلية يتكوّن من صحن وفنجان وملعقة وورقة نبات</desc>
+  <defs>
+    <linearGradient id="bg" x1="30" y1="20" x2="210" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF7ED"/>
+      <stop offset="1" stop-color="#E8D1B8"/>
+    </linearGradient>
+    <linearGradient id="terracotta" x1="62" y1="55" x2="180" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D47758"/>
+      <stop offset="1" stop-color="#A94734"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="150" y1="42" x2="198" y2="194" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D8B16A"/>
+      <stop offset="1" stop-color="#9E7132"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#6B3C28" flood-opacity=".18"/>
+    </filter>
+  </defs>
+  <rect x="10" y="10" width="220" height="220" rx="70" fill="url(#bg)"/>
+  <circle cx="117" cy="122" r="76" fill="#FFFDF9" stroke="#CBA77D" stroke-width="6"/>
+  <circle cx="117" cy="122" r="58" fill="none" stroke="#E8D4BD" stroke-width="3"/>
+  <path d="M62 129c0 31 25 56 56 56s56-25 56-56H62Z" fill="url(#terracotta)"/>
+  <path d="M75 129c5 20 22 35 43 35s38-15 43-35H75Z" fill="#F6C9B8" opacity=".42"/>
+  <path d="M77 119h82" stroke="#7B3328" stroke-width="7" stroke-linecap="round"/>
+  <path d="M165 56c12 4 19 13 20 27-14 1-24-4-30-16 2-6 5-9 10-11Z" fill="#6D8B66"/>
+  <path d="M159 72c8-3 16-10 22-17" stroke="#426148" stroke-width="4" stroke-linecap="round"/>
+  <path d="M183 91c7 4 11 11 11 19 0 8-4 15-11 19" fill="none" stroke="url(#gold)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M186 128v50" stroke="url(#gold)" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="186" cy="184" rx="9" ry="12" fill="#A97938"/>
+  <path d="M79 98h34v18c0 12-8 21-17 21s-17-9-17-21V98Z" fill="#F3E6D6" stroke="#B98C58" stroke-width="4"/>
+  <path d="M113 104h8c9 0 9 16 0 16h-8" fill="none" stroke="#B98C58" stroke-width="4"/>
+  <path d="M78 143c26 8 52 8 79 0" fill="none" stroke="#FFF4EA" stroke-width="4" stroke-linecap="round" opacity=".8"/>
+</svg>
