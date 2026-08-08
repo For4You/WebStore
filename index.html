@@ -4748,7 +4748,9 @@
           local: true,
         });
         const format = (value) =>
-          new Intl.NumberFormat("ar-DZ").format(Number(value) || 0);
+          new Intl.NumberFormat("ar-DZ", { useGrouping: false }).format(
+            Number(value) || 0,
+          );
         const byId = (id) => document.getElementById(id);
         function get(wilaya) {
           return rates.get(String(wilaya || "").trim()) || null;
@@ -4925,7 +4927,9 @@
           }
         };
         const format = (n) =>
-          new Intl.NumberFormat("ar-DZ").format(Number(n) || 0);
+          new Intl.NumberFormat("ar-DZ", { useGrouping: false }).format(
+            Number(n) || 0,
+          );
         const esc = (value) =>
           String(value ?? "").replace(
             /[&<>"']/g,
@@ -5555,7 +5559,7 @@
       })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="store.js"></script>
+    <script src="store.js?v=20260808-pricefix2"></script>
     <script>
       (() => {
         const byId = (id) => document.getElementById(id);
@@ -5565,7 +5569,9 @@
             .replace(/[۰-۹]/g, (digit) => "۰۱۲۳۴۵۶۷۸۹".indexOf(digit));
         const displayedUnitPrice = () => {
           const raw = toLatinDigits(byId("orderProductPrice")?.textContent);
-          return Number(raw.replace(/[^0-9.]/g, "")) || 0;
+          // Prices are integer DZD amounts. Ignore locale grouping separators,
+          // so both "1400" and the cached legacy display "1.400" become 1400.
+          return Number(raw.replace(/[^0-9]/g, "")) || 0;
         };
         const refresh = () =>
           window.DarDelivery.updateSummary(
