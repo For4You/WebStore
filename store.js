@@ -171,6 +171,7 @@
   let dragStart = null;
   let currentFilter = "all";
   let currentSearch = "";
+  let pendingPurchase = null;
   let toastTimer;
   let reloadTimer;
   let showcaseImages = [];
@@ -196,6 +197,7 @@
       description: row.description || "",
       badge: row.badge || "",
       stock: Number(row.stock),
+      soldCount: Math.max(0, Number(row.sold_count) || 0),
       sizes: row.sizes || [],
       colors: row.colors || [],
       visible: row.visible !== false,
@@ -456,11 +458,16 @@
         '<div class="store-empty"><div><strong>لا توجد قطع في هذا القسم الآن</strong><span>شاهدي قسمًا آخر، أو عودي لاحقًا بعد إضافة منتجات جديدة.</span></div></div>';
       return;
     }
+    const bestSold = Math.max(0, ...visible.map((product) => Number(product.soldCount || 0)));
     $("#productGrid").innerHTML = visible
-      .map(
-        (product) =>
-          `<article class="product-card" data-category="${esc(product.category)}" data-id="${esc(product.id)}" tabindex="0" role="button" aria-label="طلب ${esc(product.name)}"><div class="product-image" style="${productImageStyle(product)}">${product.badge ? `<span class="badge">${esc(product.badge)}</span>` : ""}<button class="heart" type="button" aria-label="إضافة للمفضلة">♡</button></div><div class="product-info"><div><small>${esc(categoryLabels[product.category] || product.category)}</small><h3>${esc(product.name)}</h3></div><div class="price"><strong>${format(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<del>${format(product.oldPrice)} دج</del>` : ""}</div>${product.description ? `<p class="product-summary">${esc(product.description)}</p>` : ""}<button class="add" type="button"${Number(product.stock || 0) <= 0 ? " disabled" : ""}>${Number(product.stock || 0) > 0 ? "＋ أضف للسلة" : "غير متوفر حاليًا"}</button></div></article>`,
-      )
+      .map((product) => {
+        const sold = Math.max(0, Number(product.soldCount || 0));
+        const isBest = sold > 0 && sold === bestSold;
+        const soldBadge = sold > 0
+          ? `<span class="sold-badge${isBest ? " best" : ""}">${isBest ? "الأكثر مبيعًا · " : ""}تم بيع ${format(sold)}</span>`
+          : "";
+        return `<article class="product-card" data-category="${esc(product.category)}" data-id="${esc(product.id)}" tabindex="0" role="button" aria-label="طلب ${esc(product.name)}"><div class="product-image" style="${productImageStyle(product)}">${product.badge ? `<span class="badge">${esc(product.badge)}</span>` : ""}${soldBadge}<button class="heart" type="button" aria-label="إضافة للمفضلة">♡</button></div><div class="product-info"><div><small>${esc(categoryLabels[product.category] || product.category)}</small><h3>${esc(product.name)}</h3></div><div class="price"><strong>${format(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<del>${format(product.oldPrice)} دج</del>` : ""}</div>${product.description ? `<p class="product-summary">${esc(product.description)}</p>` : ""}<button class="add" type="button"${Number(product.stock || 0) <= 0 ? " disabled" : ""}>${Number(product.stock || 0) > 0 ? "＋ أضف للسلة" : "غير متوفر حاليًا"}</button></div></article>`;
+      })
       .join("");
   }
 
@@ -706,6 +713,7 @@
     prepareGallery(activeProduct);
     restoreOrderDraft(activeProduct, quantity);
     updateOrderTotal();
+    hidePurchaseConfirmation();
     $("#orderModal").hidden = false;
     setLocked(true);
     setTimeout(() => $("#firstName").focus(), 80);
@@ -713,6 +721,7 @@
 
   function closeOrder(saveDraft = true) {
     if (saveDraft) captureOrderDraft();
+    hidePurchaseConfirmation();
     $("#orderModal").hidden = true;
     activeProduct = null;
     if (!$("#drawer").classList.contains("open")) setLocked(false);
@@ -731,6 +740,81 @@
     if (message.includes("INVALID_ORDER_DATA"))
       return "تحقق من بيانات الاسم والهاتف والعنوان.";
     return "تعذر إرسال الطلب الآن. حاول مرة أخرى.";
+  }
+
+  function hidePurchaseConfirmation() {
+    const box = $("#purchaseConfirmation");
+    if (!box) return;
+    box.hidden = true;
+    box.classList.remove("result");
+    $("#purchaseConfirmMark").textContent = "؟";
+    $("#purchaseConfirmTitle").textContent = "هل تريد تأكيد الشراء؟";
+    $("#purchaseConfirmText").textContent =
+      "راجع بياناتك ثم اختر نعم لإرسال الطلب أو رفض للعودة دون تسجيله.";
+    pendingPurchase = null;
+  }
+
+  function showPurchaseQuestion(payload) {
+    pendingPurchase = payload;
+    const box = $("#purchaseConfirmation");
+    box.classList.remove("result");
+    $("#purchaseConfirmMark").textContent = "؟";
+    $("#purchaseConfirmTitle").textContent = "هل تريد تأكيد الشراء؟";
+    $("#purchaseConfirmText").textContent =
+      `سيتم تسجيل ${format(payload.quantity)} قطعة من ${activeProduct?.name || "المنتج"}.`;
+    box.hidden = false;
+    box.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "nearest" });
+  }
+
+  function showPurchaseResult(approved, orderNumber = "") {
+    const box = $("#purchaseConfirmation");
+    box.hidden = false;
+    box.classList.add("result");
+    $("#purchaseConfirmMark").textContent = approved ? "✓" : "♡";
+    $("#purchaseConfirmTitle").textContent = approved
+      ? "شكراً، سيتم الاتصال بك لاحقاً"
+      : "رضاؤكم يهمنا";
+    $("#purchaseConfirmText").textContent = approved
+      ? `تم تسجيل طلبك بنجاح${orderNumber ? ` — رقم ${orderNumber}` : ""}.`
+      : "لم يتم تسجيل أي طلب. يمكنك تعديل البيانات أو اختيار منتج آخر.";
+  }
+
+  async function submitConfirmedPurchase() {
+    if (!pendingPurchase || !activeProduct) return;
+    const payload = pendingPurchase;
+    const button = $("#purchaseApprove");
+    button.disabled = true;
+    button.textContent = "جاري الإرسال…";
+    const orderedProductId = activeProduct.id;
+    const { data: orderNumber, error } = await client.rpc("create_order", {
+      p_product_id: String(activeProduct.id),
+      p_first_name: payload.firstName.trim(),
+      p_last_name: payload.lastName.trim(),
+      p_phone: payload.phone.trim(),
+      p_location: payload.location.trim(),
+      p_quantity: payload.quantity,
+      p_size: payload.size,
+      p_color: payload.color,
+      p_notes: payload.notes.trim(),
+    });
+    button.disabled = false;
+    button.textContent = "نعم";
+    if (error) {
+      toast(orderError(error));
+      await loadProducts(false);
+      return;
+    }
+    if (cart[orderedProductId]) {
+      cart[orderedProductId] = Math.max(0, cart[orderedProductId] - payload.quantity);
+      if (!cart[orderedProductId]) delete cart[orderedProductId];
+    }
+    orderDrafts.delete(String(orderedProductId));
+    $("#orderForm").reset();
+    updateCart();
+    pendingPurchase = null;
+    showPurchaseResult(true, orderNumber);
+    await loadProducts(false);
+    setTimeout(() => closeOrder(false), 2600);
   }
 
   function bindEvents() {
@@ -880,44 +964,30 @@
     };
     $("#quantity").oninput = updateOrderTotal;
     $("#location").onchange = updateOrderTotal;
-    $("#orderForm").onsubmit = async (event) => {
+    $("#orderForm").onsubmit = (event) => {
       event.preventDefault();
       if (!activeProduct) return;
       const data = Object.fromEntries(new FormData(event.target).entries());
       const quantity = Math.max(1, Number(data.quantity) || 1);
       if (quantity > Number(activeProduct.stock || 0))
         return toast("الكمية المطلوبة أكبر من المتوفر حاليًا");
-      const button = event.submitter;
-      button.disabled = true;
-      button.textContent = "جاري تسجيل الطلب…";
-      const orderedProductId = activeProduct.id;
-      const { data: orderNumber, error } = await client.rpc("create_order", {
-        p_product_id: String(activeProduct.id),
-        p_first_name: data.firstName.trim(),
-        p_last_name: data.lastName.trim(),
-        p_phone: data.phone.trim(),
-        p_location: data.location.trim(),
-        p_quantity: quantity,
-        p_size: data.size,
-        p_color: data.color,
-        p_notes: data.notes.trim(),
+      showPurchaseQuestion({
+        ...data,
+        quantity,
+        firstName: String(data.firstName || ""),
+        lastName: String(data.lastName || ""),
+        phone: String(data.phone || ""),
+        location: String(data.location || ""),
+        size: String(data.size || ""),
+        color: String(data.color || ""),
+        notes: String(data.notes || ""),
       });
-      button.disabled = false;
-      button.textContent = "تأكيد وإرسال الطلب ←";
-      if (error) {
-        toast(orderError(error));
-        await loadProducts(false);
-        return;
-      }
-      if (cart[orderedProductId]) {
-        cart[orderedProductId] = Math.max(0, cart[orderedProductId] - quantity);
-        if (!cart[orderedProductId]) delete cart[orderedProductId];
-      }
-      orderDrafts.delete(String(orderedProductId));
-      event.target.reset();
-      closeOrder(false);
-      updateCart();
-      toast(`تم تسجيل طلبك بنجاح — رقم ${orderNumber}`);
+    };
+    $("#purchaseApprove").onclick = submitConfirmedPurchase;
+    $("#purchaseReject").onclick = () => {
+      pendingPurchase = null;
+      showPurchaseResult(false);
+      setTimeout(() => hidePurchaseConfirmation(), 2600);
     };
     $("#newsletter").onsubmit = (event) => {
       event.preventDefault();
