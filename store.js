@@ -130,7 +130,10 @@
     }
   };
   const format = (number) =>
-    new Intl.NumberFormat("ar-DZ").format(Number(number) || 0);
+    new Intl.NumberFormat("ar-DZ", {
+      useGrouping: false,
+      maximumFractionDigits: 0,
+    }).format(Number(number) || 0);
   const twoArabicDigits = (number) =>
     String(Math.max(0, Math.floor(Number(number) || 0)))
       .padStart(2, "0")
