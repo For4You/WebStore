@@ -104,6 +104,7 @@
       description: row.description || "",
       badge: row.badge || "",
       stock: Number(row.stock),
+      soldCount: Math.max(0, Number(row.sold_count) || 0),
       sizes: row.sizes || [],
       colors: row.colors || [],
       visible: row.visible !== false,
@@ -408,7 +409,7 @@
     $("#productList").innerHTML = shown
       .map(
         (product) =>
-          `<article class="product-row" data-id="${esc(product.id)}"><div class="thumb" style="${imageStyle(product)}"></div><div class="main-data"><strong>${esc(product.name)}</strong><small>${esc(product.code || "دون رمز")} · ${fmt(safeImages(product).length)} صور · ${esc(product.badge || "دون شارة")}</small></div><div class="meta category-cell"><strong>${esc(categories[product.category] || product.category)}</strong><small>القسم</small></div><div class="meta price-cell"><strong>${fmt(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<small><s>${fmt(product.oldPrice)} دج</s></small>` : "<small>السعر</small>"}</div><div class="stock-cell"><span class="chip ${Number(product.stock || 0) <= 5 ? "low" : ""}">${fmt(product.stock)} قطعة</span><span class="chip ${product.visible === false ? "off" : ""}">${product.visible === false ? "مخفي" : "ظاهر"}</span></div><div class="row-actions"><button class="btn small edit">تعديل</button><button class="btn small copy">نسخ</button><button class="btn small danger delete">حذف</button></div></article>`,
+          `<article class="product-row" data-id="${esc(product.id)}"><div class="thumb" style="${imageStyle(product)}"></div><div class="main-data"><strong>${esc(product.name)}</strong><small>${esc(product.code || "دون رمز")} · ${fmt(safeImages(product).length)} صور · تم بيع ${fmt(product.soldCount || 0)} · ${esc(product.badge || "دون شارة")}</small></div><div class="meta category-cell"><strong>${esc(categories[product.category] || product.category)}</strong><small>القسم</small></div><div class="meta price-cell"><strong>${fmt(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<small><s>${fmt(product.oldPrice)} دج</s></small>` : "<small>السعر</small>"}</div><div class="stock-cell"><span class="chip ${Number(product.stock || 0) <= 5 ? "low" : ""}">${fmt(product.stock)} قطعة</span><span class="chip ${product.visible === false ? "off" : ""}">${product.visible === false ? "مخفي" : "ظاهر"}</span></div><div class="row-actions"><button class="btn small edit">تعديل</button><button class="btn small copy">نسخ</button><button class="btn small danger delete">حذف</button></div></article>`,
       )
       .join("");
   }
