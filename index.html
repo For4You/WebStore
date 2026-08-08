@@ -3357,6 +3357,830 @@
         .product-feature-panel { bottom: 39px !important; }
       }
 
+
+      /* Trust cards — refined and clearer */
+      .trust-strip {
+        gap: 14px;
+        padding-block: 30px;
+        background: transparent;
+        border-bottom: 1px solid var(--line);
+      }
+      .trust-item {
+        min-height: 94px;
+        position: relative;
+        overflow: hidden;
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: linear-gradient(145deg,
+          color-mix(in srgb, var(--surface) 96%, transparent),
+          color-mix(in srgb, var(--surface-2) 44%, var(--surface)));
+        box-shadow: 0 14px 36px color-mix(in srgb, var(--text) 7%, transparent);
+        transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+      }
+      .trust-item::after {
+        content: "";
+        position: absolute;
+        width: 78px;
+        height: 78px;
+        left: -28px;
+        bottom: -38px;
+        border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      .trust-item:hover {
+        transform: translateY(-4px);
+        border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+        box-shadow: 0 22px 50px color-mix(in srgb, var(--text) 11%, transparent);
+      }
+      .trust-icon {
+        width: 46px;
+        height: 46px;
+        border: 0;
+        background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+        color: var(--accent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 26%, transparent);
+        font-size: 19px;
+      }
+      .trust-item strong { font-size: 13px; }
+      .trust-item span:not(.trust-icon) { font-size: 10px; line-height: 1.7; }
+
+      /* Real sales counter on product cards */
+      .sold-badge {
+        position: absolute;
+        z-index: 4;
+        right: 16px;
+        bottom: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 11px;
+        border-radius: 999px;
+        background: rgba(20, 24, 22, .78);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 900;
+        line-height: 1;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 24px rgba(0,0,0,.18);
+      }
+      .sold-badge.best {
+        background: color-mix(in srgb, var(--accent) 92%, #211510);
+      }
+      .sold-badge::before { content: "✓"; font-size: 11px; }
+
+      /* Purchase confirmation / result */
+      .purchase-confirmation {
+        grid-column: 1/-1;
+        display: grid;
+        grid-template-columns: 48px 1fr auto;
+        align-items: center;
+        gap: 14px;
+        margin-top: 4px;
+        padding: 15px;
+        border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+        border-radius: 17px;
+        background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+        box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 10%, transparent);
+      }
+      .purchase-confirmation[hidden] { display: none; }
+      .purchase-confirmation .confirm-mark {
+        width: 48px;
+        height: 48px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-size: 22px;
+        font-weight: 900;
+      }
+      .purchase-confirmation strong { display:block; margin-bottom:4px; font-size:14px; }
+      .purchase-confirmation p { margin:0; color:var(--muted); font-size:10px; line-height:1.7; }
+      .purchase-confirmation .confirm-actions { display:flex; gap:7px; }
+      .purchase-confirmation button {
+        min-width: 74px;
+        padding: 10px 14px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface);
+        font-weight: 900;
+        cursor: pointer;
+      }
+      .purchase-confirmation .confirm-yes { border-color:var(--accent); background:var(--accent); color:#fff; }
+      .purchase-confirmation.result { grid-template-columns: 54px 1fr; }
+      .purchase-confirmation.result .confirm-mark { width:54px; height:54px; }
+      .purchase-confirmation.result .confirm-actions { display:none; }
+      @media (max-width: 760px) {
+        .trust-strip { grid-template-columns: 1fr 1fr; padding-inline: 16px; }
+        .purchase-confirmation { grid-template-columns: 44px 1fr; }
+        .purchase-confirmation .confirm-actions { grid-column: 1/-1; width:100%; }
+        .purchase-confirmation button { flex:1; }
+      }
+      @media (max-width: 480px) {
+        .trust-strip { grid-template-columns: 1fr; }
+      }
+
+
+
+      /* Compact spacing experiment — 2026-08-07
+         Reduce empty vertical space while keeping the luxury rhythm. */
+      @media (min-width: 681px) {
+        .hero {
+          min-height: min(640px, calc(100vh - 116px));
+        }
+        .hero-copy {
+          padding: clamp(46px, 5.2vw, 78px) clamp(30px, 6vw, 92px) 42px
+            clamp(30px, 4.5vw, 70px);
+        }
+        .hero-desc {
+          margin-block: 18px 24px;
+        }
+        .proof {
+          margin-top: clamp(32px, 4.5vw, 54px);
+          padding-top: 18px;
+        }
+        .product-feature-panel {
+          bottom: clamp(58px, 6vw, 76px);
+          padding: 18px;
+        }
+        .wheel-controls {
+          bottom: clamp(16px, 2.2vw, 26px);
+        }
+
+        .trust-strip {
+          gap: 10px;
+          padding-block: 19px;
+        }
+        .trust-item {
+          min-height: 78px;
+          padding: 13px 16px;
+          border-radius: 18px;
+        }
+        .trust-icon {
+          width: 40px;
+          height: 40px;
+          font-size: 17px;
+        }
+
+        .section {
+          padding-block: clamp(58px, 6vw, 92px);
+        }
+        .heading {
+          margin-bottom: 28px;
+        }
+        .products {
+          padding-top: 28px;
+        }
+        .category-grid {
+          gap: 18px;
+        }
+        .category-card {
+          min-height: 340px;
+          padding: 27px;
+          border-radius: 25px;
+        }
+        .category-card strong {
+          font-size: 30px;
+        }
+
+        .product-grid {
+          gap: 25px 20px;
+        }
+        .product-image {
+          height: 342px;
+        }
+        .product-card {
+          padding-bottom: 14px;
+        }
+        .product-info {
+          padding: 16px 18px 0;
+        }
+        .product-summary {
+          min-height: 36px;
+        }
+
+        .offer {
+          min-height: 470px;
+          margin-top: 10px;
+          margin-bottom: 68px;
+          padding: clamp(44px, 5vw, 68px);
+          border-radius: 28px;
+        }
+        .sale-orb {
+          width: 220px;
+          height: 220px;
+        }
+        .sale-orb strong {
+          font-size: 60px;
+        }
+
+        .story {
+          gap: clamp(42px, 6vw, 88px);
+        }
+        .story-art {
+          min-height: 440px;
+        }
+        .values {
+          margin-top: 24px;
+          gap: 16px;
+        }
+
+        .newsletter {
+          margin-top: 30px;
+          padding: clamp(54px, 6vw, 82px) 24px;
+        }
+        footer {
+          padding-top: 48px;
+          gap: 34px;
+        }
+      }
+
+      @media (min-width: 681px) and (max-width: 1050px) {
+        .hero {
+          min-height: 590px;
+        }
+        .category-card {
+          min-height: 315px;
+        }
+        .product-image {
+          height: 325px;
+        }
+        .offer {
+          min-height: 440px;
+        }
+      }
+
+      @media (max-width: 680px) {
+        /* The phone hero was already deliberately compact; tighten the long sections only. */
+        .section {
+          padding-top: 54px;
+          padding-bottom: 54px;
+        }
+        .heading {
+          margin-bottom: 23px;
+        }
+        .category-card {
+          min-height: 285px;
+        }
+        .product-image {
+          height: 360px;
+        }
+        .offer {
+          min-height: 560px;
+          margin-bottom: 58px;
+          padding-block: 38px;
+        }
+        .story-art {
+          min-height: 360px;
+        }
+        .newsletter {
+          margin-top: 28px;
+          padding-block: 58px;
+        }
+        footer {
+          padding-top: 48px;
+          padding-bottom: 20px;
+        }
+      }
+
+
+
+      /* =========================================================
+         Mobile refinement v3 — denser proportions + smaller cards
+         ========================================================= */
+      @media (max-width: 680px) {
+        html { scroll-padding-top: 74px; }
+        body { overflow-x: hidden; }
+
+        /* Header: less vertical weight */
+        .announcement {
+          min-height: 26px;
+          padding-block: 5px;
+          font-size: 8px;
+        }
+        .header {
+          height: 62px;
+          padding-inline: 12px;
+        }
+        .brand { gap: 7px; font-size: 15px; }
+        .brand-logo {
+          width: 36px;
+          height: 36px;
+          flex-basis: 36px;
+          border-radius: 11px;
+        }
+        .brand-copy small { display: none; }
+        .tools { gap: 0; }
+        .icon-btn {
+          width: 34px;
+          height: 34px;
+        }
+        .icon-btn svg { width: 18px; height: 18px; }
+        .theme-symbol { font-size: 18px; }
+        .cart-count { top: -1px; right: -1px; }
+
+        /* Hero: readable first, visual second. Avoid tiny side-by-side copy. */
+        .hero {
+          height: auto !important;
+          min-height: 0 !important;
+          grid-template-columns: 1fr !important;
+          overflow: hidden;
+        }
+        .hero-copy {
+          height: auto !important;
+          min-height: 0 !important;
+          padding: 36px 18px 28px !important;
+          overflow: visible;
+        }
+        .hero .eyebrow {
+          gap: 8px;
+          margin-bottom: 10px;
+          font-size: 9px;
+        }
+        .hero .eyebrow i { width: 22px; }
+        .hero h1 {
+          max-width: 330px;
+          font-size: clamp(30px, 9.3vw, 41px) !important;
+          line-height: 1.22;
+          letter-spacing: -0.045em;
+        }
+        .hero-desc {
+          display: block;
+          max-width: 370px;
+          margin: 12px 0 16px;
+          font-size: 11.5px !important;
+          line-height: 1.8;
+          -webkit-line-clamp: initial;
+        }
+        .hero-actions {
+          flex-flow: row wrap !important;
+          gap: 9px !important;
+        }
+        .hero-actions .primary {
+          padding: 10px 14px;
+          font-size: 10px;
+        }
+        .hero-actions .text-link {
+          display: inline-flex;
+          font-size: 9px;
+        }
+        .proof {
+          margin-top: 22px !important;
+          padding-top: 14px;
+          gap: 8px !important;
+        }
+        .proof strong { font-size: 10px !important; }
+        .proof span {
+          display: block;
+          font-size: 7px !important;
+        }
+
+        .hero-art.product-wheel-stage {
+          height: 265px !important;
+          min-height: 265px !important;
+        }
+        .product-wheel {
+          top: 40% !important;
+          left: 94% !important;
+          width: 610px !important;
+        }
+        .wheel-glow {
+          top: 39% !important;
+          right: -30% !important;
+          width: 86% !important;
+        }
+        .product-feature-panel {
+          right: 12px !important;
+          left: 12px !important;
+          bottom: 48px !important;
+          grid-template-columns: minmax(0,1fr) auto !important;
+          padding: 11px 12px !important;
+          gap: 8px !important;
+          border-radius: 15px !important;
+        }
+        .product-feature-panel .feature-meta { margin-bottom: 5px; }
+        .feature-counter,.feature-badge {
+          min-height: 20px;
+          padding: 3px 6px;
+          font-size: 7px;
+        }
+        .product-feature-panel small {
+          margin-bottom: 3px !important;
+          font-size: 7px !important;
+        }
+        .product-feature-panel strong {
+          font-size: 13px !important;
+        }
+        .product-feature-panel p { display: none; }
+        .feature-price { margin-top: 5px; }
+        .feature-price b { font-size: 11px; }
+        .feature-open { width: 30px; height: 30px; }
+        .wheel-controls {
+          right: 12px !important;
+          bottom: 10px !important;
+        }
+        .wheel-controls > button { width: 30px; height: 30px; }
+
+        /* Trust cards: 2x2, compact and readable — never one huge column. */
+        .trust-strip {
+          grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+          gap: 8px !important;
+          padding: 12px !important;
+          background: transparent;
+        }
+        .trust-item {
+          min-height: 66px !important;
+          flex-direction: row !important;
+          justify-content: flex-start !important;
+          gap: 8px !important;
+          padding: 9px 10px !important;
+          border-radius: 14px !important;
+          text-align: right !important;
+          box-shadow: 0 8px 22px color-mix(in srgb, var(--text) 6%, transparent);
+        }
+        .trust-item::after { display: none; }
+        .trust-icon {
+          width: 31px !important;
+          height: 31px !important;
+          flex: 0 0 31px;
+          font-size: 13px !important;
+        }
+        .trust-item div { min-width: 0; gap: 2px; }
+        .trust-item strong {
+          overflow: visible;
+          font-size: 9px !important;
+          line-height: 1.35;
+          white-space: normal;
+        }
+        .trust-item div > span {
+          display: block !important;
+          overflow: hidden;
+          font-size: 7px !important;
+          line-height: 1.4 !important;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        /* General rhythm */
+        .section {
+          padding: 40px 14px !important;
+        }
+        .heading {
+          gap: 14px;
+          margin-bottom: 18px !important;
+        }
+        .heading h2,
+        .offer h2,
+        .story h2,
+        .newsletter h2 {
+          font-size: clamp(25px, 7.4vw, 34px);
+          line-height: 1.28;
+        }
+        .filter-tabs { padding: 4px; }
+        .filter-tabs button {
+          padding: 8px 12px;
+          font-size: 10px;
+        }
+
+        /* Categories: smaller visual tiles */
+        .category-grid {
+          grid-template-columns: repeat(2, minmax(0,1fr));
+          gap: 9px;
+        }
+        .category-card,
+        .category-card:last-child {
+          grid-column: auto;
+          min-height: 165px !important;
+          padding: 15px !important;
+          border-radius: 17px !important;
+        }
+        .category-card:last-child { grid-column: 1 / -1; min-height: 135px !important; }
+        .category-card b { top: 12px; right: 13px; font-size: 9px; }
+        .category-card small { font-size: 8px; }
+        .category-card strong { font-size: 20px !important; }
+        .category-card em {
+          width: 32px;
+          height: 32px;
+          font-size: 15px;
+        }
+
+        /* Products: true two-column mobile grid instead of oversized cards. */
+        .products {
+          max-width: 100% !important;
+          padding: 34px 12px 44px !important;
+          overflow: visible !important;
+        }
+        .products .heading { padding-inline: 2px !important; }
+        .product-grid {
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+          gap: 12px 9px !important;
+          overflow: visible !important;
+          padding: 0 !important;
+          scroll-snap-type: none !important;
+        }
+        .product-card {
+          min-width: 0;
+          width: 100%;
+          flex: none !important;
+          padding: 0 0 10px !important;
+          border-radius: 16px !important;
+          box-shadow: 0 9px 26px color-mix(in srgb, var(--text) 7%, transparent);
+          transform: none !important;
+        }
+        .product-card:hover,
+        .product-card:focus-visible { transform: none !important; }
+        .product-image {
+          height: auto !important;
+          aspect-ratio: 1 / 1.06;
+          border-radius: 15px 15px 0 0 !important;
+        }
+        .badge {
+          top: 8px;
+          right: 8px;
+          max-width: calc(100% - 44px);
+          padding: 5px 7px;
+          font-size: 7px;
+        }
+        .heart {
+          top: 7px;
+          left: 7px;
+          width: 28px;
+          height: 28px;
+          font-size: 14px;
+        }
+        .sold-badge {
+          right: 7px;
+          bottom: 7px;
+          gap: 3px;
+          padding: 5px 7px;
+          font-size: 7px;
+        }
+        .sold-badge::before { font-size: 8px; }
+        .product-info {
+          grid-template-columns: minmax(0,1fr) auto;
+          gap: 6px 7px;
+          padding: 10px 9px 0 !important;
+        }
+        .product-info small { font-size: 7px; }
+        .product-info h3 {
+          display: -webkit-box;
+          overflow: hidden;
+          margin-top: 3px;
+          font-size: 11.5px !important;
+          line-height: 1.45;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+        }
+        .price { gap: 2px; }
+        .price strong { font-size: 10.5px; }
+        .price del { font-size: 8px; }
+        .product-summary { display: none; }
+        .add {
+          min-height: 34px;
+          padding: 8px 5px !important;
+          border-radius: 10px !important;
+          font-size: 9px !important;
+        }
+
+        /* Promotional and editorial sections */
+        .offer {
+          min-height: 410px !important;
+          margin: 0 12px 44px !important;
+          padding: 30px 20px !important;
+          gap: 22px;
+          border-radius: 20px;
+        }
+        .offer-copy > p:not(.eyebrow) {
+          margin: 14px 0 18px;
+          font-size: 11px;
+          line-height: 1.8;
+        }
+        .secondary-light { padding: 11px 16px; font-size: 10px; }
+        .sale-orb {
+          width: 142px !important;
+          height: 142px !important;
+        }
+        .sale-orb strong { font-size: 42px !important; }
+
+        .story { gap: 28px; }
+        .story-art {
+          min-height: 275px !important;
+          border-radius: 36% 36% 8px 8px;
+        }
+        .story-art span { font-size: 53px; }
+        .story-copy > p:not(.eyebrow) { font-size: 12px; line-height: 1.9; }
+        .values { margin-top: 20px; gap: 12px; }
+        .values div { padding-top: 12px; }
+
+        .newsletter {
+          margin-top: 18px !important;
+          padding: 42px 16px !important;
+        }
+        footer {
+          padding: 38px 16px 18px !important;
+          gap: 26px 18px;
+        }
+
+        /* Order confirmation stays compact on a phone. */
+        .purchase-confirmation {
+          grid-template-columns: 38px minmax(0,1fr) !important;
+          gap: 9px;
+          padding: 11px !important;
+          border-radius: 13px;
+        }
+        .purchase-confirmation .confirm-mark {
+          width: 38px;
+          height: 38px;
+          font-size: 17px;
+        }
+        .purchase-confirmation strong { font-size: 12px; }
+        .purchase-confirmation p { font-size: 8px; }
+        .purchase-confirmation .confirm-actions {
+          grid-column: 1/-1;
+          gap: 6px;
+        }
+        .purchase-confirmation button {
+          min-width: 0;
+          padding: 9px 10px;
+          font-size: 10px;
+        }
+      }
+
+      @media (max-width: 390px) {
+        .product-grid { gap: 10px 7px !important; }
+        .products { padding-inline: 9px !important; }
+        .product-info { padding-inline: 8px !important; }
+        .product-info h3 { font-size: 10.5px !important; }
+        .price strong { font-size: 9.5px; }
+        .add { font-size: 8.5px !important; }
+        .trust-strip { padding-inline: 9px !important; gap: 7px !important; }
+        .trust-item { padding-inline: 8px !important; }
+        .category-grid { gap: 7px; }
+      }
+
+
+
+      /* Mobile hero v4 — keep the two hero frames attached side-by-side. */
+      @media (max-width: 680px) {
+        .hero {
+          display: grid !important;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+          gap: 0 !important;
+          height: clamp(330px, 92vw, 390px) !important;
+          min-height: 0 !important;
+          overflow: hidden !important;
+        }
+        .hero-copy {
+          min-width: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 0 !important;
+          padding: 20px 12px 15px !important;
+          justify-content: center !important;
+          overflow: hidden !important;
+          border-left: 1px solid var(--line);
+        }
+        .hero .eyebrow {
+          gap: 5px !important;
+          margin: 0 0 7px !important;
+          font-size: 7px !important;
+          line-height: 1.35 !important;
+        }
+        .hero .eyebrow i { width: 15px !important; }
+        .hero h1 {
+          max-width: none !important;
+          margin: 0 !important;
+          font-size: clamp(18px, 5.35vw, 23px) !important;
+          line-height: 1.28 !important;
+          letter-spacing: -0.035em !important;
+        }
+        .hero-desc {
+          display: -webkit-box !important;
+          overflow: hidden !important;
+          max-width: none !important;
+          margin: 8px 0 10px !important;
+          font-size: 8px !important;
+          line-height: 1.62 !important;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 3;
+        }
+        .hero-actions {
+          display: flex !important;
+          flex-flow: row nowrap !important;
+          align-items: center !important;
+          gap: 5px !important;
+        }
+        .hero-actions .primary {
+          padding: 8px 9px !important;
+          gap: 4px !important;
+          font-size: 7.5px !important;
+          white-space: nowrap !important;
+        }
+        .hero-actions .arrow { font-size: 10px !important; }
+        .hero-actions .text-link { display: none !important; }
+        .proof {
+          display: grid !important;
+          grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          gap: 4px !important;
+          margin-top: 12px !important;
+          padding-top: 9px !important;
+        }
+        .proof div { min-width: 0; gap: 2px !important; }
+        .proof strong {
+          overflow: hidden;
+          font-size: 7.4px !important;
+          line-height: 1.25 !important;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .proof span {
+          display: -webkit-box !important;
+          overflow: hidden;
+          font-size: 5.5px !important;
+          line-height: 1.25 !important;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+        }
+        .hero-art.product-wheel-stage {
+          min-width: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          min-height: 0 !important;
+          border: 0 !important;
+        }
+        .product-wheel {
+          top: 35% !important;
+          left: 124% !important;
+          width: 430px !important;
+        }
+        .wheel-glow {
+          top: 35% !important;
+          right: -56% !important;
+          width: 116% !important;
+        }
+        .product-feature-panel {
+          right: 7px !important;
+          left: 7px !important;
+          bottom: 41px !important;
+          width: auto !important;
+          min-width: 0 !important;
+          grid-template-columns: minmax(0, 1fr) auto !important;
+          gap: 6px !important;
+          padding: 9px !important;
+          border-radius: 12px !important;
+        }
+        .product-feature-panel .feature-meta { gap: 4px !important; margin-bottom: 4px !important; }
+        .feature-counter,
+        .feature-badge {
+          min-height: 18px !important;
+          padding: 2px 5px !important;
+          font-size: 6px !important;
+        }
+        .product-feature-panel small {
+          overflow: hidden !important;
+          margin-bottom: 3px !important;
+          font-size: 6px !important;
+          line-height: 1.3 !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+        }
+        .product-feature-panel strong {
+          display: -webkit-box;
+          overflow: hidden;
+          font-size: 11px !important;
+          line-height: 1.25 !important;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+        }
+        .product-feature-panel p { display: none !important; }
+        .feature-price { margin-top: 4px !important; }
+        .feature-price b { font-size: 9px !important; }
+        .feature-price del { font-size: 6px !important; }
+        .feature-open { width: 27px !important; height: 27px !important; font-size: 13px !important; }
+        .wheel-controls {
+          right: 7px !important;
+          left: auto !important;
+          bottom: 7px !important;
+          gap: 4px !important;
+        }
+        .wheel-controls > button { width: 27px !important; height: 27px !important; font-size: 12px !important; }
+        .wheel-dots { gap: 3px !important; }
+        .wheel-dot { width: 6px !important; height: 6px !important; }
+        .wheel-dot.active { width: 15px !important; }
+      }
+
+      @media (max-width: 390px) {
+        .hero { height: 330px !important; }
+        .hero-copy { padding-inline: 9px !important; }
+        .hero h1 { font-size: 17px !important; }
+        .hero-desc { font-size: 7.5px !important; -webkit-line-clamp: 3; }
+        .proof span { display: none !important; }
+        .product-wheel { width: 390px !important; }
+        .product-feature-panel { bottom: 39px !important; }
+      }
 </style>
   </head>
   <body>
@@ -3481,27 +4305,20 @@
     </section>
     <section class="trust-strip" aria-label="مزايا المتجر">
       <article class="trust-item">
-        <span class="trust-icon">♢</span>
-        <div>
-          <strong>نختار ما نعرضه</strong><span>لا نملأ المتجر بقطع عشوائية</span>
-        </div>
+        <span class="trust-icon">◇</span>
+        <div><strong>اختيار بعناية</strong><span>نعرض قطعًا عملية ومختارة بدل كثرة المنتجات العشوائية</span></div>
       </article>
       <article class="trust-item">
         <span class="trust-icon">↗</span>
-        <div><strong>نجهز الطلب بسرعة</strong><span>ونبقيك على اطلاع</span></div>
+        <div><strong>تجهيز سريع</strong><span>نراجع طلبك ونبدأ التجهيز فور تأكيده</span></div>
       </article>
       <article class="trust-item">
         <span class="trust-icon">⌁</span>
-        <div>
-          <strong>نوصل لكل البلديات</strong
-          ><span>داخل الولاية وخارجها</span>
-        </div>
+        <div><strong>توصيل واسع</strong><span>إلى مختلف الولايات والبلديات حسب جدول التوصيل</span></div>
       </article>
       <article class="trust-item">
         <span class="trust-icon">✓</span>
-        <div>
-          <strong>الدفع عند الاستلام</strong><span>بعد وصول طلبك</span>
-        </div>
+        <div><strong>الدفع عند الاستلام</strong><span>تدفع قيمة طلبك عند وصوله إليك</span></div>
       </article>
     </section>
 
@@ -3890,6 +4707,17 @@
               <button class="submit-order" type="submit">
                 تأكيد وإرسال الطلب ←
               </button>
+              <section class="purchase-confirmation" id="purchaseConfirmation" hidden aria-live="polite">
+                <span class="confirm-mark" id="purchaseConfirmMark">؟</span>
+                <div>
+                  <strong id="purchaseConfirmTitle">هل تريد تأكيد الشراء؟</strong>
+                  <p id="purchaseConfirmText">راجع بياناتك ثم اختر نعم لإرسال الطلب أو رفض للعودة دون تسجيله.</p>
+                </div>
+                <div class="confirm-actions">
+                  <button class="confirm-no" id="purchaseReject" type="button">رفض</button>
+                  <button class="confirm-yes" id="purchaseApprove" type="button">نعم</button>
+                </div>
+              </section>
             </form>
           </div>
         </div>
