@@ -558,7 +558,7 @@
         .map((section, index) => {
           const image = safeImage(section.imageUrl);
           const imageStyle = image
-            ? ` style="--category-image:url('${image.replace(/'/g, "%27")}')"`
+            ? ` style="--category-image:url('${image.replace(/'/g, "%27")}');background-image:var(--category-image)"`
             : "";
           return `<button class="category-card" data-section-jump="${esc(section.key)}"${imageStyle}><b>${twoArabicDigits(index + 1)}</b><div><small>${esc(section.description || "مختارات منتقاة لهذا الركن")}</small><strong>${esc(section.name)}</strong></div><em>←</em></button>`;
         })
