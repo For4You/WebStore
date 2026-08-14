@@ -18,7 +18,6 @@
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
-  const SECTION_MARKER = "__STORE_SECTION__";
   const defaultSections = [
     { key: "kitchen", name: "المطبخ", description: "قدور وأدوات للاستخدام اليومي", order: 1, locked: true },
     { key: "table", name: "المائدة", description: "صحون وتقديم للبيت والضيوف", order: 2, locked: true },
@@ -35,6 +34,7 @@
   };
   const stockStatuses = new Set(["confirmed", "processing", "completed"]);
   const storageImagePrefix = `${SUPABASE_URL}/storage/v1/object/public/product-images/`;
+  const LEGACY_SECTION_MARKER = "__STORE_SECTION__";
 
   const localJSON = (key, fallback) => {
     try {
@@ -85,6 +85,7 @@
     String(value || "").startsWith(storageImagePrefix);
   const safeImage = (value) =>
     isDataImage(value) || isStoredImage(value) ? String(value) : "";
+  const isLegacySectionRow = (row) => String(row?.code || "") === LEGACY_SECTION_MARKER;
   const safeImages = (product) => {
     const values = Array.isArray(product?.images)
       ? product.images
@@ -94,14 +95,13 @@
       .filter((value, index, array) => value && array.indexOf(value) === index)
       .slice(0, 8);
   };
-  const isSectionRow = (row) => String(row?.code || "") === SECTION_MARKER;
   const sectionFromDb = (row) => ({
     id: row.id,
-    key: String(row.category || "").trim(),
-    name: String(row.name || row.category || "").trim(),
+    key: String(row.key || "").trim(),
+    name: String(row.name || row.key || "").trim(),
     description: String(row.description || "").trim(),
-    order: Math.max(1, Number(row.featured_order) || 999),
-    locked: defaultSections.some((section) => section.key === row.category),
+    order: Math.max(1, Number(row.display_order) || 999),
+    locked: row.locked === true || defaultSections.some((section) => section.key === row.key),
   });
   const effectiveSections = (rows) => {
     const byKey = new Map((rows || []).filter((section) => section.key && section.name).map((section) => [section.key, section]));
@@ -114,27 +114,6 @@
     Object.keys(categories).forEach((key) => delete categories[key]);
     sections.forEach((section) => (categories[section.key] = section.name));
   }
-  function sectionRecord(section) {
-    return {
-      id: String(section.id || crypto.randomUUID()),
-      name: String(section.name || "").trim(),
-      price: 0,
-      old_price: 0,
-      category: String(section.key || "").trim(),
-      description: String(section.description || "").trim(),
-      badge: "قسم",
-      stock: 0,
-      sizes: [],
-      colors: [],
-      visible: true,
-      featured: false,
-      featured_order: Math.max(1, Math.floor(Number(section.order) || 1)),
-      images: [],
-      image_position: "center",
-      code: SECTION_MARKER,
-    };
-  }
-
   function productFromDb(row) {
     const productImages = Array.isArray(row.images)
       ? row.images.filter(isStoredImage).slice(0, 8)
@@ -246,6 +225,19 @@
     if (message.includes("JWT") || message.includes("session"))
       return "انتهت جلسة الدخول، سجّل الدخول مجددًا";
     if (
+      message.includes("store_sections") &&
+      (message.includes("schema cache") || message.includes("does not exist") || message.includes("Could not find"))
+    )
+      return "جدول الأقسام غير مُجهّز بعد. شغّل ملف supabase_sections_setup.sql مرة واحدة في Supabase";
+    if (message.includes("duplicate key") && message.includes("store_sections"))
+      return "يوجد قسم بهذا المعرّف بالفعل";
+    if (message.includes("save_store_section") || message.includes("delete_store_section"))
+      return "دوال إدارة الأقسام غير مثبّتة بعد. شغّل ملف supabase_sections_rpc_fix.sql الجديد مرة واحدة";
+    if (message.includes("NOT_ADMIN"))
+      return "الحساب الحالي ليس مخوّلًا لحفظ الأقسام";
+    if (message.includes("SECTION_NAME_REQUIRED"))
+      return "اكتب اسمًا للقسم قبل الحفظ";
+    if (
       message.includes("row-level security") ||
       message.includes("permission")
     )
@@ -296,24 +288,46 @@
 
   async function ensureDefaultSections() {
     const { data, error } = await client
-      .from("products")
-      .select("id,category,code")
-      .eq("code", SECTION_MARKER);
+      .from("store_sections")
+      .select("key");
     if (error) throw error;
-    const existing = new Set((data || []).map((row) => row.category));
+    const existing = new Set((data || []).map((row) => row.key));
     const missing = defaultSections.filter((section) => !existing.has(section.key));
-    if (!missing.length) return;
-    const { error: insertError } = await client
-      .from("products")
-      .insert(missing.map((section) => sectionRecord(section)));
-    if (insertError) throw insertError;
+    for (const section of missing) await saveSection(section);
   }
 
   async function saveSection(section) {
-    const record = sectionRecord(section);
-    const { error } = await client.from("products").upsert(record, { onConflict: "id" });
+    const record = {
+      key: String(section.key || "").trim(),
+      name: String(section.name || "").trim(),
+      description: String(section.description || "").trim(),
+      displayOrder: Math.max(1, Math.floor(Number(section.order) || 1)),
+      locked: section.locked === true || defaultSections.some((item) => item.key === section.key),
+    };
+    if (!record.key || !record.name) throw new Error("SECTION_NAME_REQUIRED");
+    const { data, error } = await client.rpc("save_store_section", {
+      p_key: record.key,
+      p_name: record.name,
+      p_description: record.description,
+      p_display_order: record.displayOrder,
+      p_locked: record.locked,
+    });
     if (error) throw error;
-    return record.id;
+    return data || section.id || null;
+  }
+
+  async function loadSections() {
+    const { data, error } = await client
+      .from("store_sections")
+      .select("id,key,name,description,display_order,locked")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) throw error;
+    sections = effectiveSections((data || []).map(sectionFromDb));
+    syncCategoryLabels();
+    renderSectionControls();
+    renderSections();
+    return sections;
   }
 
   async function loadProducts() {
@@ -322,10 +336,7 @@
       .select("*")
       .order("created_at", { ascending: false });
     if (error) throw error;
-    const rows = data || [];
-    const sectionRows = rows.filter(isSectionRow).map(sectionFromDb);
-    products = rows.filter((row) => !isSectionRow(row)).map(productFromDb);
-    sections = effectiveSections(sectionRows);
+    products = (data || []).filter((row) => !isLegacySectionRow(row)).map(productFromDb);
     const knownKeys = new Set(sections.map((section) => section.key));
     [...new Set(products.map((product) => product.category).filter(Boolean))].forEach((key) => {
       if (!knownKeys.has(key)) sections.push({ key, name: key, description: "قسم مستورد", order: sections.length + 1, locked: false });
@@ -366,6 +377,7 @@
   async function refreshAll(showMessage = false) {
     try {
       setSyncState("جاري مزامنة البيانات…");
+      await loadSections();
       await Promise.all([loadProducts(), loadOrders(), loadShowcaseImages()]);
       setSyncState(
         `متصل — ${fmt(products.length)} منتج و${fmt(sections.length)} أقسام و${fmt(orders.length)} طلب و${fmt(showcaseImages.length)} صورة دائرة`,
@@ -398,6 +410,11 @@
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "showcase_images" },
+        queueReload,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "store_sections" },
         queueReload,
       )
       .subscribe();
@@ -546,6 +563,7 @@
     const first = { ...sections[index], order: next + 1 };
     const second = { ...sections[next], order: index + 1 };
     await Promise.all([saveSection(first), saveSection(second)]);
+    await loadSections();
     await loadProducts();
   }
 
@@ -559,8 +577,10 @@
       toast("هذا القسم أساسي ولا يمكن حذفه");
       return;
     }
-    const { error } = await client.from("products").delete().eq("id", section.id).eq("code", SECTION_MARKER);
+    const { data, error } = await client.rpc("delete_store_section", { p_key: section.key });
     if (error) throw error;
+    if (data !== true) throw new Error("SECTION_DELETE_FAILED");
+    await loadSections();
     await loadProducts();
   }
 
@@ -1052,10 +1072,14 @@
           order: existing?.order || sections.length + 1,
         });
         closeSection();
+        await loadSections();
         await loadProducts();
         toast(existing ? "تم تحديث القسم في المتجر" : "تمت إضافة القسم وأصبح جاهزًا للمنتجات");
       } catch (error) {
-        toast(friendlyError(error, "تعذر حفظ القسم"));
+        console.error("Section save failed:", error);
+        const friendly = friendlyError(error, "");
+        const technical = [error?.code, error?.message].filter(Boolean).join(" — ");
+        toast(friendly || `تعذر حفظ القسم${technical ? `: ${technical}` : ""}`);
       } finally {
         button.disabled = false;
       }
