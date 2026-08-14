@@ -1184,6 +1184,92 @@
         .showcase-grid { grid-template-columns: 1fr; padding: 13px; }
         .showcase-preview { min-height: 210px; }
       }
+
+      /* ===== Dynamic sections manager · v8 ===== */
+      .sections-panel { overflow: hidden; }
+      .sections-count {
+        min-height: 34px;
+        padding: 7px 11px;
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--surface-2);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 900;
+      }
+      .sections-list { display: grid; gap: 10px; padding: 14px; }
+      .section-row {
+        display: grid;
+        grid-template-columns: 52px minmax(0,1fr) auto auto;
+        align-items: center;
+        gap: 13px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: color-mix(in srgb, var(--surface) 94%, transparent);
+        box-shadow: 0 10px 26px color-mix(in srgb, var(--text) 5%, transparent);
+      }
+      .section-order-badge {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+        color: var(--accent);
+        font-weight: 900;
+      }
+      .section-main { min-width: 0; }
+      .section-main strong { display: block; font-size: 16px; }
+      .section-main small {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .section-meta {
+        min-width: 90px;
+        text-align: center;
+      }
+      .section-meta strong { display:block; font-size: 14px; }
+      .section-meta small { color:var(--muted); font-size:9px; }
+      .section-row-actions { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+      .section-row-actions .btn { white-space: nowrap; }
+      .section-form { display:grid; grid-template-columns:1fr; gap:14px; padding: 18px 0 0; }
+      .section-form .field { display:grid; gap:7px; }
+      .section-form input,
+      .section-form textarea {
+        width:100%;
+        border:1px solid var(--line);
+        border-radius:12px;
+        padding:12px 13px;
+        background:var(--surface);
+        color:var(--text);
+        outline:none;
+      }
+      .section-form textarea { min-height:100px; resize:vertical; }
+      .section-form input:focus,
+      .section-form textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 16%,transparent); }
+      .section-tip {
+        padding:11px 12px;
+        border-radius:12px;
+        background:color-mix(in srgb,var(--accent) 8%,var(--surface));
+        color:var(--muted);
+        font-size:10px;
+        line-height:1.7;
+      }
+      .section-save { width:100%; min-height:45px; }
+      .section-modal-card { width:min(520px, calc(100% - 24px)); }
+      @media(max-width:780px){
+        .section-row { grid-template-columns:44px minmax(0,1fr); gap:9px; padding:11px; }
+        .section-order-badge { width:40px; height:40px; border-radius:12px; }
+        .section-meta { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; text-align:right; padding-top:8px; border-top:1px solid var(--line); }
+        .section-row-actions { grid-column:1 / -1; justify-content:stretch; }
+        .section-row-actions .btn { flex:1 1 auto; }
+      }
+      /* ===== End dynamic sections manager · v8 ===== */
 </style>
   </head>
   <body>
@@ -1207,6 +1293,7 @@
     <main>
       <nav class="tabs">
         <button class="tab active" data-view="products">المنتجات</button
+        ><button class="tab" data-view="sections">الأقسام</button
         ><button class="tab" data-view="orders">
           الطلبات
           <span class="nav-badge" id="orderTabBadge" hidden>٠</span></button
@@ -1255,13 +1342,36 @@
                 placeholder="اسم المنتج أو رمزه"
               /><select class="control" id="productFilter">
                 <option value="all">كل الأقسام</option>
-                <option value="kitchen">المطبخ</option>
-                <option value="table">المائدة</option>
-                <option value="storage">التنظيم</option>
               </select>
             </div>
           </div>
           <div id="productList"></div>
+        </section>
+      </section>
+
+      <section class="view" id="sectionsView" hidden>
+        <div class="hero sections-hero">
+          <div>
+            <h2>إدارة أقسام المتجر</h2>
+            <p>
+              كل قسم يظهر كرف مستقل في المتجر، ومنتجاته تُسحب يمينًا ويسارًا وحدها.
+              أضف أقسامًا جديدة أو غيّر ترتيبها من هنا من دون تعديل الكود.
+            </p>
+          </div>
+          <div class="actions">
+            <button class="btn" id="refreshSections" type="button">تحديث</button>
+            <button class="btn primary" id="addSection" type="button">＋ إضافة قسم</button>
+          </div>
+        </div>
+        <section class="panel sections-panel">
+          <div class="panel-head">
+            <div>
+              <h3>ترتيب الأقسام في واجهة المتجر</h3>
+              <small class="panel-help">الترتيب هنا هو نفسه ترتيب الرفوف في المتجر. لا يمكن حذف قسم يحتوي منتجات.</small>
+            </div>
+            <span class="sections-count" id="sectionsCount">٠ أقسام</span>
+          </div>
+          <div class="sections-list" id="sectionsList"></div>
         </section>
       </section>
 
@@ -1458,10 +1568,8 @@
             </div>
             <div class="field">
               <label for="pCategory">القسم *</label
-              ><select id="pCategory">
+              ><select id="pCategory" required>
                 <option value="kitchen">المطبخ</option>
-                <option value="table">المائدة</option>
-                <option value="storage">التنظيم</option>
               </select>
             </div>
             <div class="field">
@@ -1519,6 +1627,32 @@
         </form>
       </div>
     </div>
+    <div class="modal" id="sectionModal" hidden>
+      <div class="card section-modal-card">
+        <div class="modal-head">
+          <div>
+            <small id="sectionModalKicker">قسم جديد</small>
+            <h2 id="sectionModalTitle">إضافة قسم</h2>
+          </div>
+          <button class="close" id="closeSection" type="button">×</button>
+        </div>
+        <form class="section-form" id="sectionForm">
+          <input id="sectionId" type="hidden" />
+          <input id="sectionKey" type="hidden" />
+          <div class="field">
+            <label for="sectionName">اسم القسم *</label>
+            <input id="sectionName" maxlength="45" required placeholder="مثال: مختارات البيت" />
+          </div>
+          <div class="field full">
+            <label for="sectionDescription">وصف قصير</label>
+            <textarea id="sectionDescription" maxlength="120" placeholder="مثال: إكسسوارات وأجهزة صغيرة ومفاجآت مفيدة للبيت"></textarea>
+          </div>
+          <div class="section-tip">سيُنشأ رمز داخلي للقسم تلقائيًا، لذلك يمكنك تغيير الاسم لاحقًا من دون التأثير على المنتجات.</div>
+          <button class="btn primary section-save" type="submit">حفظ القسم</button>
+        </form>
+      </div>
+    </div>
+
     <div class="modal" id="orderDetailModal" hidden>
       <div class="card">
         <div class="modal-head">
@@ -2548,6 +2682,6 @@
       })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="admin.js"></script>
+    <script src="admin.js?v=20260814-dynamic-sections-v8"></script>
   </body>
 </html>
