@@ -18,11 +18,12 @@
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
+  const CORE_SECTION_KEYS = new Set(["kitchen", "table", "storage"]);
+  const LEGACY_PRODUCT_CATEGORIES = new Set(["kitchen", "table", "storage"]);
   const defaultSections = [
     { key: "kitchen", name: "المطبخ", description: "قدور وأدوات للاستخدام اليومي", order: 1, locked: true },
     { key: "table", name: "المائدة", description: "صحون وتقديم للبيت والضيوف", order: 2, locked: true },
     { key: "storage", name: "التنظيم", description: "حلول بسيطة تقلل الفوضى", order: 3, locked: true },
-    { key: "home-picks", name: "مختارات البيت", description: "إكسسوارات وأجهزة صغيرة ومفاجآت مفيدة للبيت", order: 4, locked: true },
   ];
   const categories = {};
   const statusLabels = {
@@ -51,6 +52,7 @@
   let showcaseImages = [];
   let seenOrders = localJSON("dar-seen-orders", []);
   let images = [];
+  let sectionImage = "";
   let pending = null;
   let toastTimer;
   let realtimeChannel;
@@ -100,8 +102,9 @@
     key: String(row.key || "").trim(),
     name: String(row.name || row.key || "").trim(),
     description: String(row.description || "").trim(),
+    imageUrl: safeImage(row.image_url),
     order: Math.max(1, Number(row.display_order) || 999),
-    locked: row.locked === true || defaultSections.some((section) => section.key === row.key),
+    locked: row.locked === true || CORE_SECTION_KEYS.has(row.key),
   });
   const effectiveSections = (rows) => {
     const byKey = new Map((rows || []).filter((section) => section.key && section.name).map((section) => [section.key, section]));
@@ -228,11 +231,11 @@
       message.includes("store_sections") &&
       (message.includes("schema cache") || message.includes("does not exist") || message.includes("Could not find"))
     )
-      return "جدول الأقسام غير مُجهّز بعد. شغّل ملف supabase_sections_setup.sql مرة واحدة في Supabase";
+      return "جدول الأقسام غير مُجهّز بعد. شغّل ملف supabase_dynamic_sections_COMPLETE_v8_5.sql مرة واحدة في Supabase";
     if (message.includes("duplicate key") && message.includes("store_sections"))
       return "يوجد قسم بهذا المعرّف بالفعل";
     if (message.includes("save_store_section") || message.includes("delete_store_section"))
-      return "دوال إدارة الأقسام غير مثبّتة بعد. شغّل ملف supabase_sections_rpc_fix.sql الجديد مرة واحدة";
+      return "دوال إدارة الأقسام وصورها غير محدّثة بعد. شغّل ملف supabase_dynamic_sections_COMPLETE_v8_5.sql مرة واحدة";
     if (message.includes("NOT_ADMIN"))
       return "الحساب الحالي ليس مخوّلًا لحفظ الأقسام";
     if (message.includes("SECTION_NAME_REQUIRED"))
@@ -241,6 +244,16 @@
       return "لا يمكن حذف القسم لأنه ما زال يحتوي منتجات. انقل منتجاته إلى قسم آخر ثم أعد المحاولة";
     if (message.includes("LOCKED_SECTION"))
       return "هذا قسم أساسي محمي ولا يمكن حذفه";
+    if (
+      error?.code === "23514" ||
+      message.includes("products_category_check") ||
+      message.includes("set_product_section")
+    )
+      return "قاعدة المنتجات ما زالت مقيّدة بالأقسام الثلاثة القديمة. شغّل ملف supabase_dynamic_product_sections_v8_4.sql مرة واحدة";
+    if (message.includes("SECTION_NOT_FOUND"))
+      return "القسم المختار غير موجود في قاعدة البيانات. حدّث الأقسام ثم أعد المحاولة";
+    if (message.includes("PRODUCT_NOT_FOUND"))
+      return "تعذر العثور على المنتج بعد الحفظ";
     if (message.includes("CATEGORY_SYNC_FAILED"))
       return "تم إرسال التعديل لكن قاعدة البيانات لم تُرجع القسم الجديد. حدّث الصفحة وأعد المحاولة";
     if (message.includes("SECTION_DELETE_FAILED") || message.includes("SECTION_STILL_EXISTS"))
@@ -309,8 +322,9 @@
       key: String(section.key || "").trim(),
       name: String(section.name || "").trim(),
       description: String(section.description || "").trim(),
+      imageUrl: safeImage(section.imageUrl),
       displayOrder: Math.max(1, Math.floor(Number(section.order) || 1)),
-      locked: section.locked === true || defaultSections.some((item) => item.key === section.key),
+      locked: section.locked === true || CORE_SECTION_KEYS.has(section.key),
     };
     if (!record.key || !record.name) throw new Error("SECTION_NAME_REQUIRED");
     const { data, error } = await client.rpc("save_store_section", {
@@ -319,6 +333,7 @@
       p_description: record.description,
       p_display_order: record.displayOrder,
       p_locked: record.locked,
+      p_image_url: record.imageUrl,
     });
     if (error) throw error;
     return data || section.id || null;
@@ -327,7 +342,7 @@
   async function loadSections() {
     const { data, error } = await client
       .from("store_sections")
-      .select("id,key,name,description,display_order,locked")
+      .select("id,key,name,description,image_url,display_order,locked")
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: true });
     if (error) throw error;
@@ -527,8 +542,12 @@
     }
     list.innerHTML = sections.map((section, index) => {
       const productCount = products.filter((product) => product.category === section.key).length;
-      const locked = defaultSections.some((item) => item.key === section.key);
+      const locked = CORE_SECTION_KEYS.has(section.key) || section.locked === true;
+      const sectionImageStyle = section.imageUrl
+        ? `--section-image:url('${section.imageUrl.replace(/'/g, "%27")}')`
+        : "";
       return `<article class="section-row" data-section-key="${esc(section.key)}">
+        <div class="section-thumb${section.imageUrl ? " has-image" : ""}" style="${sectionImageStyle}"><span>صورة</span></div>
         <div class="section-order-badge">${fmt(index + 1)}</div>
         <div class="section-main"><strong>${esc(section.name)}</strong><small>${esc(section.description || "بدون وصف")}</small></div>
         <div class="section-meta"><strong>${fmt(productCount)}</strong><small>منتجات</small></div>
@@ -542,6 +561,18 @@
     }).join("");
   }
 
+  function previewSectionImage() {
+    const upload = $("#sectionImageUpload");
+    if (!upload) return;
+    const source = safeImage(sectionImage);
+    upload.classList.toggle("has-image", Boolean(source));
+    upload.style.setProperty(
+      "--section-preview",
+      source ? `url('${source.replace(/'/g, "%27")}')` : "none",
+    );
+    $("#removeSectionImage").disabled = !source;
+  }
+
   function openSection(section = null) {
     const editing = Boolean(section);
     $("#sectionModalKicker").textContent = editing ? "تعديل القسم" : "قسم جديد";
@@ -550,6 +581,9 @@
     $("#sectionKey").value = editing ? section.key : "";
     $("#sectionName").value = editing ? section.name : "";
     $("#sectionDescription").value = editing ? section.description || "" : "";
+    sectionImage = editing ? safeImage(section.imageUrl) : "";
+    $("#sectionImageInput").value = "";
+    previewSectionImage();
     $("#sectionModal").hidden = false;
     document.body.classList.add("lock");
     setTimeout(() => $("#sectionName")?.focus(), 0);
@@ -560,6 +594,9 @@
     $("#sectionForm").reset();
     $("#sectionId").value = "";
     $("#sectionKey").value = "";
+    $("#sectionImageInput").value = "";
+    sectionImage = "";
+    previewSectionImage();
     if ($("#productModal").hidden && $("#confirmModal").hidden && $("#orderDetailModal").hidden)
       document.body.classList.remove("lock");
   }
@@ -754,10 +791,51 @@
     return uploaded;
   }
 
+  async function uploadSectionImage(sectionKey, value) {
+    const source = safeImage(value);
+    if (!source) return "";
+    if (isStoredImage(source)) return source;
+    if (!isDataImage(source)) return "";
+
+    const safeKey = String(sectionKey || "section").replace(/[^a-zA-Z0-9_-]/g, "-");
+    const path = `sections/${safeKey}/${crypto.randomUUID()}.jpg`;
+    const { error } = await client.storage
+      .from("product-images")
+      .upload(path, dataUrlToBlob(source), {
+        contentType: "image/jpeg",
+        cacheControl: "31536000",
+        upsert: false,
+      });
+    if (error) throw error;
+    const { data } = client.storage.from("product-images").getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  async function removeStoredImage(imageUrl) {
+    const source = safeImage(imageUrl);
+    if (!isStoredImage(source)) return;
+    const path = decodeURIComponent(source.slice(storageImagePrefix.length));
+    if (!path) return;
+    const { error } = await client.storage.from("product-images").remove([path]);
+    if (error) console.warn("Image cleanup failed:", error);
+  }
+
   async function saveProduct(product) {
     const uploaded = await uploadImages(product.id, safeImages(product));
+    const desiredCategory = String(product.category || "").trim();
+    const existingProduct = products.find((item) => String(item.id) === String(product.id));
+
+    // قواعد البيانات القديمة كانت تسمح فقط بالمطبخ/المائدة/التنظيم.
+    // نحفظ بقيمة قديمة آمنة أولًا، ثم ننقل القسم الديناميكي عبر RPC آمن.
+    const bootstrapCategory = LEGACY_PRODUCT_CATEGORIES.has(desiredCategory)
+      ? desiredCategory
+      : (LEGACY_PRODUCT_CATEGORIES.has(existingProduct?.category)
+          ? existingProduct.category
+          : "kitchen");
+
     const record = productToDb({
       ...product,
+      category: bootstrapCategory,
       images: uploaded,
       image: uploaded[0] || "",
     });
@@ -766,14 +844,27 @@
       .upsert(record, { onConflict: "id" });
     if (error) throw error;
 
-    // لا نعرض نجاحًا قبل التأكد أن القسم الجديد وصل فعلًا إلى قاعدة البيانات.
+    if (desiredCategory && desiredCategory !== bootstrapCategory) {
+      const { data: movedCategory, error: moveError } = await client.rpc(
+        "set_product_section",
+        {
+          p_product_id: String(product.id),
+          p_section_key: desiredCategory,
+        },
+      );
+      if (moveError) throw moveError;
+      if (String(movedCategory || "") !== desiredCategory)
+        throw new Error("CATEGORY_SYNC_FAILED");
+    }
+
+    // لا نعرض نجاحًا قبل التأكد أن القسم النهائي وصل فعلًا إلى قاعدة البيانات.
     const { data: saved, error: verifyError } = await client
       .from("products")
       .select("id,category")
       .eq("id", record.id)
       .single();
     if (verifyError) throw verifyError;
-    if (String(saved?.category || "") !== String(record.category || "")) {
+    if (String(saved?.category || "") !== desiredCategory) {
       const syncError = new Error("CATEGORY_SYNC_FAILED");
       syncError.code = "CATEGORY_SYNC_FAILED";
       throw syncError;
@@ -1096,6 +1187,28 @@
     $("#sectionModal").onclick = (event) => {
       if (event.target === $("#sectionModal")) closeSection();
     };
+    $("#changeSectionImage").onclick = () => $("#sectionImageInput").click();
+    $("#removeSectionImage").onclick = () => {
+      sectionImage = "";
+      $("#sectionImageInput").value = "";
+      previewSectionImage();
+    };
+    $("#sectionImageInput").onchange = async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      if (file.size > 12 * 1024 * 1024) {
+        event.target.value = "";
+        return toast("الصورة أكبر من 12 ميجابايت");
+      }
+      try {
+        sectionImage = await resizeImage(file);
+        previewSectionImage();
+        toast("تم تجهيز صورة القسم للرفع");
+      } catch (_) {
+        event.target.value = "";
+        toast("تعذر قراءة صورة القسم");
+      }
+    };
     $("#sectionForm").onsubmit = async (event) => {
       event.preventDefault();
       const button = event.submitter;
@@ -1103,20 +1216,39 @@
       const existingKey = $("#sectionKey").value;
       const existing = sections.find((section) => section.key === existingKey);
       const key = existingKey || `section-${crypto.randomUUID().slice(0, 8)}`;
+      const previousImage = safeImage(existing?.imageUrl);
+      let uploadedImage = "";
+      let newlyUploaded = false;
       try {
+        if (isDataImage(sectionImage)) {
+          uploadedImage = await uploadSectionImage(key, sectionImage);
+          newlyUploaded = true;
+        } else {
+          uploadedImage = safeImage(sectionImage);
+        }
+
         await saveSection({
           ...existing,
           id: $("#sectionId").value || existing?.id || undefined,
           key,
           name: $("#sectionName").value.trim(),
           description: $("#sectionDescription").value.trim(),
+          imageUrl: uploadedImage,
           order: existing?.order || sections.length + 1,
         });
+
+        if (previousImage && previousImage !== uploadedImage) {
+          await removeStoredImage(previousImage);
+        }
+
         closeSection();
         await loadSections();
         await loadProducts();
-        toast(existing ? "تم تحديث القسم في المتجر" : "تمت إضافة القسم وأصبح جاهزًا للمنتجات");
+        toast(existing ? "تم تحديث القسم وصورته في المتجر" : "تمت إضافة القسم وصورته وأصبح جاهزًا للمنتجات");
       } catch (error) {
+        if (newlyUploaded && uploadedImage && uploadedImage !== previousImage) {
+          await removeStoredImage(uploadedImage);
+        }
         console.error("Section save failed:", error);
         const friendly = friendlyError(error, "");
         const technical = [error?.code, error?.message].filter(Boolean).join(" — ");
