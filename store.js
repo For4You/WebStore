@@ -12,11 +12,15 @@
     },
   );
   const storageImagePrefix = `${SUPABASE_URL}/storage/v1/object/public/product-images/`;
-  const categoryLabels = {
-    kitchen: "المطبخ",
-    table: "المائدة",
-    storage: "التنظيم",
-  };
+  const SECTION_MARKER = "__STORE_SECTION__";
+  const defaultSections = [
+    { key: "kitchen", name: "المطبخ", description: "قدور وأدوات للاستخدام اليومي", order: 1 },
+    { key: "table", name: "المائدة", description: "صحون وتقديم للبيت والضيوف", order: 2 },
+    { key: "storage", name: "التنظيم", description: "حلول بسيطة تقلل الفوضى", order: 3 },
+    { key: "home-picks", name: "مختارات البيت", description: "إكسسوارات وأجهزة صغيرة ومفاجآت مفيدة للبيت", order: 4 },
+  ];
+  let sections = [...defaultSections];
+  let categoryLabels = Object.fromEntries(sections.map((section) => [section.key, section.name]));
 
   // أسعار ومدة التوصيل حسب الولاية.
   // ولاية الشلف حالة خاصة: السعر يحدد حسب مكان التوصيل داخل الولاية.
@@ -161,6 +165,25 @@
       .filter((value, index, array) => value && array.indexOf(value) === index)
       .slice(0, 8);
   };
+  const isSectionRow = (row) => String(row?.code || "") === SECTION_MARKER;
+  const sectionFromDb = (row) => ({
+    id: row.id,
+    key: String(row.category || "").trim(),
+    name: String(row.name || row.category || "").trim(),
+    description: String(row.description || "").trim(),
+    order: Math.max(1, Number(row.featured_order) || 999),
+  });
+  const effectiveSections = (rows) => {
+    const custom = (rows || []).filter((section) => section.key && section.name);
+    const byKey = new Map(custom.map((section) => [section.key, section]));
+    defaultSections.forEach((section) => {
+      if (!byKey.has(section.key)) byKey.set(section.key, section);
+    });
+    return [...byKey.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, "ar"));
+  };
+  const refreshCategoryLabels = () => {
+    categoryLabels = Object.fromEntries(sections.map((section) => [section.key, section.name]));
+  };
 
   let products = [];
   let cart = localJSON("dar-cart", {});
@@ -172,7 +195,6 @@
   let panX = 0;
   let panY = 0;
   let dragStart = null;
-  let currentFilter = "all";
   let currentSearch = "";
   let pendingPurchase = null;
   let toastTimer;
@@ -234,10 +256,22 @@
     theme = nextTheme;
     document.documentElement.dataset.theme = nextTheme;
     localStorage.setItem("dar-theme", nextTheme);
-    $("#themeSymbol").textContent = nextTheme === "dark" ? "☀" : "☾";
+    const themeButton = $("#themeBtn");
+    $("#themeSymbol").textContent = nextTheme === "dark" ? "☾" : "☀";
+    if (themeButton) {
+      const isDark = nextTheme === "dark";
+      themeButton.setAttribute("aria-pressed", isDark ? "true" : "false");
+      themeButton.setAttribute(
+        "aria-label",
+        isDark
+          ? "الوضع الليلي مفعّل — التبديل إلى الوضع النهاري"
+          : "الوضع النهاري مفعّل — التبديل إلى الوضع الليلي",
+      );
+      themeButton.title = isDark ? "التبديل إلى الوضع النهاري" : "التبديل إلى الوضع الليلي";
+    }
     updateFeaturedProduct();
     document.querySelector('meta[name="theme-color"]').content =
-      nextTheme === "dark" ? "#071e19" : "#f6efe6";
+      nextTheme === "dark" ? "#0c1714" : "#f5efe7";
   }
 
   function featuredCandidates() {
@@ -458,35 +492,132 @@
     return `--pos:${esc(product.pos || "center")};${image ? `--product-image:url('${image.replace(/'/g, "%27")}')` : ""}`;
   }
 
+  function productCardHtml(product, bestSold) {
+    const sold = Math.max(0, Number(product.soldCount || 0));
+    const isBest = sold > 0 && sold === bestSold;
+    const soldBadge = sold > 0
+      ? `<span class="sold-badge${isBest ? " best" : ""}">${isBest ? "الأكثر مبيعًا · " : ""}تم بيع ${format(sold)}</span>`
+      : "";
+    const available = Number(product.stock || 0) > 0;
+    return `<article class="product-card" data-category="${esc(product.category)}" data-id="${esc(product.id)}" tabindex="0" role="button" aria-label="عرض تفاصيل ${esc(product.name)}"><div class="product-image" style="${productImageStyle(product)}">${product.badge ? `<span class="badge">${esc(product.badge)}</span>` : ""}${soldBadge}<button class="heart" type="button" aria-label="إضافة للمفضلة">♡</button></div><div class="product-info"><div><small>${esc(categoryLabels[product.category] || product.category)}</small><h3>${esc(product.name)}</h3></div><div class="price"><strong>${format(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<del>${format(product.oldPrice)} دج</del>` : ""}</div><div class="product-actions"><button class="add" type="button"${available ? "" : " disabled"}>${available ? "＋ أضف للسلة" : "غير متوفر حاليًا"}</button></div></div></article>`;
+  }
+
+  function updateShelfGuide(shelf) {
+    if (!shelf) return;
+    const track = shelf.querySelector(".category-product-track");
+    const guide = shelf.querySelector(".shelf-scroll-guide");
+    const thumb = shelf.querySelector(".shelf-scroll-thumb");
+    const count = shelf.querySelector(".shelf-scroll-count");
+    const cards = [...shelf.querySelectorAll(".product-card")];
+    if (!track || !guide || !thumb || !count) return;
+
+    const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+    const active = cards.length > 1 && maxScroll > 8;
+    guide.hidden = !active;
+    shelf.classList.toggle("can-scroll", active);
+    if (!active) return;
+
+    const moved = Math.abs(track.scrollLeft);
+    const progress = maxScroll ? Math.max(0, Math.min(1, moved / maxScroll)) : 0;
+    const guideTrack = guide.querySelector(".shelf-scroll-track");
+    const guideWidth = guideTrack?.clientWidth || 0;
+    const viewportRatio = Math.max(0.14, Math.min(0.55, track.clientWidth / track.scrollWidth));
+    const thumbWidth = Math.max(32, guideWidth * viewportRatio);
+    const travel = Math.max(0, guideWidth - thumbWidth);
+    thumb.style.width = `${thumbWidth}px`;
+    thumb.style.right = `${travel * progress}px`;
+
+    const card = cards[0];
+    const gap = parseFloat(getComputedStyle(track).gap) || 12;
+    const step = card ? card.getBoundingClientRect().width + gap : 1;
+    const current = Math.min(cards.length, Math.max(1, Math.round(moved / Math.max(1, step)) + 1));
+    count.textContent = `${format(current)} / ${format(cards.length)}`;
+  }
+
+  function updateAllShelfGuides() {
+    $$(".category-product-section").forEach(updateShelfGuide);
+  }
+
+  function scheduleProductScrollGuide() {
+    requestAnimationFrame(() => requestAnimationFrame(updateAllShelfGuides));
+  }
+
+  function renderCategoryNavigation() {
+    const nav = $("#categoryNavLinks");
+    const grid = $("#categoryGrid");
+    const footer = $("#footerCategoryLinks");
+    if (nav) {
+      const visible = sections.slice(0, 4);
+      nav.innerHTML = visible
+        .map((section) => `<a href="#section-${esc(section.key)}" data-section-jump="${esc(section.key)}">${esc(section.name)}</a>`)
+        .join("") +
+        (sections.length > 4 ? '<a href="#categories">كل الأقسام</a>' : "");
+    }
+    if (grid) {
+      grid.innerHTML = sections
+        .map((section, index) => `<button class="category-card" data-section-jump="${esc(section.key)}"><b>${twoArabicDigits(index + 1)}</b><div><small>${esc(section.description || "مختارات منتقاة لهذا الركن")}</small><strong>${esc(section.name)}</strong></div><em>←</em></button>`)
+        .join("");
+    }
+    if (footer) {
+      footer.innerHTML = sections
+        .map((section) => `<a href="#section-${esc(section.key)}" data-section-jump="${esc(section.key)}">${esc(section.name)}</a>`)
+        .join("") + '<a href="#offer">العروض</a>';
+    }
+  }
+
   function renderProducts(loading = false) {
+    const container = $("#categoryProductSections");
+    if (!container) return;
     if (loading) {
-      $("#productGrid").innerHTML =
-        '<div class="store-empty"><div><strong>جاري تحميل المنتجات…</strong><span>لحظات وتظهر أحدث المنتجات والمخزون.</span></div></div>';
+      container.innerHTML =
+        '<div class="store-empty shelf-loading"><div><strong>جاري تحميل المنتجات…</strong><span>لحظات وتظهر الأقسام ومنتجاتها.</span></div></div>';
       return;
     }
-    const visible = products.filter(
+
+    renderCategoryNavigation();
+    const query = currentSearch.toLocaleLowerCase("ar");
+    const visibleProducts = products.filter(
       (product) =>
         product.visible !== false &&
-        (currentFilter === "all" || product.category === currentFilter) &&
-        (!currentSearch || String(product.name).includes(currentSearch)),
+        (!query || String(product.name || "").toLocaleLowerCase("ar").includes(query)),
     );
-    if (!visible.length) {
-      $("#productGrid").innerHTML =
-        '<div class="store-empty"><div><strong>لا توجد قطع في هذا القسم الآن</strong><span>شاهدي قسمًا آخر، أو عودي لاحقًا بعد إضافة منتجات جديدة.</span></div></div>';
+
+    const shelves = sections
+      .map((section) => {
+        const items = visibleProducts.filter((product) => product.category === section.key);
+        if (!items.length) return "";
+        const bestSold = Math.max(0, ...items.map((product) => Number(product.soldCount || 0)));
+        return `<section class="category-product-section" id="section-${esc(section.key)}" data-section="${esc(section.key)}">
+          <div class="shelf-heading">
+            <div>
+              <p class="shelf-kicker"><span></span>${esc(section.description || "مختارات منتقاة لهذا الركن")}</p>
+              <div class="shelf-title-line"><h3>${esc(section.name)}</h3><span class="shelf-count">${format(items.length)} منتجات</span></div>
+            </div>
+            <div class="shelf-controls" aria-label="تحريك منتجات ${esc(section.name)}">
+              <button type="button" data-shelf-move="prev" aria-label="السابق">→</button>
+              <button type="button" data-shelf-move="next" aria-label="التالي">←</button>
+            </div>
+          </div>
+          <div class="category-product-track" tabindex="0" aria-label="منتجات قسم ${esc(section.name)}">
+            ${items.map((product) => productCardHtml(product, bestSold)).join("")}
+          </div>
+          <div class="shelf-scroll-guide" aria-hidden="true" hidden>
+            <span class="shelf-scroll-copy">اسحبي داخل ${esc(section.name)}</span>
+            <span class="shelf-scroll-track"><span class="shelf-scroll-thumb"></span></span>
+            <span class="shelf-scroll-count">١ / ${format(items.length)}</span>
+          </div>
+        </section>`;
+      })
+      .filter(Boolean)
+      .join("");
+
+    if (!shelves) {
+      container.innerHTML =
+        '<div class="store-empty"><div><strong>لا توجد منتجات مطابقة الآن</strong><span>جرّبي كلمة بحث أخرى أو عودي لاحقًا بعد إضافة منتجات جديدة.</span></div></div>';
       return;
     }
-    const bestSold = Math.max(0, ...visible.map((product) => Number(product.soldCount || 0)));
-    $("#productGrid").innerHTML = visible
-      .map((product) => {
-        const sold = Math.max(0, Number(product.soldCount || 0));
-        const isBest = sold > 0 && sold === bestSold;
-        const soldBadge = sold > 0
-          ? `<span class="sold-badge${isBest ? " best" : ""}">${isBest ? "الأكثر مبيعًا · " : ""}تم بيع ${format(sold)}</span>`
-          : "";
-        const available = Number(product.stock || 0) > 0;
-        return `<article class="product-card" data-category="${esc(product.category)}" data-id="${esc(product.id)}" tabindex="0" role="button" aria-label="عرض تفاصيل ${esc(product.name)}"><div class="product-image" style="${productImageStyle(product)}">${product.badge ? `<span class="badge">${esc(product.badge)}</span>` : ""}${soldBadge}<button class="heart" type="button" aria-label="إضافة للمفضلة">♡</button></div><div class="product-info"><div><small>${esc(categoryLabels[product.category] || product.category)}</small><h3>${esc(product.name)}</h3></div><div class="price"><strong>${format(product.price)} دج</strong>${Number(product.oldPrice) > 0 ? `<del>${format(product.oldPrice)} دج</del>` : ""}</div><div class="product-actions"><button class="add" type="button"${available ? "" : " disabled"}>${available ? "＋ أضف للسلة" : "غير متوفر حاليًا"}</button></div></div></article>`;
-      })
-      .join("");
+    container.innerHTML = shelves;
+    scheduleProductScrollGuide();
   }
 
   async function loadProducts(showError = true) {
@@ -500,7 +631,19 @@
       if (showError) toast("تعذر تحميل المنتجات الآن. حاول تحديث الصفحة.");
       return false;
     }
-    products = (data || []).map(productFromDb);
+    const rows = data || [];
+    const sectionRows = rows.filter(isSectionRow).map(sectionFromDb);
+    sections = effectiveSections(sectionRows);
+    products = rows.filter((row) => !isSectionRow(row)).map(productFromDb);
+    const knownKeys = new Set(sections.map((section) => section.key));
+    [...new Set(products.map((product) => product.category).filter(Boolean))].forEach((key) => {
+      if (!knownKeys.has(key)) {
+        sections.push({ key, name: key, description: "مختارات هذا القسم", order: sections.length + 1 });
+        knownKeys.add(key);
+      }
+    });
+    sections.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, "ar"));
+    refreshCategoryLabels();
     renderProducts();
     updateCart();
     if (activeProduct) {
@@ -551,12 +694,10 @@
       .subscribe();
   }
 
-  function filterProducts(key) {
-    currentFilter = key;
-    $$("[data-filter]").forEach((button) =>
-      button.classList.toggle("active", button.dataset.filter === key),
-    );
-    renderProducts();
+  function jumpToSection(key) {
+    const target = document.getElementById(`section-${key}`);
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    else $("#products")?.scrollIntoView({ behavior: "smooth" });
   }
 
   function updateOrderTotal() {
@@ -986,18 +1127,23 @@
   }
 
   function bindEvents() {
-    $("#themeBtn").onclick = () =>
-      setTheme(theme === "light" ? "dark" : "light");
+    $("#themeBtn").onclick = () => {
+      const nextTheme = theme === "light" ? "dark" : "light";
+      if (document.startViewTransition && !reducedMotion.matches) {
+        document.startViewTransition(() => setTheme(nextTheme));
+      } else {
+        setTheme(nextTheme);
+      }
+    };
+    window.addEventListener("resize", scheduleProductScrollGuide, { passive: true });
+    window.addEventListener("orientationchange", () => setTimeout(scheduleProductScrollGuide, 120), { passive: true });
+
     $("#menuBtn").onclick = () => $("#nav").classList.add("open");
     $("#closeMenu").onclick = () => $("#nav").classList.remove("open");
-    $$("#nav a").forEach(
-      (anchor) => (anchor.onclick = () => $("#nav").classList.remove("open")),
-    );
-    $$("[data-nav-filter]").forEach((anchor) =>
-      anchor.addEventListener("click", () =>
-        filterProducts(anchor.dataset.navFilter),
-      ),
-    );
+    $("#nav").addEventListener("click", (event) => {
+      const anchor = event.target.closest("a");
+      if (anchor) $("#nav").classList.remove("open");
+    });
     $("#searchBtn").onclick = () => {
       $("#searchBar").hidden = !$("#searchBar").hidden;
       if (!$("#searchBar").hidden) $("#searchBar input").focus();
@@ -1007,15 +1153,12 @@
       currentSearch = event.target.value.trim();
       renderProducts();
     };
-    $$("[data-filter]").forEach(
-      (button) =>
-        (button.onclick = () => filterProducts(button.dataset.filter)),
-    );
-    $$("[data-jump]").forEach((button) => {
-      button.onclick = () => {
-        filterProducts(button.dataset.jump);
-        $("#products").scrollIntoView({ behavior: "smooth" });
-      };
+    document.addEventListener("click", (event) => {
+      const jump = event.target.closest("[data-section-jump]");
+      if (jump) {
+        event.preventDefault();
+        jumpToSection(jump.dataset.sectionJump);
+      }
     });
     $("#featurePrev").onclick = () => setFeaturedProduct(featuredIndex - 1);
     $("#featureNext").onclick = () => setFeaturedProduct(featuredIndex + 1);
@@ -1059,7 +1202,23 @@
       { passive: true },
     );
     reducedMotion.addEventListener?.("change", startFeaturedRotation);
-    $("#productGrid").onclick = (event) => {
+    $("#categoryProductSections").addEventListener("scroll", (event) => {
+      const track = event.target.closest?.(".category-product-track");
+      if (track) requestAnimationFrame(() => updateShelfGuide(track.closest(".category-product-section")));
+    }, true);
+    $("#categoryProductSections").onclick = (event) => {
+      const move = event.target.closest("[data-shelf-move]");
+      if (move) {
+        const shelf = move.closest(".category-product-section");
+        const track = shelf?.querySelector(".category-product-track");
+        const card = track?.querySelector(".product-card");
+        if (track && card) {
+          const gap = parseFloat(getComputedStyle(track).gap) || 12;
+          const amount = (card.getBoundingClientRect().width + gap) * 2;
+          track.scrollBy({ left: move.dataset.shelfMove === "next" ? -amount : amount, behavior: "smooth" });
+        }
+        return;
+      }
       const card = event.target.closest(".product-card");
       if (!card) return;
       const product = products.find(
@@ -1090,7 +1249,7 @@
       }
       openOrder(product.id);
     };
-    $("#productGrid").onkeydown = (event) => {
+    $("#categoryProductSections").onkeydown = (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       const card = event.target.closest(".product-card");
       if (!card || event.target.closest("button")) return;
@@ -1260,6 +1419,7 @@
     setTheme(theme);
     bindEvents();
     setupMotion();
+    renderCategoryNavigation();
     renderProducts(true);
     updateCart();
     await Promise.all([loadProducts(true), loadShowcase(true)]);
