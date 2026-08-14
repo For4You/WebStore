@@ -5901,7 +5901,7 @@
         grid-column: auto !important;
       }
       .category-grid .category-card:nth-child(n+4) {
-        background-image:
+        --category-fallback-image:
           radial-gradient(circle at 24% 20%, color-mix(in srgb, var(--accent) 72%, transparent), transparent 26%),
           radial-gradient(circle at 78% 34%, color-mix(in srgb, var(--gold) 72%, transparent), transparent 24%),
           linear-gradient(145deg, #23342e, #101d19 70%);
@@ -7371,7 +7371,7 @@
       })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="store.js?v=20260814-v8-5-section-images"></script>
+    <script src="store.js?v=20260814-v8-5-1-section-images-fix"></script>
     <script>
       (() => {
         const byId = (id) => document.getElementById(id);
