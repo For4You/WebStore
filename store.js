@@ -12,7 +12,7 @@
     },
   );
   const storageImagePrefix = `${SUPABASE_URL}/storage/v1/object/public/product-images/`;
-  const SECTION_MARKER = "__STORE_SECTION__";
+  const LEGACY_SECTION_MARKER = "__STORE_SECTION__";
   const defaultSections = [
     { key: "kitchen", name: "المطبخ", description: "قدور وأدوات للاستخدام اليومي", order: 1 },
     { key: "table", name: "المائدة", description: "صحون وتقديم للبيت والضيوف", order: 2 },
@@ -156,6 +156,7 @@
     );
   const safeImage = (value) =>
     String(value || "").startsWith(storageImagePrefix) ? String(value) : "";
+  const isLegacySectionRow = (row) => String(row?.code || "") === LEGACY_SECTION_MARKER;
   const safeImages = (product) => {
     const values = Array.isArray(product?.images)
       ? product.images
@@ -165,13 +166,12 @@
       .filter((value, index, array) => value && array.indexOf(value) === index)
       .slice(0, 8);
   };
-  const isSectionRow = (row) => String(row?.code || "") === SECTION_MARKER;
   const sectionFromDb = (row) => ({
     id: row.id,
-    key: String(row.category || "").trim(),
-    name: String(row.name || row.category || "").trim(),
+    key: String(row.key || "").trim(),
+    name: String(row.name || row.key || "").trim(),
     description: String(row.description || "").trim(),
-    order: Math.max(1, Number(row.featured_order) || 999),
+    order: Math.max(1, Number(row.display_order) || 999),
   });
   const effectiveSections = (rows) => {
     const custom = (rows || []).filter((section) => section.key && section.name);
@@ -620,6 +620,25 @@
     scheduleProductScrollGuide();
   }
 
+  async function loadSections(showError = true) {
+    const { data, error } = await client
+      .from("store_sections")
+      .select("id,key,name,description,display_order")
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true });
+    if (error) {
+      sections = [...defaultSections];
+      refreshCategoryLabels();
+      renderCategoryNavigation();
+      if (showError) toast("تعذر تحميل الأقسام. شغّل ملف إعداد الأقسام في Supabase.");
+      return false;
+    }
+    sections = effectiveSections((data || []).map(sectionFromDb));
+    refreshCategoryLabels();
+    renderCategoryNavigation();
+    return true;
+  }
+
   async function loadProducts(showError = true) {
     const { data, error } = await client
       .from("products")
@@ -631,10 +650,7 @@
       if (showError) toast("تعذر تحميل المنتجات الآن. حاول تحديث الصفحة.");
       return false;
     }
-    const rows = data || [];
-    const sectionRows = rows.filter(isSectionRow).map(sectionFromDb);
-    sections = effectiveSections(sectionRows);
-    products = rows.filter((row) => !isSectionRow(row)).map(productFromDb);
+    products = (data || []).filter((row) => !isLegacySectionRow(row)).map(productFromDb);
     const knownKeys = new Set(sections.map((section) => section.key));
     [...new Set(products.map((product) => product.category).filter(Boolean))].forEach((key) => {
       if (!knownKeys.has(key)) {
@@ -677,7 +693,10 @@
   function subscribeRealtime() {
     const queueReload = () => {
       clearTimeout(reloadTimer);
-      reloadTimer = setTimeout(() => Promise.all([loadProducts(false), loadShowcase(false)]), 350);
+      reloadTimer = setTimeout(async () => {
+        await loadSections(false);
+        await Promise.all([loadProducts(false), loadShowcase(false)]);
+      }, 350);
     };
     client
       .channel("webstore-products-live")
@@ -689,6 +708,11 @@
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "showcase_images" },
+        queueReload,
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "store_sections" },
         queueReload,
       )
       .subscribe();
@@ -1422,6 +1446,7 @@
     renderCategoryNavigation();
     renderProducts(true);
     updateCart();
+    await loadSections(true);
     await Promise.all([loadProducts(true), loadShowcase(true)]);
     subscribeRealtime();
   }
