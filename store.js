@@ -17,7 +17,6 @@
     { key: "kitchen", name: "المطبخ", description: "قدور وأدوات للاستخدام اليومي", order: 1 },
     { key: "table", name: "المائدة", description: "صحون وتقديم للبيت والضيوف", order: 2 },
     { key: "storage", name: "التنظيم", description: "حلول بسيطة تقلل الفوضى", order: 3 },
-    { key: "home-picks", name: "مختارات البيت", description: "إكسسوارات وأجهزة صغيرة ومفاجآت مفيدة للبيت", order: 4 },
   ];
   let sections = [...defaultSections];
   let categoryLabels = Object.fromEntries(sections.map((section) => [section.key, section.name]));
@@ -171,6 +170,7 @@
     key: String(row.key || "").trim(),
     name: String(row.name || row.key || "").trim(),
     description: String(row.description || "").trim(),
+    imageUrl: safeImage(row.image_url),
     order: Math.max(1, Number(row.display_order) || 999),
   });
   const effectiveSections = (rows) => {
@@ -555,7 +555,13 @@
     }
     if (grid) {
       grid.innerHTML = sections
-        .map((section, index) => `<button class="category-card" data-section-jump="${esc(section.key)}"><b>${twoArabicDigits(index + 1)}</b><div><small>${esc(section.description || "مختارات منتقاة لهذا الركن")}</small><strong>${esc(section.name)}</strong></div><em>←</em></button>`)
+        .map((section, index) => {
+          const image = safeImage(section.imageUrl);
+          const imageStyle = image
+            ? ` style="--category-image:url('${image.replace(/'/g, "%27")}')"`
+            : "";
+          return `<button class="category-card" data-section-jump="${esc(section.key)}"${imageStyle}><b>${twoArabicDigits(index + 1)}</b><div><small>${esc(section.description || "مختارات منتقاة لهذا الركن")}</small><strong>${esc(section.name)}</strong></div><em>←</em></button>`;
+        })
         .join("");
     }
     if (footer) {
@@ -623,7 +629,7 @@
   async function loadSections(showError = true) {
     const { data, error } = await client
       .from("store_sections")
-      .select("id,key,name,description,display_order")
+      .select("id,key,name,description,image_url,display_order")
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: true });
     if (error) {
