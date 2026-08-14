@@ -18,11 +18,14 @@
 
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
-  const categories = {
-    kitchen: "المطبخ",
-    table: "المائدة",
-    storage: "التنظيم",
-  };
+  const SECTION_MARKER = "__STORE_SECTION__";
+  const defaultSections = [
+    { key: "kitchen", name: "المطبخ", description: "قدور وأدوات للاستخدام اليومي", order: 1, locked: true },
+    { key: "table", name: "المائدة", description: "صحون وتقديم للبيت والضيوف", order: 2, locked: true },
+    { key: "storage", name: "التنظيم", description: "حلول بسيطة تقلل الفوضى", order: 3, locked: true },
+    { key: "home-picks", name: "مختارات البيت", description: "إكسسوارات وأجهزة صغيرة ومفاجآت مفيدة للبيت", order: 4, locked: true },
+  ];
+  const categories = {};
   const statusLabels = {
     new: "جديد",
     confirmed: "مؤكد",
@@ -43,6 +46,7 @@
   };
   const legacyProducts = localJSON("dar-products", []);
   let products = [];
+  let sections = [...defaultSections];
   let orders = [];
   let showcaseImages = [];
   let seenOrders = localJSON("dar-seen-orders", []);
@@ -90,6 +94,46 @@
       .filter((value, index, array) => value && array.indexOf(value) === index)
       .slice(0, 8);
   };
+  const isSectionRow = (row) => String(row?.code || "") === SECTION_MARKER;
+  const sectionFromDb = (row) => ({
+    id: row.id,
+    key: String(row.category || "").trim(),
+    name: String(row.name || row.category || "").trim(),
+    description: String(row.description || "").trim(),
+    order: Math.max(1, Number(row.featured_order) || 999),
+    locked: defaultSections.some((section) => section.key === row.category),
+  });
+  const effectiveSections = (rows) => {
+    const byKey = new Map((rows || []).filter((section) => section.key && section.name).map((section) => [section.key, section]));
+    defaultSections.forEach((section) => {
+      if (!byKey.has(section.key)) byKey.set(section.key, { ...section });
+    });
+    return [...byKey.values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, "ar"));
+  };
+  function syncCategoryLabels() {
+    Object.keys(categories).forEach((key) => delete categories[key]);
+    sections.forEach((section) => (categories[section.key] = section.name));
+  }
+  function sectionRecord(section) {
+    return {
+      id: String(section.id || crypto.randomUUID()),
+      name: String(section.name || "").trim(),
+      price: 0,
+      old_price: 0,
+      category: String(section.key || "").trim(),
+      description: String(section.description || "").trim(),
+      badge: "قسم",
+      stock: 0,
+      sizes: [],
+      colors: [],
+      visible: true,
+      featured: false,
+      featured_order: Math.max(1, Math.floor(Number(section.order) || 1)),
+      images: [],
+      image_position: "center",
+      code: SECTION_MARKER,
+    };
+  }
 
   function productFromDb(row) {
     const productImages = Array.isArray(row.images)
@@ -240,9 +284,36 @@
       return false;
     }
     hideAuth();
+    try {
+      await ensureDefaultSections();
+    } catch (error) {
+      toast(friendlyError(error, "تعذر تهيئة الأقسام الافتراضية"));
+    }
     await refreshAll();
     subscribeRealtime();
     return true;
+  }
+
+  async function ensureDefaultSections() {
+    const { data, error } = await client
+      .from("products")
+      .select("id,category,code")
+      .eq("code", SECTION_MARKER);
+    if (error) throw error;
+    const existing = new Set((data || []).map((row) => row.category));
+    const missing = defaultSections.filter((section) => !existing.has(section.key));
+    if (!missing.length) return;
+    const { error: insertError } = await client
+      .from("products")
+      .insert(missing.map((section) => sectionRecord(section)));
+    if (insertError) throw insertError;
+  }
+
+  async function saveSection(section) {
+    const record = sectionRecord(section);
+    const { error } = await client.from("products").upsert(record, { onConflict: "id" });
+    if (error) throw error;
+    return record.id;
   }
 
   async function loadProducts() {
@@ -251,8 +322,19 @@
       .select("*")
       .order("created_at", { ascending: false });
     if (error) throw error;
-    products = (data || []).map(productFromDb);
+    const rows = data || [];
+    const sectionRows = rows.filter(isSectionRow).map(sectionFromDb);
+    products = rows.filter((row) => !isSectionRow(row)).map(productFromDb);
+    sections = effectiveSections(sectionRows);
+    const knownKeys = new Set(sections.map((section) => section.key));
+    [...new Set(products.map((product) => product.category).filter(Boolean))].forEach((key) => {
+      if (!knownKeys.has(key)) sections.push({ key, name: key, description: "قسم مستورد", order: sections.length + 1, locked: false });
+    });
+    sections.sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, "ar"));
+    syncCategoryLabels();
+    renderSectionControls();
     renderProducts();
+    renderSections();
     return products;
   }
 
@@ -286,7 +368,7 @@
       setSyncState("جاري مزامنة البيانات…");
       await Promise.all([loadProducts(), loadOrders(), loadShowcaseImages()]);
       setSyncState(
-        `متصل — ${fmt(products.length)} منتج و${fmt(orders.length)} طلب و${fmt(showcaseImages.length)} صورة دائرة`,
+        `متصل — ${fmt(products.length)} منتج و${fmt(sections.length)} أقسام و${fmt(orders.length)} طلب و${fmt(showcaseImages.length)} صورة دائرة`,
       );
       if (showMessage) toast("تم تحديث البيانات من Supabase");
     } catch (error) {
@@ -388,6 +470,100 @@
     return source ? `--image:url('${source.replace(/'/g, "%27")}')` : "";
   }
 
+  function renderSectionControls() {
+    const filter = $("#productFilter");
+    const productSelect = $("#pCategory");
+    if (filter) {
+      const current = filter.value || "all";
+      filter.innerHTML = '<option value="all">كل الأقسام</option>' + sections
+        .map((section) => `<option value="${esc(section.key)}">${esc(section.name)}</option>`)
+        .join("");
+      filter.value = sections.some((section) => section.key === current) ? current : "all";
+    }
+    if (productSelect) {
+      const current = productSelect.value;
+      productSelect.innerHTML = sections
+        .map((section) => `<option value="${esc(section.key)}">${esc(section.name)}</option>`)
+        .join("");
+      productSelect.value = sections.some((section) => section.key === current)
+        ? current
+        : (sections[0]?.key || "");
+    }
+  }
+
+  function renderSections() {
+    const list = $("#sectionsList");
+    const count = $("#sectionsCount");
+    if (!list || !count) return;
+    count.textContent = `${fmt(sections.length)} أقسام`;
+    if (!sections.length) {
+      list.innerHTML = '<div class="empty"><div><b>لا توجد أقسام</b><span>أضف أول قسم ليظهر كرف مستقل في المتجر.</span></div></div>';
+      return;
+    }
+    list.innerHTML = sections.map((section, index) => {
+      const productCount = products.filter((product) => product.category === section.key).length;
+      const locked = defaultSections.some((item) => item.key === section.key);
+      return `<article class="section-row" data-section-key="${esc(section.key)}">
+        <div class="section-order-badge">${fmt(index + 1)}</div>
+        <div class="section-main"><strong>${esc(section.name)}</strong><small>${esc(section.description || "بدون وصف")}</small></div>
+        <div class="section-meta"><strong>${fmt(productCount)}</strong><small>منتجات</small></div>
+        <div class="section-row-actions">
+          <button class="btn small section-up" type="button" ${index === 0 ? "disabled" : ""}>↑</button>
+          <button class="btn small section-down" type="button" ${index === sections.length - 1 ? "disabled" : ""}>↓</button>
+          <button class="btn small section-edit" type="button">تعديل</button>
+          <button class="btn small danger section-delete" type="button" ${locked ? "disabled title=\"قسم أساسي\"" : ""}>حذف</button>
+        </div>
+      </article>`;
+    }).join("");
+  }
+
+  function openSection(section = null) {
+    const editing = Boolean(section);
+    $("#sectionModalKicker").textContent = editing ? "تعديل القسم" : "قسم جديد";
+    $("#sectionModalTitle").textContent = editing ? `تعديل ${section.name}` : "إضافة قسم";
+    $("#sectionId").value = editing ? section.id || "" : "";
+    $("#sectionKey").value = editing ? section.key : "";
+    $("#sectionName").value = editing ? section.name : "";
+    $("#sectionDescription").value = editing ? section.description || "" : "";
+    $("#sectionModal").hidden = false;
+    document.body.classList.add("lock");
+    setTimeout(() => $("#sectionName")?.focus(), 0);
+  }
+
+  function closeSection() {
+    $("#sectionModal").hidden = true;
+    $("#sectionForm").reset();
+    $("#sectionId").value = "";
+    $("#sectionKey").value = "";
+    if ($("#productModal").hidden && $("#confirmModal").hidden && $("#orderDetailModal").hidden)
+      document.body.classList.remove("lock");
+  }
+
+  async function moveSection(key, direction) {
+    const index = sections.findIndex((section) => section.key === key);
+    const next = index + direction;
+    if (index < 0 || next < 0 || next >= sections.length) return;
+    const first = { ...sections[index], order: next + 1 };
+    const second = { ...sections[next], order: index + 1 };
+    await Promise.all([saveSection(first), saveSection(second)]);
+    await loadProducts();
+  }
+
+  async function deleteSection(section) {
+    const productCount = products.filter((product) => product.category === section.key).length;
+    if (productCount) {
+      toast(`لا يمكن حذف ${section.name}: انقل ${fmt(productCount)} منتجات إلى قسم آخر أولًا`);
+      return;
+    }
+    if (!section.id) {
+      toast("هذا القسم أساسي ولا يمكن حذفه");
+      return;
+    }
+    const { error } = await client.from("products").delete().eq("id", section.id).eq("code", SECTION_MARKER);
+    if (error) throw error;
+    await loadProducts();
+  }
+
   function renderProducts() {
     stats();
     const query = $("#productSearch").value.trim().toLowerCase();
@@ -427,7 +603,7 @@
     $("#pPrice").value = editing ? product.price : "";
     $("#pOldPrice").value =
       editing && Number(product.oldPrice) ? product.oldPrice : "";
-    $("#pCategory").value = editing ? product.category : "kitchen";
+    $("#pCategory").value = editing ? product.category : (sections[0]?.key || "kitchen");
     $("#pStock").value = editing ? Number(product.stock || 0) : 1;
     $("#pDescription").value = editing ? product.description || "" : "";
     $("#pSizes").value = editing ? (product.sizes || []).join("، ") : "";
@@ -754,11 +930,12 @@
       (section) => (section.hidden = section.id !== `${view}View`),
     );
     if (view === "products") renderProducts();
+    if (view === "sections") renderSections();
     if (view === "orders") renderOrders();
     if (view === "showcase") renderShowcaseImages();
     if (view === "settings")
       setSyncState(
-        `متصل — ${fmt(products.length)} منتج و${fmt(orders.length)} طلب و${fmt(showcaseImages.length)} صورة دائرة`,
+        `متصل — ${fmt(products.length)} منتج و${fmt(sections.length)} أقسام و${fmt(orders.length)} طلب و${fmt(showcaseImages.length)} صورة دائرة`,
       );
   }
 
@@ -768,6 +945,24 @@
     anchor.download = name;
     anchor.click();
     setTimeout(() => URL.revokeObjectURL(anchor.href), 200);
+  }
+
+  async function importSections(items) {
+    if (!Array.isArray(items) || !items.length) return;
+    for (let index = 0; index < items.length; index += 1) {
+      const item = items[index];
+      if (!item?.name) continue;
+      const key = String(item.key || `section-${crypto.randomUUID().slice(0, 8)}`);
+      const existing = sections.find((section) => section.key === key);
+      await saveSection({
+        ...existing,
+        id: existing?.id || item.id || undefined,
+        key,
+        name: item.name,
+        description: item.description || "",
+        order: Number(item.order) || index + 1,
+      });
+    }
   }
 
   async function importProducts(items) {
@@ -834,6 +1029,61 @@
     $("#refreshProducts").onclick = () => refreshAll(true);
     $("#productSearch").oninput = renderProducts;
     $("#productFilter").onchange = renderProducts;
+    $("#addSection").onclick = () => openSection();
+    $("#refreshSections").onclick = () => refreshAll(true);
+    $("#closeSection").onclick = closeSection;
+    $("#sectionModal").onclick = (event) => {
+      if (event.target === $("#sectionModal")) closeSection();
+    };
+    $("#sectionForm").onsubmit = async (event) => {
+      event.preventDefault();
+      const button = event.submitter;
+      button.disabled = true;
+      const existingKey = $("#sectionKey").value;
+      const existing = sections.find((section) => section.key === existingKey);
+      const key = existingKey || `section-${crypto.randomUUID().slice(0, 8)}`;
+      try {
+        await saveSection({
+          ...existing,
+          id: $("#sectionId").value || existing?.id || undefined,
+          key,
+          name: $("#sectionName").value.trim(),
+          description: $("#sectionDescription").value.trim(),
+          order: existing?.order || sections.length + 1,
+        });
+        closeSection();
+        await loadProducts();
+        toast(existing ? "تم تحديث القسم في المتجر" : "تمت إضافة القسم وأصبح جاهزًا للمنتجات");
+      } catch (error) {
+        toast(friendlyError(error, "تعذر حفظ القسم"));
+      } finally {
+        button.disabled = false;
+      }
+    };
+    $("#sectionsList").onclick = async (event) => {
+      const row = event.target.closest("[data-section-key]");
+      if (!row) return;
+      const section = sections.find((item) => item.key === row.dataset.sectionKey);
+      if (!section) return;
+      try {
+        if (event.target.closest(".section-edit")) return openSection(section);
+        if (event.target.closest(".section-up")) return await moveSection(section.key, -1);
+        if (event.target.closest(".section-down")) return await moveSection(section.key, 1);
+        if (event.target.closest(".section-delete")) {
+          if (event.target.disabled) return;
+          return ask(`حذف قسم «${section.name}»؟`, async () => {
+            try {
+              await deleteSection(section);
+              toast("تم حذف القسم");
+            } catch (error) {
+              toast(friendlyError(error, "تعذر حذف القسم"));
+            }
+          });
+        }
+      } catch (error) {
+        toast(friendlyError(error, "تعذر تحديث ترتيب الأقسام"));
+      }
+    };
 
     $("#addShowcaseImages").onclick = () => $("#showcaseInput").click();
     $("#refreshShowcase").onclick = async () => {
@@ -1159,7 +1409,7 @@
     $("#exportProducts").onclick = () =>
       download(
         "dar-wa-anaqa-products.json",
-        JSON.stringify({ version: 3, source: "supabase", products }, null, 2),
+        JSON.stringify({ version: 4, source: "supabase", sections: sections.map(({ id, key, name, description, order }) => ({ id, key, name, description, order })), products }, null, 2),
         "application/json",
       );
     $("#importProducts").onclick = () => $("#importFile").click();
@@ -1171,13 +1421,15 @@
         try {
           const parsed = JSON.parse(reader.result);
           const items = Array.isArray(parsed) ? parsed : parsed.products;
+          const importedSections = Array.isArray(parsed?.sections) ? parsed.sections : [];
           if (!Array.isArray(items)) throw new Error("INVALID_FILE");
           ask(
-            `سيتم إضافة أو تحديث ${fmt(items.length)} منتجًا في Supabase. هل تريد المتابعة؟`,
+            `سيتم إضافة أو تحديث ${fmt(items.length)} منتجًا${importedSections.length ? ` و${fmt(importedSections.length)} أقسام` : ""} في Supabase. هل تريد المتابعة؟`,
             async () => {
               try {
+                await importSections(importedSections);
                 await importProducts(items);
-                toast("اكتمل استيراد المنتجات");
+                toast("اكتمل استيراد المنتجات والأقسام");
               } catch (error) {
                 toast(friendlyError(error, "تعذر استيراد المنتجات"));
               }
@@ -1219,6 +1471,7 @@
       if (event.key !== "Escape") return;
       if (!$("#confirmModal").hidden) closeAsk();
       else if (!$("#orderDetailModal").hidden) closeOrderDetail();
+      else if (!$("#sectionModal").hidden) closeSection();
       else if (!$("#productModal").hidden) closeProduct();
     });
   }
@@ -1229,7 +1482,10 @@
         (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light"),
     );
     bindEvents();
+    syncCategoryLabels();
+    renderSectionControls();
     renderProducts();
+    renderSections();
     renderNewOrders();
     const { data } = await client.auth.getSession();
     await requireAdmin(data.session);
