@@ -237,6 +237,14 @@
       return "الحساب الحالي ليس مخوّلًا لحفظ الأقسام";
     if (message.includes("SECTION_NAME_REQUIRED"))
       return "اكتب اسمًا للقسم قبل الحفظ";
+    if (message.includes("SECTION_HAS_PRODUCTS"))
+      return "لا يمكن حذف القسم لأنه ما زال يحتوي منتجات. انقل منتجاته إلى قسم آخر ثم أعد المحاولة";
+    if (message.includes("LOCKED_SECTION"))
+      return "هذا قسم أساسي محمي ولا يمكن حذفه";
+    if (message.includes("CATEGORY_SYNC_FAILED"))
+      return "تم إرسال التعديل لكن قاعدة البيانات لم تُرجع القسم الجديد. حدّث الصفحة وأعد المحاولة";
+    if (message.includes("SECTION_DELETE_FAILED") || message.includes("SECTION_STILL_EXISTS"))
+      return "لم يكتمل حذف القسم من قاعدة البيانات";
     if (
       message.includes("row-level security") ||
       message.includes("permission")
@@ -568,20 +576,39 @@
   }
 
   async function deleteSection(section) {
-    const productCount = products.filter((product) => product.category === section.key).length;
-    if (productCount) {
-      toast(`لا يمكن حذف ${section.name}: انقل ${fmt(productCount)} منتجات إلى قسم آخر أولًا`);
-      return;
+    // نقرأ المنتجات من قاعدة البيانات قبل الحذف، وليس من الذاكرة فقط.
+    const { count, error: countError } = await client
+      .from("products")
+      .select("id", { count: "exact", head: true })
+      .eq("category", section.key)
+      .neq("code", "__STORE_SECTION__");
+    if (countError) throw countError;
+    if (Number(count || 0) > 0) {
+      const hasProducts = new Error("SECTION_HAS_PRODUCTS");
+      hasProducts.code = "SECTION_HAS_PRODUCTS";
+      hasProducts.productCount = Number(count || 0);
+      throw hasProducts;
     }
     if (!section.id) {
-      toast("هذا القسم أساسي ولا يمكن حذفه");
-      return;
+      const locked = new Error("LOCKED_SECTION");
+      locked.code = "LOCKED_SECTION";
+      throw locked;
     }
     const { data, error } = await client.rpc("delete_store_section", { p_key: section.key });
     if (error) throw error;
     if (data !== true) throw new Error("SECTION_DELETE_FAILED");
+
+    // تحقق نهائي: لا نعلن النجاح إذا بقي القسم موجودًا.
+    const { data: remaining, error: verifyError } = await client
+      .from("store_sections")
+      .select("id,key")
+      .eq("key", section.key)
+      .maybeSingle();
+    if (verifyError) throw verifyError;
+    if (remaining) throw new Error("SECTION_STILL_EXISTS");
     await loadSections();
     await loadProducts();
+    return true;
   }
 
   function renderProducts() {
@@ -738,6 +765,20 @@
       .from("products")
       .upsert(record, { onConflict: "id" });
     if (error) throw error;
+
+    // لا نعرض نجاحًا قبل التأكد أن القسم الجديد وصل فعلًا إلى قاعدة البيانات.
+    const { data: saved, error: verifyError } = await client
+      .from("products")
+      .select("id,category")
+      .eq("id", record.id)
+      .single();
+    if (verifyError) throw verifyError;
+    if (String(saved?.category || "") !== String(record.category || "")) {
+      const syncError = new Error("CATEGORY_SYNC_FAILED");
+      syncError.code = "CATEGORY_SYNC_FAILED";
+      throw syncError;
+    }
+    return saved;
   }
 
   function renderShowcaseImages() {
@@ -1100,7 +1141,11 @@
               await deleteSection(section);
               toast("تم حذف القسم");
             } catch (error) {
-              toast(friendlyError(error, "تعذر حذف القسم"));
+              console.error("Section delete failed:", error);
+              const countText = error?.productCount ? ` (${fmt(error.productCount)} منتجات)` : "";
+              const friendly = friendlyError(error, "");
+              const technical = [error?.code, error?.message].filter(Boolean).join(" — ");
+              toast(`${friendly || `تعذر حذف القسم${technical ? `: ${technical}` : ""}`}${countText}`);
             }
           });
         }
@@ -1297,12 +1342,17 @@
       try {
         button.textContent = "جاري رفع الصور والحفظ…";
         await saveProduct(product);
-        closeProduct();
         await loadProducts();
+        const refreshed = products.find((item) => String(item.id) === String(id));
+        if (!refreshed || String(refreshed.category) !== String(product.category)) {
+          throw new Error("CATEGORY_SYNC_FAILED");
+        }
+        closeProduct();
+        const sectionName = categories[product.category] || product.category;
         toast(
           existing.id
-            ? "تم حفظ التعديل على جميع الأجهزة"
-            : "تمت إضافة المنتج إلى جميع الأجهزة",
+            ? `تم الحفظ ونقل المنتج إلى «${sectionName}»`
+            : `تمت إضافة المنتج داخل «${sectionName}»`,
         );
       } catch (error) {
         toast(friendlyError(error, "تعذر حفظ المنتج أو رفع صوره"));
